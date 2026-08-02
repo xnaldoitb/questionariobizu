@@ -1,0 +1,15 @@
+import { db } from './_lib/db.mjs';
+import { requireUser } from './_lib/auth.mjs';
+import { json, parseBody } from './_lib/http.mjs';
+export const handler = async (event) => {
+  const user = await requireUser(event);
+  if (!user) return json(401, { erro: 'Não autenticado.' });
+  const { sessao_id, questao_id, resposta_marcada, pulada = false } = parseBody(event);
+  const { data: q, error } = await db().from('questoes').select('resposta_correta,resolucao').eq('id', questao_id).single();
+  if (error || !q) return json(404, { erro: 'Questão não encontrada.' });
+  const acertou = !pulada && Number(resposta_marcada) === q.resposta_correta;
+  if (sessao_id) {
+    await db().from('respostas').upsert({ sessao_id, usuario_id: user.id, questao_id, resposta_marcada: pulada ? null : Number(resposta_marcada), acertou, pulada }, { onConflict: 'sessao_id,questao_id' });
+  }
+  return json(200, { correta: q.resposta_correta, acertou, resolucao: q.resolucao });
+};

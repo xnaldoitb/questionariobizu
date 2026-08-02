@@ -1,0 +1,62 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+        radial-gradient(ellipse at top left, rgba(200, 16, 46, .05), transparent 55%),
+        radial-gradient(ellipse at bottom right, rgba(23, 61, 120, .10), transparent 55%),
+        var(--paper);
+    font-family: 'Spectral', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+}
+html[data-theme="dark"] body {
+    background:
+        radial-gradient(ellipse at top left, rgba(255, 90, 104, .06), transparent 55%),
+        radial-gradient(ellipse at bottom right, rgba(60, 110, 200, .14), transparent 55%),
+        var(--paper);
+}
+.texture {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: .35;
+    background-image: repeating-linear-gradient(0deg, rgba(10,18,32,.03) 0, rgba(10,18,32,.03) 1px, transparent 1px, transparent 3px);
+}
+html[data-theme="dark"] .texture {
+    background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0, rgba(255,255,255,.025) 1px, transparent 1px, transparent 3px);
+}
+body > *:not(.texture) { position: relative; z-index: 1; }
+button, input, select, textarea { font: inherit; }
+label {
+    display: grid;
+    gap: 7px;
+    margin: 16px 0;
+    color: var(--ink-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+}
+input, select, textarea {
+    width: 100%;
+    padding: 11px 12px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    outline: none;
+    font-family: 'Spectral', Georgia, serif;
+    font-size: 15px;
+    text-transform: none;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--brass);
+    box-shadow: 0 0 0 2px rgba(200,16,46,.12);
+}
+textarea { min-height: 96px; resize: vertical; }
+.hidden { display: none !important; }
+.muted { color: var(--ink-soft); }
+.error { color: var(--red); font-size: 13px; }

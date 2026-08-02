@@ -1,0 +1,22 @@
+import { db } from './_lib/db.mjs';
+import { requireUser } from './_lib/auth.mjs';
+import { json, parseBody } from './_lib/http.mjs';
+export const handler = async (event) => {
+  if (!(await requireUser(event,'admin'))) return json(403,{erro:'Acesso restrito.'});
+  if (event.httpMethod === 'GET') {
+    const p=event.queryStringParameters||{}; let q=db().from('questoes').select('*,capitulos(nome),disciplinas(nome)').order('id',{ascending:false}).limit(200);
+    if(p.disciplina) q=q.eq('disciplina_id',p.disciplina); const {data,error}=await q;
+    return error?json(500,{erro:error.message}):json(200,{questoes:data});
+  }
+  const b=parseBody(event);
+  if (event.httpMethod === 'POST') {
+    const tipo=b.tipo==='certo_errado'?'certo_errado':'multipla_escolha'; const esperadas=tipo==='certo_errado'?2:5; if(!Array.isArray(b.alternativas)||b.alternativas.length!==esperadas)return json(400,{erro:`A questão deve ter ${esperadas} alternativas.`}); const correta=Number(b.resposta_correta); if(!Number.isInteger(correta)||correta<0||correta>=esperadas)return json(400,{erro:'Gabarito inválido.'}); const payload={disciplina_id:b.disciplina_id,capitulo_id:Number(b.capitulo_id),tipo,enunciado:b.enunciado,alternativas:b.alternativas,resposta_correta:correta,resolucao:b.resolucao,dificuldade:b.dificuldade||'media',fonte:b.fonte||null,ativo:true};
+    const {data,error}=await db().from('questoes').insert(payload).select().single();
+    return error?json(400,{erro:error.message}):json(201,{questao:data});
+  }
+  if (event.httpMethod === 'DELETE') {
+    const id=Number((event.queryStringParameters||{}).id); const {error}=await db().from('questoes').update({ativo:false}).eq('id',id);
+    return error?json(400,{erro:error.message}):json(200,{ok:true});
+  }
+  return json(405,{erro:'Método não permitido.'});
+};

@@ -1,0 +1,36 @@
+{
+  "versao": 1,
+  "disciplina": {
+    "id": "exemplo-disciplina",
+    "nome": "Disciplina de Exemplo",
+    "descricao": "Descrição opcional da disciplina",
+    "ordem": 10,
+    "ativo": true
+  },
+  "capitulos": [
+    {
+      "id": 1,
+      "indice": 1,
+      "nome": "Capítulo I · Introdução",
+      "ativo": true
+    }
+  ],
+  "questoes": [
+    {
+      "capitulo_id": 1,
+      "enunciado": "Exemplo de enunciado da questão?",
+      "alternativas": [
+        "Alternativa A",
+        "Alternativa B",
+        "Alternativa C",
+        "Alternativa D",
+        "Alternativa E"
+      ],
+      "resposta_correta": 0,
+      "resolucao": "Explique aqui por que a alternativa correta é a letra A.",
+      "dificuldade": "media",
+      "fonte": "Fonte opcional",
+      "ativo": true
+    }
+  ]
+}
