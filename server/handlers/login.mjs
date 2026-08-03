@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
-import { db } from './_lib/db.mjs';
-import { createToken, sessionCookie } from './_lib/auth.mjs';
-import { json, parseBody } from './_lib/http.mjs';
+import { db } from '../lib/db.mjs';
+import { createToken, sessionCookie } from '../lib/auth.mjs';
+import { json, parseBody } from '../lib/http.mjs';
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { erro: 'Método não permitido.' });
   try {

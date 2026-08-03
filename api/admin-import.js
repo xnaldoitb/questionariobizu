@@ -1,0 +1,4 @@
+import { handler } from '../server/handlers/admin-import.mjs';
+import { vercelHandler } from '../server/lib/vercel-adapter.mjs';
+
+export default vercelHandler(handler);

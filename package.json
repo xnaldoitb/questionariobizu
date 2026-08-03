@@ -1,13 +1,15 @@
 {
   "name": "banco-questoes-cfap-pmpa",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "netlify dev --cwd . --dir public",
+    "dev": "npx serve public -l 3000",
+    "dev:vercel": "vercel dev",
     "seed": "node --env-file=.env scripts/seed.mjs",
     "create-admin": "node --env-file=.env scripts/create-admin.mjs",
-    "check": "node scripts/check-project.mjs"
+    "check": "node scripts/check-project.mjs",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
@@ -15,6 +17,6 @@
     "jose": "^6.0.12"
   },
   "devDependencies": {
-    "netlify-cli": "^23.0.0"
+    "vercel": "^48.0.0"
   }
 }

@@ -1,3 +1,3 @@
-import { clearCookie } from './_lib/auth.mjs';
-import { json } from './_lib/http.mjs';
+import { clearCookie } from '../lib/auth.mjs';
+import { json } from '../lib/http.mjs';
 export const handler = async () => json(200, { ok: true }, { 'set-cookie': clearCookie });

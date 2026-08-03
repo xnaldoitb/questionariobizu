@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs'; import { db } from './_lib/db.mjs'; import { requireUser } from './_lib/auth.mjs'; import { json,parseBody } from './_lib/http.mjs';
+import bcrypt from 'bcryptjs'; import { db } from '../lib/db.mjs'; import { requireUser } from '../lib/auth.mjs'; import { json,parseBody } from '../lib/http.mjs';
 export const handler=async(event)=>{const admin=await requireUser(event,'admin');if(!admin)return json(403,{erro:'Acesso restrito.'});const p=event.queryStringParameters||{};
  if(event.httpMethod==='GET'){const {data,error}=await db().from('usuarios').select('id,usuario,nome,perfil,ativo,criado_em,ultimo_acesso').order('criado_em',{ascending:false});return error?json(500,{erro:error.message}):json(200,{usuarios:data});}
  const b=parseBody(event);

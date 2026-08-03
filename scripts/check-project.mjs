@@ -8,7 +8,7 @@ const requiredFiles = [
     'public/components/quiz.html',
     'public/components/admin.html',
     'public/js/app.js',
-    'netlify/functions/login.mjs',
+    'api/login.js',
     'supabase/schema.sql'
 ];
 

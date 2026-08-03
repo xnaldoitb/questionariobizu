@@ -1,6 +1,6 @@
-import { db } from './_lib/db.mjs';
-import { requireUser } from './_lib/auth.mjs';
-import { json, parseBody } from './_lib/http.mjs';
+import { db } from '../lib/db.mjs';
+import { requireUser } from '../lib/auth.mjs';
+import { json, parseBody } from '../lib/http.mjs';
 export const handler = async (event) => {
   if (!(await requireUser(event,'admin'))) return json(403,{erro:'Acesso restrito.'});
   if (event.httpMethod === 'GET') {

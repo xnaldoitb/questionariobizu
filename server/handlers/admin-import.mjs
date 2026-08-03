@@ -1,6 +1,6 @@
-import { db } from './_lib/db.mjs';
-import { requireUser } from './_lib/auth.mjs';
-import { json, parseBody } from './_lib/http.mjs';
+import { db } from '../lib/db.mjs';
+import { requireUser } from '../lib/auth.mjs';
+import { json, parseBody } from '../lib/http.mjs';
 
 const texto = (v, campo) => {
   const valor = String(v ?? '').trim();
