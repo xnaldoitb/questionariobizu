@@ -1,28 +1,48 @@
 <section class="hidden" id="quizView">
-<div class="quiz-head">
-<button class="btn ghost" id="backBtn">← Voltar</button>
-<div class="progress-wrap">
-<div class="progress">
-<span id="progressFill"></span>
-</div>
-<small id="progressText"></small>
-</div>
-<strong id="scoreText"></strong>
-</div>
-<article class="question-card">
-<div class="question-meta">
-<span id="questionChapter"></span>
-<span id="questionNumber"></span>
-</div>
-<h2 id="questionText"></h2>
-<div class="options" id="options"></div>
-<div class="resolution hidden" id="resolution">
-<strong>Resolução comentada</strong>
-<p id="resolutionText"></p>
-</div>
-<div class="actions">
-<button class="btn ghost" id="skipBtn">Pular</button>
-<button class="btn primary" disabled="" id="nextBtn">Próxima →</button>
-</div>
-</article>
+ <div class="quiz-head">
+  <button class="btn ghost" id="backBtn" type="button">
+   <span aria-hidden="true">
+    ←
+   </span>
+   Voltar
+  </button>
+  <div class="progress-wrap">
+   <div aria-hidden="true" class="progress">
+    <span id="progressFill">
+    </span>
+   </div>
+   <small id="progressText">
+   </small>
+  </div>
+  <strong class="score-pill" id="scoreText">
+  </strong>
+ </div>
+ <article class="question-card">
+  <div class="question-meta">
+   <span id="questionChapter">
+   </span>
+   <span id="questionNumber">
+   </span>
+  </div>
+  <h2 id="questionText">
+  </h2>
+  <div class="options" id="options">
+  </div>
+  <div class="resolution hidden" id="resolution">
+   <strong>
+    Resolução comentada
+   </strong>
+   <p id="resolutionText">
+   </p>
+  </div>
+  <div class="actions">
+   <button class="btn ghost" id="skipBtn" type="button">
+    Pular questão →
+   </button>
+   <button class="btn primary" disabled="" id="nextBtn" type="button">
+    Próxima →
+   </button>
+  </div>
+ </article>
 </section>
+

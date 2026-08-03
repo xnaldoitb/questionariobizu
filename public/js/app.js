@@ -16,8 +16,24 @@ import {
     renderCatalogAdmin
 } from './features/admin.js';
 
+function updateThemeControl() {
+    const darkMode = document.documentElement.dataset.theme === 'dark';
+    const label = $('#themeButtonLabel');
+    const button = $('#themeBtn');
+
+    if (label) {
+        label.textContent = darkMode ? 'Modo claro' : 'Modo escuro';
+    }
+
+    if (button) {
+        button.setAttribute('aria-label', darkMode ? 'Ativar modo claro' : 'Ativar modo escuro');
+        button.setAttribute('aria-pressed', String(darkMode));
+    }
+}
+
 function applySavedTheme() {
     document.documentElement.dataset.theme = localStorage.getItem('theme') || 'light';
+    updateThemeControl();
 }
 
 function toggleTheme() {
@@ -26,6 +42,20 @@ function toggleTheme() {
 
     document.documentElement.dataset.theme = nextTheme;
     localStorage.setItem('theme', nextTheme);
+    updateThemeControl();
+}
+
+function setMobileMenu(open) {
+    const header = $('#siteHeader');
+    const toggle = $('#menuToggle');
+
+    if (!header || !toggle) {
+        return;
+    }
+
+    header.classList.toggle('menu-open', open);
+    document.body.classList.toggle('menu-locked', open);
+    toggle.setAttribute('aria-expanded', String(open));
 }
 
 async function enterApplication() {
@@ -44,14 +74,47 @@ async function enterApplication() {
 }
 
 function bindNavigationEvents() {
-    $('#navQuiz').addEventListener('click', () => showView('dashboard'));
+    $('#brandHome')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        showView('dashboard');
+        setMobileMenu(false);
+    });
+
+    $('#menuToggle')?.addEventListener('click', () => {
+        setMobileMenu(!$('#siteHeader').classList.contains('menu-open'));
+    });
+
+    $('#menuClose')?.addEventListener('click', () => setMobileMenu(false));
+    $('#menuBackdrop')?.addEventListener('click', () => setMobileMenu(false));
+
+    $('#navQuiz').addEventListener('click', () => {
+        showView('dashboard');
+        setMobileMenu(false);
+    });
 
     $('#navAdmin').addEventListener('click', async () => {
         showView('adminView');
         await loadUsers();
+        setMobileMenu(false);
     });
 
     $('#themeBtn').addEventListener('click', toggleTheme);
+
+    document.querySelectorAll('.main-navigation .nav-btn').forEach((button) => {
+        button.addEventListener('click', () => setMobileMenu(false));
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) {
+            setMobileMenu(false);
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            setMobileMenu(false);
+        }
+    });
 
     $('#subjectSelect').addEventListener('change', () => {
         fillChapterSelect('#subjectSelect', '#chapterSelect', true);

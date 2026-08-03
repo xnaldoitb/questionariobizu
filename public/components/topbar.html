@@ -1,23 +1,137 @@
-<header class="topbar">
-<div class="topbar-brand">
-<span aria-hidden="true" class="topbar-flag">
-<svg viewbox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
-<rect fill="#c8102e" height="70" width="100"></rect>
-<line stroke="#ffffff" stroke-width="16" x1="0" x2="100" y1="0" y2="70"></line>
-<path d="M50,26 L54.5,37 L66,37 L57,44 L60.5,55 L50,48 L39.5,55 L43,44 L34,37 L45.5,37 Z" fill="#173d78"></path>
-</svg>
-</span>
-<div>
-<strong>Banco de Questões</strong>
-<span>QUESTÕES BIZURADAS · CFAP · PMPA</span>
-</div>
-</div>
-<nav>
-<button class="nav-btn active" id="navQuiz">Simulado</button>
-<button class="nav-btn" id="navHistory">Histórico</button>
-<button class="nav-btn" id="navRanking">Ranking</button>
-<button class="nav-btn hidden" id="navAdmin">Administração</button>
-<button class="icon-btn" id="themeBtn" title="Alternar tema">◐</button>
-<button class="icon-btn" id="logoutBtn" title="Sair">↪</button>
-</nav>
+<header class="topbar" id="siteHeader">
+ <div class="topbar-inner">
+  <a aria-label="Ir para o início" class="topbar-brand" href="#" id="brandHome">
+   <span aria-hidden="true" class="topbar-flag">
+    <svg viewbox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
+     <rect fill="#c8102e" height="70" width="100">
+     </rect>
+     <line stroke="#ffffff" stroke-width="16" x1="0" x2="100" y1="0" y2="70">
+     </line>
+     <path d="M50,26 L54.5,37 L66,37 L57,44 L60.5,55 L50,48 L39.5,55 L43,44 L34,37 L45.5,37 Z" fill="#173d78">
+     </path>
+    </svg>
+   </span>
+   <span class="topbar-brand-copy">
+    <strong>
+     Banco de Questões
+    </strong>
+    <small>
+     QUESTÕES BIZURADAS · CFAP · PMPA
+    </small>
+   </span>
+  </a>
+  <button aria-controls="mainNavigation" aria-expanded="false" class="menu-toggle" id="menuToggle" type="button">
+   <span aria-hidden="true" class="menu-toggle-lines">
+    <span>
+    </span>
+    <span>
+    </span>
+    <span>
+    </span>
+   </span>
+   <span>
+    Menu
+   </span>
+  </button>
+  <nav aria-label="Navegação principal" class="main-navigation" id="mainNavigation">
+   <div class="mobile-nav-head">
+    <span aria-hidden="true" class="topbar-flag">
+     <svg viewbox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
+      <rect fill="#c8102e" height="70" width="100">
+      </rect>
+      <line stroke="#ffffff" stroke-width="16" x1="0" x2="100" y1="0" y2="70">
+      </line>
+      <path d="M50,26 L54.5,37 L66,37 L57,44 L60.5,55 L50,48 L39.5,55 L43,44 L34,37 L45.5,37 Z" fill="#173d78">
+      </path>
+     </svg>
+    </span>
+    <div>
+     <strong>
+      Banco de Questões
+     </strong>
+     <small>
+      CFAP · PMPA
+     </small>
+    </div>
+    <button aria-label="Fechar menu" class="menu-close" id="menuClose" type="button">
+     ×
+    </button>
+   </div>
+   <div class="nav-links">
+    <button class="nav-btn active" id="navQuiz" type="button">
+     <svg aria-hidden="true" viewbox="0 0 24 24">
+      <path d="M7 3h10a2 2 0 0 1 2 2v16l-7-3-7 3V5a2 2 0 0 1 2-2Z">
+      </path>
+      <path d="M9 8h6M9 12h6">
+      </path>
+     </svg>
+     <span>
+      Simulado
+     </span>
+    </button>
+    <button class="nav-btn" id="navHistory" type="button">
+     <svg aria-hidden="true" viewbox="0 0 24 24">
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8">
+      </path>
+      <path d="M3 3v5h5M12 7v5l3 2">
+      </path>
+     </svg>
+     <span>
+      Histórico
+     </span>
+    </button>
+    <button class="nav-btn" id="navRanking" type="button">
+     <svg aria-hidden="true" viewbox="0 0 24 24">
+      <path d="M8 21v-5H4v5M14 21V10h-4v11M20 21V3h-4v18">
+      </path>
+     </svg>
+     <span>
+      Ranking
+     </span>
+    </button>
+    <button class="nav-btn hidden" id="navAdmin" type="button">
+     <svg aria-hidden="true" viewbox="0 0 24 24">
+      <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z">
+      </path>
+      <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.17.37.48.7.86.9.3.17.67.26 1.04.26h.1v4h-.1c-.37 0-.74.09-1.04.26-.38.2-.69.53-.86.9Z">
+      </path>
+     </svg>
+     <span>
+      Administração
+     </span>
+    </button>
+   </div>
+   <div class="nav-actions">
+    <button class="utility-btn" id="themeBtn" title="Alternar tema" type="button">
+     <svg aria-hidden="true" class="theme-icon theme-icon-moon" viewbox="0 0 24 24">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z">
+      </path>
+     </svg>
+     <svg aria-hidden="true" class="theme-icon theme-icon-sun" viewbox="0 0 24 24">
+      <circle cx="12" cy="12" r="4">
+      </circle>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41">
+      </path>
+     </svg>
+     <span id="themeButtonLabel">
+      Modo escuro
+     </span>
+    </button>
+    <button class="utility-btn utility-btn-danger" id="logoutBtn" title="Sair da conta" type="button">
+     <svg aria-hidden="true" viewbox="0 0 24 24">
+      <path d="M10 17l5-5-5-5M15 12H3">
+      </path>
+      <path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5">
+      </path>
+     </svg>
+     <span>
+      Sair
+     </span>
+    </button>
+   </div>
+  </nav>
+ </div>
+ <div class="menu-backdrop" id="menuBackdrop">
+ </div>
 </header>
+
