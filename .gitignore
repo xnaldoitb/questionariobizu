@@ -2,5 +2,6 @@ node_modules/
 .netlify/
 .env
 .env.*
-!.env.example
+.env.example
 *.log
+.env.local
