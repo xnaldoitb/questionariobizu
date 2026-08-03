@@ -1,19 +1,16 @@
 {
-  "name": "banco-questoes-cfap-pmpa",
-  "version": "4.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "npx serve public -l 3000",
-    "dev:vercel": "vercel dev",
-    "seed": "node --env-file=.env scripts/seed.mjs",
-    "create-admin": "node --env-file=.env scripts/create-admin.mjs",
-    "check": "node scripts/check-project.mjs",
-    "deploy": "vercel --prod"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.55.0",
-    "bcryptjs": "^3.0.2",
-    "jose": "^6.0.12"
-  }
+    "name": "banco-questoes-cfap-pmpa",
+    "version": "4.0.1",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "seed": "node --env-file=.env scripts/seed.mjs",
+        "create-admin": "node --env-file=.env scripts/create-admin.mjs",
+        "check": "node scripts/check-project.mjs"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.55.0",
+        "bcryptjs": "^3.0.2",
+        "jose": "^6.0.12"
+    }
 }
