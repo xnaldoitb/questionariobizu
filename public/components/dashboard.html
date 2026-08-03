@@ -1,101 +1,47 @@
 <section id="dashboard">
- <header class="masthead hero">
-  <div class="masthead-emblems">
-   <div class="flag-badge" title="Bandeira do Pará">
-    <svg aria-hidden="true" viewbox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
-     <rect fill="#c8102e" height="70" width="100">
-     </rect>
-     <line stroke="#ffffff" stroke-width="16" x1="0" x2="100" y1="0" y2="70">
-     </line>
-     <path d="M50,26 L54.5,37 L66,37 L57,44 L60.5,55 L50,48 L39.5,55 L43,44 L34,37 L45.5,37 Z" fill="#173d78">
-     </path>
-    </svg>
-   </div>
-   <div class="stamp">
-    USO INTERNO
-   </div>
-  </div>
-  <div class="masthead-copy">
-   <p class="eyebrow">
-    <span class="dot">
-    </span>
-    questões bizuradas
-   </p>
-   <h1 class="title">
-    Banco de Questões
-   </h1>
-   <p class="subtitle">
-    Questões de múltipla escolha e certo ou errado, com resolução comentada,
-                organizadas por disciplina e capítulo. Escolha abaixo como deseja estudar.
-   </p>
-  </div>
-  <div class="user-card">
-   <span>
-    Usuário conectado
-   </span>
-   <strong id="userName">
-   </strong>
-   <small id="userRole">
-   </small>
-  </div>
- </header>
- <section aria-labelledby="studyTitle" class="panel study-panel">
-  <div class="panel-heading">
-   <div>
-    <p class="eyebrow">
-     <span class="dot">
-     </span>
-     preparar simulado
-    </p>
-    <h2 id="studyTitle">
-     Selecione o conteúdo
-    </h2>
-   </div>
-   <span aria-hidden="true" class="panel-mark">
-    §
-   </span>
-  </div>
-  <div class="filters-grid">
-   <label>
-    Disciplina
-    <select id="subjectSelect">
-    </select>
-   </label>
-   <label>
-    Capítulo
-    <select id="chapterSelect">
-    </select>
-   </label>
-   <label>
-    Quantidade
-    <select id="limitSelect">
-     <option value="10">
-      10 questões
-     </option>
-     <option value="20">
-      20 questões
-     </option>
-     <option value="30">
-      30 questões
-     </option>
-     <option value="50">
-      50 questões
-     </option>
-     <option value="500">
-      Todas
-     </option>
-    </select>
-   </label>
-   <button class="btn primary start-button" id="startBtn" type="button">
-    <svg aria-hidden="true" viewbox="0 0 24 24">
-     <path d="m8 5 11 7-11 7V5Z">
-     </path>
-    </svg>
-    <span>
-     Iniciar simulado
-    </span>
-   </button>
-  </div>
- </section>
-</section>
+    <div class="study-intro">
+        <div>
+            <p class="eyebrow"><span class="dot"></span> questões bizuradas</p>
+            <h1>Banco de Questões</h1>
+            <p>
+                Escolha uma disciplina, um capítulo e a quantidade de questões.
+                Seu histórico e desempenho serão salvos automaticamente.
+            </p>
+        </div>
 
+        <div class="user-badge" aria-label="Usuário conectado">
+            <span class="user-badge-label">Usuário conectado</span>
+            <strong id="userName"></strong>
+            <small id="userRole"></small>
+        </div>
+    </div>
+
+    <div class="panel study-panel">
+        <div class="filters-grid">
+            <label>
+                Disciplina
+                <select id="subjectSelect"></select>
+            </label>
+
+            <label>
+                Capítulo
+                <select id="chapterSelect"></select>
+            </label>
+
+            <label>
+                Quantidade
+                <select id="limitSelect">
+                    <option value="10">10 questões</option>
+                    <option value="20">20 questões</option>
+                    <option value="30">30 questões</option>
+                    <option value="50">50 questões</option>
+                    <option value="500">Todas</option>
+                </select>
+            </label>
+
+            <button class="btn primary start-button" id="startBtn" type="button">
+                Iniciar simulado
+            </button>
+        </div>
+    </div>
+</section>

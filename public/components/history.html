@@ -1,17 +1,24 @@
-<section class="hidden" id="historyView">
- <div class="section-title">
-  <div>
-   <p class="eyebrow">
-    DESEMPENHO
-   </p>
-   <h2>
-    Histórico de estudos
-   </h2>
-  </div>
- </div>
- <div class="stats" id="historyStats">
- </div>
- <div class="history-list" id="historyList">
- </div>
-</section>
+<div class="modal-overlay hidden" id="historyModal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+    <section class="report-modal report-modal-history">
+        <header class="report-modal-header">
+            <div>
+                <p class="eyebrow"><span class="dot"></span> desempenho</p>
+                <h2 id="historyTitle">Histórico de estudos</h2>
+                <p>Resumo das sessões, acertos e evolução do usuário.</p>
+            </div>
+            <button class="modal-close" id="historyClose" type="button" aria-label="Fechar histórico">×</button>
+        </header>
 
+        <div class="report-summary" id="historyStats"></div>
+
+        <div class="report-toolbar">
+            <div>
+                <strong>Sessões concluídas</strong>
+                <span>Resultados organizados da mais recente para a mais antiga.</span>
+            </div>
+            <button class="btn ghost mini" id="historyRefresh" type="button">Atualizar</button>
+        </div>
+
+        <div class="report-list" id="historyList"></div>
+    </section>
+</div>

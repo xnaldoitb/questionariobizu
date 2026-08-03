@@ -1,244 +1,126 @@
 <section class="hidden" id="adminView">
- <div class="section-title">
-  <div>
-   <p class="eyebrow">
-    PAINEL ADMINISTRATIVO
-   </p>
-   <h2>
-    Gerenciar conteúdo
-   </h2>
-  </div>
- </div>
- <div class="admin-tabs">
-  <button class="btn ghost admin-tab active" data-admin="usersPanel">
-   Usuários
-  </button>
-  <button class="btn ghost admin-tab" data-admin="catalogPanel">
-   Disciplinas e capítulos
-  </button>
-  <button class="btn ghost admin-tab" data-admin="questionsPanel">
-   Questões
-  </button>
- </div>
- <div class="admin-panel" id="usersPanel">
-  <div class="admin-grid">
-   <form class="panel" id="userForm">
-    <h3>
-     Novo usuário
-    </h3>
-    <label>
-     Nome
-     <input name="nome" required=""/>
-    </label>
-    <label>
-     Usuário
-     <input name="usuario" required=""/>
-    </label>
-    <label>
-     Senha
-     <input minlength="6" name="senha" required="" type="password"/>
-    </label>
-    <label>
-     Perfil
-     <select name="perfil">
-      <option value="aluno">
-       Aluno
-      </option>
-      <option value="admin">
-       Administrador
-      </option>
-     </select>
-    </label>
-    <button class="btn primary full">
-     Cadastrar usuário
-    </button>
-   </form>
-   <div class="panel wide">
-    <div class="panel-head">
-     <h3>
-      Contas cadastradas
-     </h3>
-     <button class="btn ghost" id="refreshUsers" type="button">
-      Atualizar
-     </button>
-    </div>
-    <div id="usersList">
-    </div>
-   </div>
-  </div>
- </div>
- <div class="admin-panel hidden" id="catalogPanel">
-  <div class="admin-grid">
-   <form class="panel" id="disciplineForm">
-    <h3>
-     Nova disciplina
-    </h3>
-    <label>
-     Código
-     <input name="id" placeholder="ex.: constitucional" required=""/>
-    </label>
-    <label>
-     Título
-     <input name="nome" required=""/>
-    </label>
-    <label>
-     Descrição
-     <textarea name="descricao"></textarea>
-    </label>
-    <label>
-     Ordem
-     <input name="ordem" type="number" value="0"/>
-    </label>
-    <button class="btn primary full">
-     Adicionar disciplina
-    </button>
-   </form>
-   <form class="panel" id="chapterForm">
-    <h3>
-     Novo capítulo
-    </h3>
-    <label>
-     Disciplina
-     <select id="chapterSubject" name="disciplina_id" required="">
-     </select>
-    </label>
-    <label>
-     Título do capítulo
-     <input name="nome" required=""/>
-    </label>
-    <label>
-     Ordem
-     <input name="indice" type="number"/>
-    </label>
-    <button class="btn primary full">
-     Adicionar capítulo
-    </button>
-   </form>
-   <div class="panel wide">
-    <div class="panel-head">
-     <h3>
-      Disciplinas cadastradas
-     </h3>
-    </div>
-    <div id="catalogAdminList">
-    </div>
-   </div>
-  </div>
- </div>
- <div class="admin-panel hidden" id="questionsPanel">
-  <div class="admin-grid">
-   <form class="panel" id="questionForm">
-    <h3>
-     Nova questão
-    </h3>
-    <label>
-     Disciplina
-     <select id="adminSubject" name="disciplina_id" required="">
-     </select>
-    </label>
-    <label>
-     Capítulo
-     <select id="adminChapter" name="capitulo_id" required="">
-     </select>
-    </label>
-    <label>
-     Tipo de questão
-     <select id="questionType" name="tipo">
-      <option value="multipla_escolha">
-       Múltipla escolha (A–E)
-      </option>
-      <option value="certo_errado">
-       Certo ou errado
-      </option>
-     </select>
-    </label>
-    <label>
-     Enunciado
-     <textarea name="enunciado" required=""></textarea>
-    </label>
-    <div id="alternativeInputs">
-    </div>
-    <label>
-     Resposta correta
-     <select id="correctAnswer" name="resposta_correta">
-     </select>
-    </label>
-    <label>
-     Resolução
-     <textarea name="resolucao" required=""></textarea>
-    </label>
-    <button class="btn primary full">
-     Cadastrar questão
-    </button>
-   </form>
-   <div class="panel wide">
-    <div class="panel-head">
-     <h3>
-      Importar disciplina completa
-     </h3>
-    </div>
-    <p class="muted">
-     Importe uma ou várias disciplinas por Excel (.xlsx), CSV ou JSON. O arquivo pode
+<div class="section-title">
+<div>
+<p class="eyebrow">PAINEL ADMINISTRATIVO</p>
+<h2>Gerenciar conteúdo</h2>
+</div>
+</div>
+<div class="admin-tabs">
+<button class="btn ghost admin-tab active" data-admin="usersPanel">Usuários</button>
+<button class="btn ghost admin-tab" data-admin="catalogPanel">Disciplinas e capítulos</button>
+<button class="btn ghost admin-tab" data-admin="questionsPanel">Questões</button>
+</div>
+<div class="admin-panel" id="usersPanel">
+<div class="admin-grid">
+<form class="panel" id="userForm">
+<h3>Novo usuário</h3>
+<label>Nome<input name="nome" required=""/></label>
+<label>Usuário<input name="usuario" required=""/></label>
+<label>Senha<input minlength="6" name="senha" required="" type="password"/></label>
+<label>
+                                Perfil
+                                <select name="perfil">
+<option value="aluno">Aluno</option>
+<option value="admin">Administrador</option>
+</select>
+</label>
+<button class="btn primary full">Cadastrar usuário</button>
+</form>
+<div class="panel wide">
+<div class="panel-head">
+<h3>Contas cadastradas</h3>
+<button class="btn ghost" id="refreshUsers" type="button">Atualizar</button>
+</div>
+<div id="usersList"></div>
+</div>
+</div>
+</div>
+<div class="admin-panel hidden" id="catalogPanel">
+<div class="admin-grid">
+<form class="panel" id="disciplineForm">
+<h3>Nova disciplina</h3>
+<label>Código<input name="id" placeholder="ex.: constitucional" required=""/></label>
+<label>Título<input name="nome" required=""/></label>
+<label>Descrição<textarea name="descricao"></textarea></label>
+<label>Ordem<input name="ordem" type="number" value="0"/></label>
+<button class="btn primary full">Adicionar disciplina</button>
+</form>
+<form class="panel" id="chapterForm">
+<h3>Novo capítulo</h3>
+<label>Disciplina<select id="chapterSubject" name="disciplina_id" required=""></select></label>
+<label>Título do capítulo<input name="nome" required=""/></label>
+<label>Ordem<input name="indice" type="number"/></label>
+<button class="btn primary full">Adicionar capítulo</button>
+</form>
+<div class="panel wide">
+<div class="panel-head">
+<h3>Disciplinas cadastradas</h3>
+</div>
+<div id="catalogAdminList"></div>
+</div>
+</div>
+</div>
+<div class="admin-panel hidden" id="questionsPanel">
+<div class="admin-grid">
+<form class="panel" id="questionForm">
+<h3>Nova questão</h3>
+<label>Disciplina<select id="adminSubject" name="disciplina_id" required=""></select></label>
+<label>Capítulo<select id="adminChapter" name="capitulo_id" required=""></select></label>
+<label>
+                                Tipo de questão
+                                <select id="questionType" name="tipo">
+<option value="multipla_escolha">Múltipla escolha (A–E)</option>
+<option value="certo_errado">Certo ou errado</option>
+</select>
+</label>
+<label>Enunciado<textarea name="enunciado" required=""></textarea></label>
+<div id="alternativeInputs"></div>
+<label>
+                                Resposta correta
+                                <select id="correctAnswer" name="resposta_correta"></select>
+</label>
+<label>Resolução<textarea name="resolucao" required=""></textarea></label>
+<button class="btn primary full">Cadastrar questão</button>
+</form>
+<div class="panel wide">
+<div class="panel-head">
+<h3>Importar disciplina completa</h3>
+</div>
+<p class="muted">
+                                Importe uma ou várias disciplinas por Excel (.xlsx), CSV ou JSON. O arquivo pode
                                 conter capítulos, questões de múltipla escolha ou certo/errado, gabaritos e resoluções.
-    </p>
-    <label>
-     Arquivo da disciplina
-     <input accept=".xlsx,.xls,.csv,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,application/json" id="importFile" type="file"/>
-    </label>
-    <label>
-     Modo de importação
-     <select id="importMode">
-      <option value="merge">
-       Mesclar com o conteúdo existente
-      </option>
-      <option value="replace">
-       Substituir as questões ativas da disciplina
-      </option>
-     </select>
-    </label>
-    <div class="data-actions">
-     <button class="btn ghost" id="analyzeImportBtn" type="button">
-      Analisar arquivo
-     </button>
-     <button class="btn primary" disabled="" id="importBtn" type="button">
-      Confirmar importação
-     </button>
-     <a class="btn ghost" download="" href="/modelo-importacao-questoes.xlsx">
-      Baixar modelo Excel
-     </a>
-     <a class="btn ghost" download="" href="/modelo-importacao-disciplina.json">
-      Modelo JSON
-     </a>
-    </div>
-    <p class="muted" id="importStatus">
-    </p>
-    <div class="import-preview hidden" id="importPreview">
-    </div>
-   </div>
-   <div class="panel wide">
-    <div class="panel-head">
-     <h3>
-      Exportar disciplina completa
-     </h3>
-    </div>
-    <label>
-     Disciplina
-     <select id="exportSubject">
-     </select>
-    </label>
-    <div class="data-actions">
-     <button class="btn primary" id="exportBtn">
-      Baixar JSON
-     </button>
-     <button class="btn ghost" id="exportExcelBtn" type="button">
-      Baixar Excel (.xlsx)
-     </button>
-    </div>
-    <p class="muted">
-     Os arquivos exportados podem ser importados novamente neste ou em outro banco.
-    </p>
-   </div>
-  </div>
- </div>
+                            </p>
+<label>
+                                Arquivo da disciplina
+                                <input accept=".xlsx,.xls,.csv,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,application/json" id="importFile" type="file"/>
+</label>
+<label>
+                                Modo de importação
+                                <select id="importMode">
+<option value="merge">Mesclar com o conteúdo existente</option>
+<option value="replace">Substituir as questões ativas da disciplina</option>
+</select>
+</label>
+<div class="data-actions">
+<button class="btn ghost" id="analyzeImportBtn" type="button">Analisar arquivo</button>
+<button class="btn primary" disabled="" id="importBtn" type="button">Confirmar importação</button>
+<a class="btn ghost" download="" href="/modelo-importacao-questoes.xlsx">Baixar modelo Excel</a>
+<a class="btn ghost" download="" href="/modelo-importacao-disciplina.json">Modelo JSON</a>
+</div>
+<p class="muted" id="importStatus"></p>
+<div class="import-preview hidden" id="importPreview"></div>
+</div>
+<div class="panel wide">
+<div class="panel-head">
+<h3>Exportar disciplina completa</h3>
+</div>
+<label>Disciplina<select id="exportSubject"></select></label>
+<div class="data-actions">
+<button class="btn primary" id="exportBtn">Baixar JSON</button>
+<button class="btn ghost" id="exportExcelBtn" type="button">Baixar Excel (.xlsx)</button>
+</div>
+<p class="muted">Os arquivos exportados podem ser importados novamente neste ou em outro banco.</p>
+</div>
+</div>
+</div>
 </section>
-

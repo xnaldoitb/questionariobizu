@@ -1,77 +1,53 @@
 <section class="login-shell" id="loginView">
- <div class="login-card">
-  <div class="login-brand-head">
-   <div class="flag-badge login-flag" title="Bandeira do Pará">
-    <svg aria-hidden="true" viewbox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
-     <rect fill="#c8102e" height="70" width="100">
-     </rect>
-     <line stroke="#ffffff" stroke-width="16" x1="0" x2="100" y1="0" y2="70">
-     </line>
-     <path d="M50,26 L54.5,37 L66,37 L57,44 L60.5,55 L50,48 L39.5,55 L43,44 L34,37 L45.5,37 Z" fill="#173d78">
-     </path>
-    </svg>
-   </div>
-   <div class="login-stamp">
-    USO INTERNO
-   </div>
-  </div>
-  <p class="eyebrow">
-   <span class="dot">
-   </span>
-   questões bizuradas
-  </p>
-  <h1>
-   Banco de Questões
-  </h1>
-  <p class="muted">
-   CFAP · PMPA — acesso ao ambiente de estudos, histórico e ranking.
-  </p>
-  <div class="auth-tabs">
-   <button class="auth-tab active" id="showLogin" type="button">
-    Entrar
-   </button>
-   <button class="auth-tab" id="showSignup" type="button">
-    Criar conta
-   </button>
-  </div>
-  <form id="loginForm">
-   <label>
-    Usuário
-    <input autocomplete="username" id="loginUser" required=""/>
-   </label>
-   <label>
-    Senha
-    <input autocomplete="current-password" id="loginPass" required="" type="password"/>
-   </label>
-   <button class="btn primary full">
-    Entrar
-   </button>
-   <p class="error" id="loginError">
-   </p>
-  </form>
-  <form class="hidden" id="signupForm">
-   <label>
-    Nome completo
-    <input id="signupName" minlength="3" required=""/>
-   </label>
-   <label>
-    Nome de usuário
-    <input autocomplete="username" id="signupUser" minlength="3" required=""/>
-   </label>
-   <label>
-    Senha
-    <input autocomplete="new-password" id="signupPass" minlength="6" required="" type="password"/>
-   </label>
-   <label>
-    Confirmar senha
-    <input autocomplete="new-password" id="signupConfirm" minlength="6" required="" type="password"/>
-   </label>
-   <button class="btn primary full">
-    Criar minha conta
-   </button>
-   <p class="error" id="signupError">
-   </p>
-  </form>
- </div>
+<div class="login-card">
+<div class="login-brand-head">
+<div class="flag-badge login-flag" title="Bandeira do Pará">
+<svg aria-hidden="true" viewbox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#c8102e" height="70" width="100"></rect>
+<line stroke="#ffffff" stroke-width="16" x1="0" x2="100" y1="0" y2="70"></line>
+<path d="M50,26 L54.5,37 L66,37 L57,44 L60.5,55 L50,48 L39.5,55 L43,44 L34,37 L45.5,37 Z" fill="#173d78"></path>
+</svg>
+</div>
+<div class="login-stamp">USO INTERNO</div>
+</div>
+<p class="eyebrow"><span class="dot"></span> questões bizuradas</p>
+<h1>Banco de Questões</h1>
+<p class="muted">CFAP · PMPA — acesso ao ambiente de estudos, histórico e ranking.</p>
+<div class="auth-tabs">
+<button class="auth-tab active" id="showLogin" type="button">Entrar</button>
+<button class="auth-tab" id="showSignup" type="button">Criar conta</button>
+</div>
+<form id="loginForm">
+<label>
+                    Usuário
+                    <input autocomplete="username" id="loginUser" required=""/>
+</label>
+<label>
+                    Senha
+                    <input autocomplete="current-password" id="loginPass" required="" type="password"/>
+</label>
+<button class="btn primary full">Entrar</button>
+<p class="error" id="loginError"></p>
+</form>
+<form class="hidden" id="signupForm">
+<label>
+                    Nome completo
+                    <input id="signupName" minlength="3" required=""/>
+</label>
+<label>
+                    Nome de usuário
+                    <input autocomplete="username" id="signupUser" minlength="3" required=""/>
+</label>
+<label>
+                    Senha
+                    <input autocomplete="new-password" id="signupPass" minlength="6" required="" type="password"/>
+</label>
+<label>
+                    Confirmar senha
+                    <input autocomplete="new-password" id="signupConfirm" minlength="6" required="" type="password"/>
+</label>
+<button class="btn primary full">Criar minha conta</button>
+<p class="error" id="signupError"></p>
+</form>
+</div>
 </section>
-

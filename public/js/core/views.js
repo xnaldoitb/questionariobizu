@@ -4,15 +4,11 @@ const views = [
     'dashboard',
     'quizView',
     'resultView',
-    'historyView',
-    'rankingView',
     'adminView'
 ];
 
 const navigationByView = {
     dashboard: 'navQuiz',
-    historyView: 'navHistory',
-    rankingView: 'navRanking',
     adminView: 'navAdmin'
 };
 
@@ -21,7 +17,9 @@ export function showView(id) {
         $(`#${viewId}`)?.classList.toggle('hidden', viewId !== id);
     });
 
-    $$('.nav-btn').forEach((button) => button.classList.remove('active'));
+    $$('.action-button, .action-brand').forEach((button) => {
+        button.classList.remove('active');
+    });
 
     const navigationId = navigationByView[id];
     if (navigationId) {

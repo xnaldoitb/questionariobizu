@@ -1,17 +1,24 @@
-<section class="hidden" id="rankingView">
- <div class="section-title">
-  <div>
-   <p class="eyebrow">
-    CLASSIFICAÇÃO
-   </p>
-   <h2>
-    Ranking de estudos
-   </h2>
-  </div>
- </div>
- <div class="panel">
-  <div class="ranking-list" id="rankingList">
-  </div>
- </div>
-</section>
+<div class="modal-overlay hidden" id="rankingModal" role="dialog" aria-modal="true" aria-labelledby="rankingTitle">
+    <section class="report-modal report-modal-ranking">
+        <header class="report-modal-header">
+            <div>
+                <p class="eyebrow"><span class="dot"></span> classificação</p>
+                <h2 id="rankingTitle">Ranking de estudos</h2>
+                <p>Classificação baseada em acertos, percentual e questões respondidas.</p>
+            </div>
+            <button class="modal-close" id="rankingClose" type="button" aria-label="Fechar ranking">×</button>
+        </header>
 
+        <div class="ranking-podium" id="rankingPodium"></div>
+
+        <div class="report-toolbar">
+            <div>
+                <strong>Classificação geral</strong>
+                <span>Os melhores resultados aparecem primeiro.</span>
+            </div>
+            <button class="btn ghost mini" id="rankingRefresh" type="button">Atualizar</button>
+        </div>
+
+        <div class="report-list ranking-list" id="rankingList"></div>
+    </section>
+</div>
