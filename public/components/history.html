@@ -1,24 +1,41 @@
 <div class="modal-overlay hidden" id="historyModal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
-    <section class="report-modal report-modal-history">
+    <section class="report-modal history-v5-modal">
         <header class="report-modal-header">
             <div>
-                <p class="eyebrow"><span class="dot"></span> desempenho</p>
-                <h2 id="historyTitle">Histórico de estudos</h2>
-                <p>Resumo das sessões, acertos e evolução do usuário.</p>
+                <p class="eyebrow"><span class="dot"></span> desempenho individual</p>
+                <h2 id="historyTitle">Histórico de respostas</h2>
+                <p>Consulte cada questão respondida e revise seus acertos e erros.</p>
             </div>
             <button class="modal-close" id="historyClose" type="button" aria-label="Fechar histórico">×</button>
         </header>
 
-        <div class="report-summary" id="historyStats"></div>
+        <div class="history-summary-v5" id="historyStats"></div>
 
-        <div class="report-toolbar">
-            <div>
-                <strong>Sessões concluídas</strong>
-                <span>Resultados organizados da mais recente para a mais antiga.</span>
+        <div class="history-toolbar-v5">
+            <div class="history-filters" role="group" aria-label="Filtrar respostas">
+                <button class="history-filter active" data-history-filter="all" type="button">Todas</button>
+                <button class="history-filter" data-history-filter="wrong" type="button">Só erradas</button>
+                <button class="history-filter" data-history-filter="correct" type="button">Só corretas</button>
             </div>
-            <button class="btn ghost mini" id="historyRefresh" type="button">Atualizar</button>
+            <div class="history-actions">
+                <button class="btn ghost mini" id="historyRefresh" type="button">Atualizar</button>
+                <button class="btn ghost mini danger" id="historyReset" type="button">Resetar histórico</button>
+            </div>
         </div>
 
-        <div class="report-list" id="historyList"></div>
+        <div class="history-answer-list" id="historyList"></div>
+    </section>
+</div>
+
+<div class="modal-overlay hidden" id="reviewModal" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">
+    <section class="report-modal review-modal">
+        <header class="report-modal-header">
+            <div>
+                <p class="eyebrow"><span class="dot"></span> revisão</p>
+                <h2 id="reviewTitle">Revisar questão</h2>
+            </div>
+            <button class="modal-close" id="reviewClose" type="button" aria-label="Fechar revisão">×</button>
+        </header>
+        <div id="reviewContent"></div>
     </section>
 </div>

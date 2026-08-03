@@ -29,16 +29,64 @@ function changeAdminTab(button) {
 
 export async function loadUsers() {
     if (state.user?.perfil !== 'admin') return;
+
     try {
         const users = (await api('admin-users')).usuarios;
-        $('#usersList').innerHTML = users.map((user) => `
-            <div class="data-row"><div><strong>${escapeHtml(user.nome)}</strong>
-            <div class="muted">@${escapeHtml(user.usuario)} · ${user.perfil} · ${user.ativo ? 'ativo' : 'bloqueado'}</div></div>
-            <div class="data-actions"><button class="btn ghost mini" data-toggle="${user.id}" data-active="${user.ativo}" data-name="${escapeHtml(user.nome)}" data-role="${user.perfil}">${user.ativo ? 'Bloquear' : 'Ativar'}</button>
-            <button class="btn ghost mini danger" data-delete-user="${user.id}">Apagar</button></div></div>`).join('');
-        $$('[data-toggle]').forEach((b) => b.addEventListener('click', () => updateUser(b.dataset.toggle, b.dataset.name, b.dataset.role, b.dataset.active !== 'true')));
-        $$('[data-delete-user]').forEach((b) => b.addEventListener('click', () => deleteUser(b.dataset.deleteUser)));
-    } catch (error) { toast(error.message); }
+        $('#usersList').innerHTML = users.map((user) => {
+            const isAdmin = user.perfil === 'admin';
+            const accountActions = isAdmin
+                ? '<span class="admin-protected-badge">Conta protegida</span>'
+                : `
+                    <button class="btn ghost mini" data-toggle="${user.id}" data-active="${user.ativo}" data-name="${escapeHtml(user.nome)}" data-role="${user.perfil}">
+                        ${user.ativo ? 'Bloquear' : 'Ativar'}
+                    </button>
+                    <button class="btn ghost mini danger" data-delete-user="${user.id}">Apagar</button>
+                `;
+
+            return `
+                <article class="admin-user-card ${isAdmin ? 'is-admin' : ''}">
+                    <div class="admin-user-avatar">${initials(user.nome)}</div>
+                    <div class="admin-user-copy">
+                        <strong>${escapeHtml(user.nome)}</strong>
+                        <span>AL SD PM Nº: ${escapeHtml(user.usuario)}</span>
+                        <small>${isAdmin ? 'Administrador' : 'Aluno'} · ${user.ativo ? 'ativo' : 'bloqueado'}</small>
+                    </div>
+                    <div class="admin-user-actions">
+                        <button class="btn ghost mini" data-reset-history="${user.id}">Resetar histórico</button>
+                        <button class="btn ghost mini" data-reset-ranking="${user.id}">Resetar ranking</button>
+                        ${accountActions}
+                    </div>
+                </article>
+            `;
+        }).join('');
+
+        $$('[data-toggle]').forEach((button) => button.addEventListener('click', () => {
+            updateUser(button.dataset.toggle, button.dataset.name, button.dataset.role, button.dataset.active !== 'true');
+        }));
+        $$('[data-delete-user]').forEach((button) => button.addEventListener('click', () => deleteUser(button.dataset.deleteUser)));
+        $$('[data-reset-history]').forEach((button) => button.addEventListener('click', () => resetUserResults(button.dataset.resetHistory, 'reset_history', 'histórico')));
+        $$('[data-reset-ranking]').forEach((button) => button.addEventListener('click', () => resetUserResults(button.dataset.resetRanking, 'reset_ranking', 'ranking')));
+    } catch (error) {
+        toast(error.message);
+    }
+}
+
+function initials(name = '') {
+    return name.trim().split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase() || 'AL';
+}
+
+async function resetUserResults(id, action, label) {
+    if (!confirm(`Resetar o ${label} deste usuário?`)) return;
+    try {
+        await api('admin-users', {
+            method: 'PUT',
+            body: JSON.stringify({ id, action })
+        });
+        toast(`${label[0].toUpperCase()}${label.slice(1)} resetado.`);
+        loadUsers();
+    } catch (error) {
+        toast(error.message);
+    }
 }
 
 async function createUser(event) {

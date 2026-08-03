@@ -37,14 +37,40 @@ function toggleTheme() {
     updateThemeButton();
 }
 
+
+function initials(name = '') {
+    return name.trim().split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase() || 'AL';
+}
+
+async function loadProfileDashboard() {
+    $('#profileWarName').textContent = state.user.nome;
+    $('#profileRegistration').textContent = `AL SD PM Nº: ${state.user.usuario}`;
+    $('#profileAvatar').textContent = initials(state.user.nome);
+
+    try {
+        const [rankingData, sessionsData] = await Promise.all([
+            fetch('/api/ranking', { credentials: 'same-origin' }).then((response) => response.json()),
+            fetch('/api/sessoes', { credentials: 'same-origin' }).then((response) => response.json())
+        ]);
+        const ranking = rankingData.ranking || [];
+        const position = ranking.findIndex((entry) => entry.usuario_id === state.user.id || entry.usuario === state.user.usuario);
+        const sessions = sessionsData.sessoes || [];
+        const answered = sessions.reduce((total, session) => total + Number(session.respondidas || 0), 0);
+        const correct = sessions.reduce((total, session) => total + Number(session.acertos || 0), 0);
+
+        $('#profileRanking').textContent = position >= 0 ? `${position + 1}º` : '—';
+        $('#profileAnswered').textContent = answered;
+        $('#profileCorrect').textContent = correct;
+    } catch {
+        $('#profileRanking').textContent = '—';
+    }
+}
+
 async function enterApplication() {
     $('#loginView').classList.add('hidden');
     $('#appView').classList.remove('hidden');
 
-    $('#userName').textContent = state.user.nome;
-    $('#userRole').textContent = state.user.perfil === 'admin'
-        ? 'Administrador'
-        : 'Aluno';
+    await loadProfileDashboard();
 
     $('#navAdmin').classList.toggle('hidden', state.user.perfil !== 'admin');
 

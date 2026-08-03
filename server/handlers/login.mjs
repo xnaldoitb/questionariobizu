@@ -7,9 +7,9 @@ export const handler = async (event) => {
   try {
     const { usuario = '', senha = '' } = parseBody(event);
     const login = String(usuario).trim().toLowerCase();
-    if (!login || !senha) return json(400, { erro: 'Informe usuário e senha.' });
+    if (!login || !senha) return json(400, { erro: 'Informe o AL SD PM Nº e a senha.' });
     const { data: user, error } = await db().from('usuarios').select('*').eq('usuario', login).eq('ativo', true).maybeSingle();
-    if (error || !user || !(await bcrypt.compare(String(senha), user.senha_hash))) return json(401, { erro: 'Usuário ou senha inválidos.' });
+    if (error || !user || !(await bcrypt.compare(String(senha), user.senha_hash))) return json(401, { erro: 'AL SD PM Nº ou senha inválidos.' });
     await db().from('usuarios').update({ ultimo_acesso: new Date().toISOString() }).eq('id', user.id);
     const token = await createToken(user);
     return json(200, { usuario: { id: user.id, usuario: user.usuario, nome: user.nome, perfil: user.perfil } }, { 'set-cookie': sessionCookie(token) });

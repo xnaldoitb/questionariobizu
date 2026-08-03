@@ -1,18 +1,41 @@
 <section id="dashboard">
-    <div class="study-intro">
-        <div>
-            <p class="eyebrow"><span class="dot"></span> questões bizuradas</p>
-            <h1>Banco de Questões</h1>
-            <p>
-                Escolha uma disciplina, um capítulo e a quantidade de questões.
-                Seu histórico e desempenho serão salvos automaticamente.
-            </p>
+    <div class="profile-dashboard" aria-label="Resumo do aluno">
+        <div class="profile-identity">
+            <div class="profile-avatar" id="profileAvatar" aria-hidden="true">AL</div>
+            <div>
+                <span class="profile-kicker">Aluno conectado</span>
+                <h1 id="profileWarName">—</h1>
+                <p id="profileRegistration">AL SD PM Nº: —</p>
+            </div>
         </div>
 
-        <div class="user-badge" aria-label="Usuário conectado">
-            <span class="user-badge-label">Usuário conectado</span>
-            <strong id="userName"></strong>
-            <small id="userRole"></small>
+        <div class="profile-metrics">
+            <article class="profile-metric profile-rank">
+                <span>Colocação</span>
+                <strong id="profileRanking">—</strong>
+                <small>no ranking geral</small>
+            </article>
+            <article class="profile-metric">
+                <span>Questões respondidas</span>
+                <strong id="profileAnswered">0</strong>
+                <small>respostas registradas</small>
+            </article>
+            <article class="profile-metric profile-hits">
+                <span>Acertos</span>
+                <strong id="profileCorrect">0</strong>
+                <small>respostas corretas</small>
+            </article>
+        </div>
+    </div>
+
+    <div class="study-intro compact-study-intro">
+        <div>
+            <p class="eyebrow"><span class="dot"></span> questões bizuradas</p>
+            <h2>Banco de Questões</h2>
+            <p>
+                Escolha uma disciplina, um capítulo e a quantidade de questões.
+                Seu desempenho será registrado automaticamente.
+            </p>
         </div>
     </div>
 
@@ -22,12 +45,10 @@
                 Disciplina
                 <select id="subjectSelect"></select>
             </label>
-
             <label>
                 Capítulo
                 <select id="chapterSelect"></select>
             </label>
-
             <label>
                 Quantidade
                 <select id="limitSelect">
@@ -38,10 +59,7 @@
                     <option value="500">Todas</option>
                 </select>
             </label>
-
-            <button class="btn primary start-button" id="startBtn" type="button">
-                Iniciar simulado
-            </button>
+            <button class="btn primary start-button" id="startBtn" type="button">Iniciar simulado</button>
         </div>
     </div>
 </section>
