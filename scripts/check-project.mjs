@@ -8,7 +8,7 @@ const requiredFiles = [
     'public/components/quiz.html',
     'public/components/admin.html',
     'public/js/app.js',
-    'api/login.js',
+    'api/[...route].js',
     'supabase/schema.sql'
 ];
 
