@@ -154,7 +154,7 @@ function rowsToImports(rows){
         const chapterKey=normalizeHeader(chapter);
         if(!g.chapters.has(chapterKey))g.chapters.set(chapterKey,{id:chapterKey,disciplina_id:id,indice:chapterOrder,nome:chapter,ativo:true});
         const cap=g.chapters.get(chapterKey);
-        g.questions.push({capitulo_id:cap.id,capitulo_indice:cap.indice,tipo:type,enunciado:statement,alternativas,resposta_correta:correct,resolucao:text(row.resolucao)||'Sem resolução comentada.',dificuldade:['facil','media','dificil'].includes(normalizeHeader(row.dificuldade))?normalizeHeader(row.dificuldade):'media',fonte:text(row.fonte)||null,ativo:truthy(row.ativo)});
+        g.questions.push({capitulo_id:cap.id,capitulo_indice:cap.indice,tipo:type,enunciado:statement,alternativas:alternatives,resposta_correta:correct,resolucao:text(row.resolucao)||'Sem resolução comentada.',dificuldade:['facil','media','dificil'].includes(normalizeHeader(row.dificuldade))?normalizeHeader(row.dificuldade):'media',fonte:text(row.fonte)||null,ativo:truthy(row.ativo)});
     });
     const imports=[...groups.values()].map(g=>({versao:2,disciplina:g.disciplina,capitulos:[...g.chapters.values()],questoes:g.questions}));
     return {imports,errors};
