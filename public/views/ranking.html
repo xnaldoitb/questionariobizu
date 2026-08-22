@@ -1,0 +1,29 @@
+<div class="modal-overlay hidden" id="rankingModal" role="dialog" aria-modal="true" aria-labelledby="rankingTitle">
+    <section class="report-modal report-modal-ranking ranking-v5-modal">
+        <header class="report-modal-header">
+            <div>
+                <p class="section-kicker"><span class="kicker-mark"></span> classificação geral</p>
+                <h2 id="rankingTitle">Ranking de estudos</h2>
+                <p>Classificação por acertos, aproveitamento e questões respondidas.</p>
+            </div>
+            <button class="modal-close" id="rankingClose" type="button" aria-label="Fechar ranking">×</button>
+        </header>
+        <div class="report-modal-body-scroll">
+<div class="my-ranking-card" id="myRankingCard"></div>
+        <div class="ranking-podium" id="rankingPodium"></div>
+
+        <div class="report-toolbar">
+            <div>
+                <strong>Classificação geral</strong>
+                <span>Os melhores resultados aparecem primeiro.</span>
+            </div>
+            <div class="data-actions">
+                <button class="ui-button quiet-action mini" id="rankingRefresh" type="button">Atualizar</button>
+                <button class="ui-button quiet-action mini danger" id="rankingReset" type="button">Resetar ranking</button>
+            </div>
+        </div>
+
+        <div class="report-list ranking-list" id="rankingList"></div>
+        </div>
+    </section>
+</div>

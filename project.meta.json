@@ -1,0 +1,10 @@
+{
+  "project": "Questões Bizuradas",
+  "product": "Banco de Questões",
+  "author": "Ronaldo Amorim",
+  "maintainer": "Ronaldo Amorim",
+  "architecture_version": "Reimplementação Visual 1.4 + Administração 2.0",
+  "admin_version": "Administração 2.0",
+  "ui_version": "4.5 · Confirmação de resposta e eliminação de alternativas",
+  "version": "4.5.0"
+}

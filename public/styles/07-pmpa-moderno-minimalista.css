@@ -1,0 +1,936 @@
+/* =========================================================
+   QUESTIONÁRIO BIZU — PMPA MODERNO MINIMALISTA
+   Camada exclusivamente visual.
+   Paleta institucional inspirada em azul-marinho, vermelho
+   e neutros claros, com baixo uso de sombras e sem gradientes.
+   ========================================================= */
+
+:root {
+    --canvas: #F4F7FA;
+    --canvas-soft: #EDF2F7;
+    --panel-surface: #FFFFFF;
+    --choice-hover: #F7F9FC;
+    --choice-selected: #EEF3F9;
+
+    --text-main: #172033;
+    --text-muted: #5A6B7F;
+    --text-accent: #0B2A4B;
+    --text-on-primary: #F7FAFC;
+
+    --navy-deep: #071A30;
+    --navy-strong: #0B2747;
+    --navy-mid: #163D68;
+    --navy-bright: #235789;
+    --brand-blue: #163D68;
+
+    --signal: #B52135;
+    --signal-soft: #C84253;
+
+    --danger: #A52835;
+    --danger-surface: #FCEDEF;
+    --success: #276A4B;
+    --success-surface: #EAF5EF;
+
+    --line: #D5DEE8;
+    --card-shadow: 0 8px 24px -20px rgb(7 26 48 / 46%);
+
+    --app-background: var(--canvas);
+    --surface: var(--panel-surface);
+    --surface-soft: var(--canvas-soft);
+    --muted-text: var(--text-muted);
+    --primary-navy: var(--navy-strong);
+    --primary-blue: var(--text-accent);
+    --border-color: var(--line);
+}
+
+:root[data-theme="dark"] {
+    --canvas: #0E1722;
+    --canvas-soft: #152230;
+    --panel-surface: #111D2A;
+    --choice-hover: #182738;
+    --choice-selected: #1B3047;
+
+    --text-main: #EEF3F8;
+    --text-muted: #A9B6C5;
+    --text-accent: #A8C8E8;
+    --text-on-primary: #F7FAFC;
+
+    --navy-deep: #081522;
+    --navy-strong: #102943;
+    --navy-mid: #1C4268;
+    --navy-bright: #2B5C8D;
+    --brand-blue: #6F9BC7;
+
+    --signal: #E26A79;
+    --signal-soft: #EA8592;
+
+    --danger: #F08A94;
+    --danger-surface: #3B2026;
+    --success: #6CC69A;
+    --success-surface: #173529;
+
+    --line: #2A3B4D;
+    --card-shadow: 0 8px 24px -20px rgb(0 0 0 / 76%);
+}
+
+/* Fundo limpo: nada de textura, manchas ou gradientes. */
+body,
+:root[data-theme="dark"] body {
+    background: var(--canvas);
+}
+
+.page-grain {
+    display: none !important;
+}
+
+/* Campos */
+:where(input, select, textarea) {
+    background: var(--panel-surface);
+    border-color: var(--line);
+    border-radius: 7px;
+}
+
+:is(input, select, textarea):focus {
+    border-color: var(--navy-bright);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--navy-bright) 14%, transparent);
+}
+
+/* Cabeçalho: sólido, discreto e institucional. */
+.action-bar {
+    background: var(--canvas);
+    backdrop-filter: none;
+}
+
+.action-brand {
+    background: var(--navy-strong);
+    border-color: var(--navy-strong);
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.action-brand:hover,
+.action-brand.active {
+    color: var(--text-on-primary);
+    background: var(--navy-mid);
+    border-color: var(--navy-mid);
+    transform: none;
+}
+
+.action-button {
+    color: var(--text-muted);
+    background: var(--panel-surface);
+    border-color: var(--line);
+    border-radius: 8px;
+}
+
+.action-button:hover,
+.action-button.active {
+    color: var(--navy-strong);
+    background: var(--canvas-soft);
+    border-color: color-mix(in srgb, var(--navy-mid) 48%, var(--line));
+    transform: none;
+}
+
+.action-button.active {
+    box-shadow: inset 0 -2px 0 var(--signal);
+}
+
+:root[data-theme="dark"] .action-button:hover,
+:root[data-theme="dark"] .action-button.active {
+    color: var(--text-main);
+}
+
+/* Botões: azul como ação principal; vermelho só em sinalização/risco. */
+.ui-button {
+    border-radius: 7px;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.ui-button:not(:disabled):hover {
+    color: var(--text-on-primary);
+    background: var(--navy-mid);
+    border-color: var(--navy-mid);
+}
+
+.ui-button.main-action {
+    color: var(--text-on-primary);
+    background: var(--navy-strong);
+    border-color: var(--navy-strong);
+}
+
+.ui-button.main-action:not(:disabled):hover {
+    background: var(--navy-mid);
+    border-color: var(--navy-mid);
+}
+
+.ui-button.quiet-action:not(:disabled):hover {
+    color: var(--navy-strong);
+    background: var(--canvas-soft);
+    border-color: var(--navy-mid);
+}
+
+:root[data-theme="dark"] .ui-button.quiet-action:not(:disabled):hover {
+    color: var(--text-main);
+}
+
+/* Cartões: pouco relevo e borda suave. */
+.panel,
+.question-card,
+.result-card,
+.login-card,
+.admin-summary-card,
+.admin-question-card,
+.admin-content-group,
+.admin-create-box,
+.admin-quick-panel,
+.admin-toolbar-panel,
+.admin-list-panel,
+.admin-backup-panel,
+.report-modal,
+.admin-modal-card {
+    border-color: var(--line);
+    border-radius: 9px;
+    box-shadow: var(--card-shadow);
+}
+
+.panel::before,
+.question-card::before {
+    top: 22px;
+    bottom: 22px;
+    width: 2px;
+    background: var(--signal);
+    border-radius: 0 2px 2px 0;
+}
+
+/* Login */
+.login-shell {
+    background: var(--canvas);
+}
+
+.login-card::before {
+    display: none;
+}
+
+.brand-mark {
+    background: var(--navy-strong);
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.auth-tab,
+.admin-tab,
+.admin-tabs-v2 .admin-tab {
+    border-radius: 7px;
+}
+
+.auth-tab.active,
+.admin-tab.active,
+.admin-tabs-v2 .admin-tab.active {
+    color: var(--text-on-primary);
+    background: var(--navy-strong);
+    border-color: var(--navy-strong);
+    box-shadow: inset 0 -2px 0 var(--signal);
+}
+
+/* Área principal */
+.hero {
+    color: var(--text-on-primary);
+    background: var(--navy-strong);
+    border-color: var(--navy-strong);
+    border-radius: 9px;
+    box-shadow: var(--card-shadow);
+}
+
+.hero::before {
+    display: none;
+}
+
+.hero h1 {
+    color: #FFFFFF;
+}
+
+.hero p {
+    color: #E6EDF5;
+    opacity: 1;
+}
+
+.user-card {
+    background: rgb(255 255 255 / 7%);
+    border-color: rgb(255 255 255 / 18%);
+    border-radius: 7px;
+}
+
+.section-title h2 {
+    color: var(--text-accent);
+}
+
+.section-kicker {
+    color: var(--signal);
+}
+
+/* Questionário */
+.progress {
+    background: var(--canvas-soft);
+    border-color: var(--line);
+    border-radius: 999px;
+}
+
+.progress span {
+    background: var(--signal);
+}
+
+.question-meta {
+    color: var(--text-accent);
+}
+
+.answer-choice {
+    background: var(--panel-surface);
+    border-color: var(--line);
+    border-radius: 8px;
+}
+
+.answer-choice:not(:disabled):hover {
+    background: var(--choice-hover);
+    border-color: var(--navy-mid);
+}
+
+.answer-choice .answer-key {
+    color: var(--navy-mid);
+    border-color: color-mix(in srgb, var(--navy-mid) 62%, var(--line));
+    border-radius: 6px;
+}
+
+.answer-choice.is-selected {
+    background: var(--choice-selected);
+    border-color: var(--navy-mid);
+    box-shadow: inset 3px 0 0 var(--signal);
+}
+
+.answer-explanation {
+    background: var(--canvas-soft);
+    border-inline-start-color: var(--navy-mid);
+}
+
+/* Perfil, Histórico e Ranking */
+.profile-dashboard,
+.my-ranking-card {
+    background: var(--navy-strong);
+    border-color: var(--navy-strong);
+    box-shadow: var(--card-shadow);
+}
+
+.profile-dashboard::before {
+    opacity: .08;
+}
+
+.profile-metric,
+.ranking-card,
+.history-card,
+.history-answer-card,
+.report-stat,
+.history-stat-v5 {
+    border-color: var(--line);
+    box-shadow: none;
+}
+
+.report-modal-header {
+    border-bottom-color: var(--line);
+}
+
+.ranking-card.is-me,
+.ranking-row.is-me {
+    box-shadow: inset 3px 0 0 var(--signal);
+    border-color: color-mix(in srgb, var(--signal) 50%, var(--line));
+}
+
+/* Administração 2.0 */
+.admin-title-row {
+    border-bottom-color: var(--line);
+}
+
+.admin-summary-card {
+    background: var(--panel-surface);
+    box-shadow: none;
+}
+
+.admin-summary-card strong {
+    color: var(--navy-strong);
+}
+
+:root[data-theme="dark"] .admin-summary-card strong {
+    color: var(--text-accent);
+}
+
+.admin-user-card,
+.admin-user-card-v2,
+.admin-content-row,
+.admin-question-card {
+    background: var(--panel-surface);
+    border-color: var(--line);
+    box-shadow: none;
+}
+
+.admin-user-card.is-admin {
+    border-color: color-mix(in srgb, var(--navy-mid) 55%, var(--line));
+}
+
+.admin-protected-badge {
+    color: var(--navy-mid);
+    border-color: color-mix(in srgb, var(--navy-mid) 55%, var(--line));
+    background: var(--canvas-soft);
+}
+
+:root[data-theme="dark"] .admin-protected-badge {
+    color: var(--text-accent);
+}
+
+.admin-action-menu > summary {
+    border-radius: 7px;
+}
+
+.admin-action-menu-popover {
+    border-radius: 8px;
+    box-shadow: 0 12px 30px -22px rgb(7 26 48 / 60%);
+}
+
+.admin-create-box > summary::before {
+    border-radius: 6px;
+}
+
+.admin-content-group,
+.admin-create-box,
+.admin-quick-panel,
+.admin-toolbar-panel,
+.admin-list-panel,
+.admin-backup-panel {
+    background: var(--panel-surface);
+    box-shadow: none;
+}
+
+.admin-status-pill.status-pendente {
+    color: #8A5A00;
+    border-color: #D7B979;
+    background: #FFF8E8;
+}
+
+:root[data-theme="dark"] .admin-status-pill.status-pendente {
+    color: #F1CF82;
+    border-color: #705A2C;
+    background: #2E281B;
+}
+
+.danger-zone-v2 {
+    background: color-mix(in srgb, var(--danger-surface) 62%, var(--panel-surface));
+    border-width: 1px;
+}
+
+.danger-action-card {
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+/* Toast e modais */
+.toast {
+    background: var(--navy-strong);
+    border-color: var(--navy-mid);
+    border-radius: 8px;
+    box-shadow: 0 10px 28px -20px rgb(7 26 48 / 65%);
+}
+
+.admin-modal,
+.report-overlay {
+    background: rgb(7 26 48 / 55%);
+}
+
+/* Retira efeitos decorativos pesados remanescentes. */
+.login-stamp,
+.heritage-stamp {
+    box-shadow: none;
+}
+
+@media (max-width: 720px) {
+    .panel,
+    .question-card,
+    .result-card,
+    .login-card {
+        border-radius: 8px;
+    }
+
+    .action-brand,
+    .action-button {
+        border-radius: 7px;
+    }
+}
+
+/* =========================================================
+   v4.3 · VIP, revisão inteligente e insígnias do ranking
+   ========================================================= */
+.study-review-filter {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-subtle, rgba(17, 44, 74, .14));
+    border-radius: 14px;
+    background: var(--surface-soft, rgba(255, 255, 255, .55));
+    cursor: pointer;
+}
+
+.study-review-filter input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: #163d68;
+}
+
+.study-review-filter span {
+    line-height: 1.45;
+    color: var(--text-secondary, #4d5b6d);
+}
+
+.study-review-filter strong {
+    color: var(--text-primary, #172033);
+}
+
+.vip-insignia {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 20px;
+    padding: 2px 7px;
+    margin-left: 4px;
+    border: 1px solid rgba(151, 108, 16, .35);
+    border-radius: 999px;
+    background: linear-gradient(135deg, #fff8dc, #f0d37b);
+    color: #67470b;
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: .04em;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+html[data-theme="dark"] .vip-insignia {
+    background: linear-gradient(135deg, #3a3117, #6b541c);
+    border-color: rgba(240, 211, 123, .42);
+    color: #ffe69a;
+}
+
+.admin-user-card.is-vip {
+    box-shadow: inset 3px 0 0 #b8912e;
+}
+
+.admin-vip-toggle {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 10px;
+    min-height: 58px;
+    padding: 10px 12px;
+    border: 1px solid rgba(151, 108, 16, .22);
+    border-radius: 12px;
+    background: rgba(240, 211, 123, .10);
+}
+
+.admin-vip-toggle input {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    accent-color: #9a7218;
+}
+
+.admin-vip-toggle span {
+    display: grid;
+    gap: 3px;
+}
+
+.admin-vip-toggle small {
+    font-weight: 400;
+    color: var(--text-secondary, #667487);
+}
+
+.ranking-medal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    font-size: 17px;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.podium-position .ranking-medal {
+    width: 25px;
+    height: 25px;
+    font-size: 20px;
+}
+
+.history-archived-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    margin-left: 5px;
+    border-radius: 999px;
+    border: 1px solid var(--border-subtle, rgba(17, 44, 74, .14));
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    opacity: .78;
+}
+
+@media (max-width: 720px) {
+    .study-review-filter {
+        margin-top: 10px;
+    }
+
+    .vip-insignia {
+        font-size: 9px;
+        padding-inline: 6px;
+    }
+}
+
+/* =========================================================
+   v4.4 · Insígnias visuais de identidade
+   Premium = visual apenas; não concede nenhum privilégio.
+   ========================================================= */
+.account-insignia {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 20px;
+    padding: 2px 7px;
+    margin-left: 4px;
+    border-radius: 999px;
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: .04em;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.premium-insignia {
+    border: 1px solid rgba(34, 81, 128, .28);
+    background: linear-gradient(135deg, #f6f9fc, #dbe7f2);
+    color: #183b61;
+}
+
+.admin-insignia {
+    border: 1px solid rgba(33, 81, 68, .34);
+    background: linear-gradient(135deg, #edf8f3, #cfe9dc);
+    color: #1d5946;
+}
+
+.supreme-insignia {
+    border: 1px solid rgba(118, 28, 45, .38);
+    background: linear-gradient(135deg, #fff0f3, #edbdc7);
+    color: #781c2f;
+    box-shadow: 0 0 0 1px rgba(118, 28, 45, .05) inset;
+}
+
+/* Mantém VIP como categoria de destaque, agora usando a mesma base estrutural. */
+.account-insignia.vip-insignia {
+    border: 1px solid rgba(151, 108, 16, .35);
+    background: linear-gradient(135deg, #fff8dc, #f0d37b);
+    color: #67470b;
+}
+
+html[data-theme="dark"] .premium-insignia {
+    border-color: rgba(126, 166, 207, .36);
+    background: linear-gradient(135deg, #17283a, #24425f);
+    color: #c9e1f5;
+}
+
+html[data-theme="dark"] .admin-insignia {
+    border-color: rgba(113, 190, 158, .35);
+    background: linear-gradient(135deg, #183128, #245442);
+    color: #b8ead5;
+}
+
+html[data-theme="dark"] .supreme-insignia {
+    border-color: rgba(226, 106, 121, .48);
+    background: linear-gradient(135deg, #381a22, #682637);
+    color: #ffc5cf;
+}
+
+html[data-theme="dark"] .account-insignia.vip-insignia {
+    background: linear-gradient(135deg, #3a3117, #6b541c);
+    border-color: rgba(240, 211, 123, .42);
+    color: #ffe69a;
+}
+
+.admin-user-card:has(.supreme-insignia) {
+    box-shadow: inset 3px 0 0 #9b2942;
+}
+
+.admin-user-card:has(.admin-insignia) {
+    border-left-color: rgba(29, 89, 70, .46);
+}
+
+@media (max-width: 720px) {
+    .account-insignia {
+        min-height: 18px;
+        padding-inline: 6px;
+        font-size: 9px;
+    }
+}
+
+/* =========================================================
+   v4.4.1 · Correções de contraste e layout do ranking
+   ========================================================= */
+.study-review-filter span {
+    color: var(--text-muted);
+}
+
+.study-review-filter strong {
+    color: var(--text-main);
+}
+
+:root[data-theme="dark"] .study-review-filter {
+    background: var(--panel-surface);
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] .study-review-filter span {
+    color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .study-review-filter strong {
+    color: var(--text-main);
+}
+
+/* No pódio a colocação contém medalha + número; por isso deve ser
+   uma pequena cápsula, e não o círculo usado na lista geral. */
+.podium-position {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: auto;
+    min-width: 62px;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    position: relative;
+    z-index: 1;
+}
+
+.podium-position .ranking-medal {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    font-size: 16px;
+}
+
+.podium-card .ranking-avatar {
+    position: relative;
+    z-index: 0;
+    margin-top: 4px;
+}
+
+/* Na lista, número e avatar ficam sempre em células visuais distintas. */
+.ranking-card-main > .ranking-position,
+.ranking-card-main > .ranking-avatar {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 720px) {
+    .podium-position {
+        min-width: 58px;
+        height: 28px;
+        padding-inline: 7px;
+        font-size: 10px;
+    }
+
+    .podium-position .ranking-medal {
+        width: 18px;
+        height: 18px;
+        flex-basis: 18px;
+        font-size: 15px;
+    }
+}
+
+
+/* =========================================================
+   v4.5 · Insígnias com contraste + eliminação e confirmação
+   ========================================================= */
+
+/* Contraste reforçado das insígnias no modo claro, sobretudo no cartão de perfil. */
+:root:not([data-theme="dark"]) .premium-insignia,
+:root[data-theme="light"] .premium-insignia {
+    border-color: #315f8e;
+    background: linear-gradient(135deg, #dceaf8, #b9d2eb);
+    color: #0b3158;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .75) inset, 0 1px 3px rgba(7, 26, 48, .16);
+}
+
+:root:not([data-theme="dark"]) .admin-insignia,
+:root[data-theme="light"] .admin-insignia {
+    border-color: #2e7058;
+    background: linear-gradient(135deg, #d7eee5, #acd9c4);
+    color: #134b38;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .75) inset, 0 1px 3px rgba(13, 59, 44, .15);
+}
+
+:root:not([data-theme="dark"]) .supreme-insignia,
+:root[data-theme="light"] .supreme-insignia {
+    border-color: #9b2942;
+    background: linear-gradient(135deg, #f6d9df, #e5a8b5);
+    color: #651426;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .72) inset, 0 1px 4px rgba(101, 20, 38, .18);
+}
+
+:root:not([data-theme="dark"]) .account-insignia.vip-insignia,
+:root[data-theme="light"] .account-insignia.vip-insignia {
+    border-color: #96700f;
+    background: linear-gradient(135deg, #ffefb5, #e5c354);
+    color: #533a00;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset, 0 1px 4px rgba(83, 58, 0, .18);
+}
+
+.profile-dashboard .account-insignia {
+    font-weight: 900;
+    border-width: 1px;
+}
+
+.answer-tools-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 12px;
+    color: var(--text-muted);
+    font: 600 11px/1.45 var(--type-ui);
+}
+
+.answer-tools-hint > span {
+    color: var(--text-accent);
+    font-size: 15px;
+}
+
+.answer-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 42px;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.answer-row .answer-choice {
+    min-width: 0;
+}
+
+.answer-eliminate {
+    display: grid;
+    place-items: center;
+    min-width: 42px;
+    min-height: 48px;
+    padding: 0;
+    color: var(--text-muted);
+    background: var(--panel-surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 17px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, color .15s ease, transform .15s ease, opacity .15s ease;
+}
+
+.answer-eliminate:not(:disabled):hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: var(--danger-surface);
+    transform: translateY(-1px);
+}
+
+.answer-eliminate.is-active {
+    color: #fff;
+    border-color: var(--danger);
+    background: var(--danger);
+}
+
+.answer-eliminate:disabled {
+    cursor: default;
+    opacity: .5;
+    transform: none;
+}
+
+.answer-row.is-eliminated .answer-choice {
+    opacity: .5;
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: var(--danger);
+}
+
+.answer-row.is-eliminated .answer-key {
+    opacity: .72;
+}
+
+.confirm-answer-action {
+    min-width: 190px;
+    margin-inline: auto;
+    color: #fff;
+    background: var(--navy-mid);
+    border: 1px solid var(--navy-mid);
+    font-weight: 800;
+}
+
+.confirm-answer-action:not(:disabled):hover {
+    background: var(--navy-bright);
+    border-color: var(--navy-bright);
+}
+
+.confirm-answer-action:disabled {
+    color: var(--text-muted);
+    background: var(--canvas-soft);
+    border-color: var(--line);
+    opacity: .72;
+}
+
+/* A seleção é apenas provisória; o gabarito só aparece depois da confirmação. */
+.answer-choice.is-selected:not(.is-correct):not(.is-wrong) {
+    box-shadow: inset 4px 0 0 var(--signal);
+}
+
+@media (max-width: 520px) {
+    .answer-tools-hint {
+        align-items: flex-start;
+        font-size: 10px;
+    }
+
+    .answer-row {
+        grid-template-columns: minmax(0, 1fr) 38px;
+        gap: 6px;
+    }
+
+    .answer-eliminate {
+        min-width: 38px;
+        min-height: 46px;
+        font-size: 16px;
+    }
+
+    .quiz-controls {
+        flex-direction: column;
+    }
+
+    #confirmAnswerBtn {
+        order: 1;
+        width: 100%;
+        min-width: 0;
+    }
+
+    #nextBtn {
+        order: 2;
+        width: 100%;
+    }
+
+    #skipBtn {
+        order: 3;
+        width: 100%;
+    }
+}

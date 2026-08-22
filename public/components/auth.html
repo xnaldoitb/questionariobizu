@@ -1,0 +1,77 @@
+<section class="login-shell" id="loginView">
+    <div class="login-card">
+        <div class="login-brand-head">
+            <img
+                class="login-slogan-image"
+                src="/assets/slogan-conhecimento-missao.svg"
+                alt="Conhecimento é Missão"
+                width="172"
+                height="56"
+            >
+        </div>
+
+        <p class="muted">Acesso ao ambiente de estudos para o CFP.</p>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="showLogin" type="button">Entrar</button>
+            <button class="auth-tab" id="showSignup" type="button">Criar conta</button>
+        </div>
+
+        <form id="loginForm">
+            <label>
+                AL SD PM Nº:
+                <input
+                    autocomplete="username"
+                    id="loginUser"
+                    inputmode="numeric"
+                    placeholder="Informe seu número"
+                    required
+                >
+            </label>
+            <label>
+                Senha
+                <input autocomplete="current-password" id="loginPass" required type="password">
+            </label>
+            <button class="btn primary full">Entrar</button>
+            <p class="error" id="loginError"></p>
+        </form>
+
+        <form class="hidden" id="signupForm">
+            <label>
+                Nome de Guerra
+                <input id="signupName" minlength="2" placeholder="Ex.: AMORIM" required>
+            </label>
+            <label>
+                AL SD PM Nº: (mínimo 3 dígitos)
+                <input
+                    autocomplete="username"
+                    id="signupUser"
+                    inputmode="numeric"
+                    minlength="3"
+                    placeholder="Informe seu número"
+                    required
+                >
+            </label>
+            <label>
+                Senha (mínimo 6 dígitos)
+                <input autocomplete="new-password" id="signupPass" minlength="6" required type="password">
+            </label>
+            <label>
+                Confirmar senha
+                <input autocomplete="new-password" id="signupConfirm" minlength="6" required type="password">
+            </label>
+            <button class="btn primary full">Criar minha conta</button>
+            <p class="error" id="signupError"></p>
+        </form>
+
+        <div class="admin-contact">
+            <strong>Contato dos ADMs — WhatsApp</strong>
+            <p>Entre em contato para liberar acesso após CRIAR CONTA.</p>
+            <div class="admin-contact-links">
+                <a href="https://wa.me/5591982575188" target="_blank" rel="noopener noreferrer">+55 91 98257-5188</a>
+                <a href="https://wa.me/5585997680865" target="_blank" rel="noopener noreferrer">+55 85 99768-0865</a>
+                <a href="https://wa.me/5593992048088" target="_blank" rel="noopener noreferrer">+55 93 99204-8088</a>
+            </div>
+        </div>
+    </div>
+</section>

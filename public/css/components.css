@@ -1,0 +1,614 @@
+.btn {
+    padding: 10px 16px;
+    color: var(--accent-ink);
+    background: transparent;
+    border: 1px solid var(--accent-ink);
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: .15s ease;
+}
+.btn:hover:not(:disabled) { color: var(--khaki); background: var(--olive-800); }
+.btn.primary { color: var(--khaki); background: var(--olive-800); border-color: var(--olive-800); }
+.btn.primary:hover:not(:disabled) { background: var(--olive-900); }
+.btn.ghost { color: var(--ink-soft); background: transparent; border-color: var(--rule); }
+.btn.ghost:hover:not(:disabled) { color: var(--ink); background: transparent; border-color: var(--brass); }
+.btn:disabled { cursor: not-allowed; opacity: .35; }
+.full { width: 100%; }
+.mini { padding: 7px 10px; font-size: 10.5px; }
+.danger { color: var(--red) !important; border-color: var(--red) !important; }
+.nav-btn, .icon-btn {
+    padding: 8px 10px;
+    color: var(--khaki);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font: 11px 'JetBrains Mono', monospace;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.nav-btn.active, .nav-btn:hover, .icon-btn:hover { border-color: rgba(201,191,138,.35); background: rgba(255,255,255,.06); }
+.panel, .question-card, .result-card {
+    position: relative;
+    padding: 26px;
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+}
+.panel::before, .question-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+    width: 4px;
+    background: var(--brass);
+    border-radius: 0 3px 3px 0;
+}
+.panel { margin-top: 20px; }
+.panel-head, .section-title, .history-item { display: flex; justify-content: space-between; gap: 12px; }
+.panel-head { align-items: center; }
+.section-title { margin-bottom: 15px; }
+.section-title h2 { margin: 0; font: 800 28px 'Bitter', Georgia, serif; color: var(--accent-ink); }
+.eyebrow { color: var(--brass); font: 600 11px 'JetBrains Mono', monospace; letter-spacing: .18em; text-transform: uppercase; }
+.auth-tabs, .admin-tabs, .data-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.auth-tabs, .admin-tabs { margin: 0 0 18px; }
+.auth-tab { flex: 1; padding: 9px; color: var(--ink-soft); background: var(--paper-dark); border: 1px solid var(--rule); border-radius: 4px; font: 600 11px 'JetBrains Mono', monospace; text-transform: uppercase; cursor: pointer; }
+.auth-tab.active { color: var(--khaki); background: var(--olive-800); border-color: var(--olive-800); }
+.admin-tab.active { color: var(--khaki); background: var(--olive-800); border-color: var(--brass); }
+.toast { position: fixed; right: 20px; bottom: 20px; z-index: 99; padding: 12px 16px; color: var(--khaki); background: var(--olive-800); border: 1px solid var(--brass); border-radius: 4px; font: 12px 'JetBrains Mono', monospace; opacity: 0; transform: translateY(10px); transition: .2s; }
+.toast.show { opacity: 1; transform: none; }
+
+/* Exclusão definitiva de disciplina */
+.btn.danger-fill {
+    color: #fff;
+    background: var(--red);
+    border-color: var(--red);
+}
+
+.btn.danger-fill:hover {
+    filter: brightness(0.92);
+    transform: translateY(-1px);
+}
+
+.catalog-discipline-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.catalog-discipline-title small {
+    color: var(--muted);
+    font-family: var(--font-mono, monospace);
+    font-size: 0.72rem;
+    overflow-wrap: anywhere;
+}
+
+
+/* Exclusão geral de disciplinas */
+.catalog-admin-heading {
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.danger-zone-note {
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border: 1px solid rgba(180, 35, 35, 0.34);
+    border-left: 4px solid var(--red, #b42323);
+    border-radius: 10px;
+    background: rgba(180, 35, 35, 0.07);
+    line-height: 1.45;
+}
+
+.danger-zone-note strong {
+    color: var(--red, #b42323);
+}
+
+#deleteAllDisciplinesBtn {
+    min-height: 42px;
+    white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+    .catalog-admin-heading {
+        flex-direction: column;
+    }
+
+    #deleteAllDisciplinesBtn {
+        width: 100%;
+    }
+}
+
+
+/* Banner da página inicial ocupando todo o botão, sem cortar a imagem */
+.action-brand {
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    width: 190px !important;
+    height: 72px !important;
+    min-width: 190px !important;
+    min-height: 72px !important;
+    box-sizing: border-box !important;
+}
+
+.action-brand .action-slogan-image {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    flex: 1 1 auto !important;
+}
+
+.action-brand .action-copy {
+    display: none !important;
+}
+
+@media (max-width: 820px) {
+    .action-brand {
+        width: 170px !important;
+        height: 64px !important;
+        min-width: 170px !important;
+        min-height: 64px !important;
+        padding: 0 !important;
+    }
+
+    .action-brand .action-slogan-image {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+    }
+}
+
+@media (max-width: 430px) {
+    .action-brand {
+        width: 154px !important;
+        height: 58px !important;
+        min-width: 154px !important;
+        min-height: 58px !important;
+    }
+}
+
+
+
+/* Cabeçalho / barra principal não fixa */
+.action-bar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
+}
+
+
+
+/* =========================================================
+   MOBILE: banner à esquerda + botões à direita
+   Botões excedentes quebram para baixo, sempre à direita.
+   Sem rolagem horizontal.
+   ========================================================= */
+@media (max-width: 820px) {
+    html,
+    body {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+    }
+
+    .action-bar {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow: visible !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    .action-brand {
+        flex: 0 0 154px !important;
+        width: 154px !important;
+        min-width: 154px !important;
+        max-width: 154px !important;
+        height: 58px !important;
+        min-height: 58px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        align-self: flex-start !important;
+    }
+
+    .action-brand .action-slogan-image {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+        object-position: center !important;
+    }
+
+    .action-menu {
+        display: flex !important;
+        flex: 1 1 calc(100% - 162px) !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-end !important;
+        align-content: flex-start !important;
+        align-items: flex-start !important;
+        gap: 5px !important;
+        width: auto !important;
+        max-width: calc(100% - 162px) !important;
+        min-width: 0 !important;
+        margin-left: auto !important;
+        overflow: visible !important;
+        overflow-x: hidden !important;
+        white-space: normal !important;
+        box-sizing: border-box !important;
+    }
+
+    .action-menu .action-button,
+    .action-menu .action-button-square {
+        display: inline-flex !important;
+        flex: 0 0 auto !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        min-height: 32px !important;
+        height: auto !important;
+        padding: 6px 7px !important;
+        gap: 4px !important;
+        box-sizing: border-box !important;
+        align-items: center !important;
+        justify-content: center !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        font-size: 10px !important;
+        line-height: 1.05 !important;
+    }
+
+    .action-menu .action-button > span:last-child,
+    .action-menu .desktop-label {
+        display: inline-block !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        max-width: none !important;
+    }
+
+    .action-menu .action-icon {
+        flex: 0 0 auto !important;
+        font-size: 11px !important;
+        min-width: 11px !important;
+        line-height: 1 !important;
+    }
+}
+
+/* Em celulares menores, reduz um pouco o banner para sobrar mais espaço à direita */
+@media (max-width: 430px) {
+    .action-brand {
+        flex-basis: 138px !important;
+        width: 138px !important;
+        min-width: 138px !important;
+        max-width: 138px !important;
+        height: 52px !important;
+        min-height: 52px !important;
+    }
+
+    .action-menu {
+        flex-basis: calc(100% - 146px) !important;
+        max-width: calc(100% - 146px) !important;
+        gap: 4px !important;
+    }
+
+    .action-menu .action-button,
+    .action-menu .action-button-square {
+        min-height: 30px !important;
+        padding: 5px 6px !important;
+        font-size: 9.5px !important;
+        gap: 3px !important;
+    }
+
+    .action-menu .action-icon {
+        font-size: 10px !important;
+        min-width: 10px !important;
+    }
+}
+
+/* Muito estreito: mantém banner em cima à esquerda, menu continua abaixo à direita */
+@media (max-width: 340px) {
+    .action-brand {
+        flex: 0 0 132px !important;
+        width: 132px !important;
+        min-width: 132px !important;
+        max-width: 132px !important;
+    }
+
+    .action-menu {
+        flex: 1 1 calc(100% - 140px) !important;
+        max-width: calc(100% - 140px) !important;
+    }
+}
+
+
+
+/* =========================================================
+   MODAIS HISTÓRICO E RANKING — RESPONSIVOS COM ROLAGEM
+   Funciona em desktop, tablets e celulares em paisagem.
+   ========================================================= */
+#historyModal,
+#rankingModal,
+.modal-overlay {
+    overflow: hidden !important;
+}
+
+#historyModal .report-modal,
+#rankingModal .report-modal,
+.history-v5-modal,
+.ranking-v5-modal {
+    display: flex !important;
+    flex-direction: column !important;
+    width: min(960px, calc(100vw - 32px)) !important;
+    max-width: calc(100vw - 32px) !important;
+    max-height: calc(100dvh - 32px) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    margin: 16px auto !important;
+    box-sizing: border-box !important;
+}
+
+#historyModal .report-modal-header,
+#rankingModal .report-modal-header,
+.history-v5-modal .report-modal-header,
+.ranking-v5-modal .report-modal-header {
+    flex: 0 0 auto !important;
+}
+
+#historyModal .history-summary-v5,
+#rankingModal .my-ranking-card,
+#rankingModal .ranking-podium,
+#historyModal .history-toolbar-v5,
+#rankingModal .report-toolbar {
+    flex: 0 0 auto !important;
+}
+
+/* O conteúdo principal rola dentro do modal */
+#historyModal .report-list,
+#historyModal #historyList,
+#rankingModal .report-list,
+#rankingModal #rankingList {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-right: 4px !important;
+}
+
+/* Caso o conteúdo acima da lista fique alto, o próprio modal também pode rolar */
+#historyModal .report-modal,
+#rankingModal .report-modal {
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* Desktop */
+@media (min-width: 821px) {
+    #historyModal .report-modal,
+    #rankingModal .report-modal {
+        width: min(980px, calc(100vw - 48px)) !important;
+        max-height: calc(100vh - 48px) !important;
+        margin: 24px auto !important;
+    }
+}
+
+/* Tablets e celulares em paisagem */
+@media (max-height: 620px) and (orientation: landscape) {
+    #historyModal,
+    #rankingModal {
+        align-items: center !important;
+        padding: 8px !important;
+    }
+
+    #historyModal .report-modal,
+    #rankingModal .report-modal {
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+        max-height: calc(100dvh - 16px) !important;
+        margin: 8px auto !important;
+        border-radius: 14px !important;
+    }
+
+    #historyModal .report-modal-header,
+    #rankingModal .report-modal-header {
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+
+    #historyModal .history-summary-v5,
+    #rankingModal .ranking-podium {
+        margin-top: 8px !important;
+        margin-bottom: 8px !important;
+    }
+}
+
+/* Celulares */
+@media (max-width: 600px) {
+    #historyModal,
+    #rankingModal {
+        padding: 10px !important;
+    }
+
+    #historyModal .report-modal,
+    #rankingModal .report-modal {
+        width: calc(100vw - 20px) !important;
+        max-width: calc(100vw - 20px) !important;
+        max-height: calc(100dvh - 20px) !important;
+        margin: 10px auto !important;
+        border-radius: 14px !important;
+    }
+
+    #historyModal .report-modal-header h2,
+    #rankingModal .report-modal-header h2 {
+        font-size: 1.2rem !important;
+    }
+}
+
+
+/* REGRA DE SEGURANÇA: não permitir que estilos de layout revelem botões ocultos */
+.action-menu .action-button.hidden,
+.action-menu .hidden,
+#navAdmin.hidden {
+    display: none !important;
+}
+
+
+/* =========================================================
+   HISTÓRICO / RANKING — CABEÇALHO FIXO + CORPO ROLÁVEL
+   ========================================================= */
+#historyModal,
+#rankingModal {
+    position: fixed !important;
+    inset: 0 !important;
+    display: flex;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+#historyModal.hidden,
+#rankingModal.hidden {
+    display: none !important;
+}
+
+#historyModal .report-modal,
+#rankingModal .report-modal {
+    display: flex !important;
+    flex-direction: column !important;
+    width: min(980px, calc(100vw - 32px)) !important;
+    max-width: calc(100vw - 32px) !important;
+    height: auto !important;
+    max-height: calc(100dvh - 32px) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+#historyModal .report-modal-header,
+#rankingModal .report-modal-header {
+    flex: 0 0 auto !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 5 !important;
+}
+
+/* Todo o conteúdo restante rola aqui */
+#historyModal .report-modal-body-scroll,
+#rankingModal .report-modal-body-scroll {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    scrollbar-gutter: stable !important;
+    padding-bottom: 18px !important;
+}
+
+/* Listas não criam uma segunda rolagem conflitante */
+#historyModal #historyList,
+#rankingModal #rankingList,
+#historyModal .report-list,
+#rankingModal .report-list {
+    overflow: visible !important;
+    max-height: none !important;
+    min-height: 0 !important;
+}
+
+/* Desktop */
+@media (min-width: 821px) {
+    #historyModal,
+    #rankingModal {
+        padding: 24px !important;
+    }
+
+    #historyModal .report-modal,
+    #rankingModal .report-modal {
+        max-height: calc(100vh - 48px) !important;
+        width: min(980px, calc(100vw - 48px)) !important;
+        max-width: calc(100vw - 48px) !important;
+    }
+}
+
+/* Celulares */
+@media (max-width: 600px) {
+    #historyModal,
+    #rankingModal {
+        padding: 10px !important;
+    }
+
+    #historyModal .report-modal,
+    #rankingModal .report-modal {
+        width: calc(100vw - 20px) !important;
+        max-width: calc(100vw - 20px) !important;
+        max-height: calc(100dvh - 20px) !important;
+        border-radius: 14px !important;
+    }
+
+    #historyModal .report-modal-body-scroll,
+    #rankingModal .report-modal-body-scroll {
+        padding-bottom: 14px !important;
+    }
+}
+
+/* Paisagem em celular/tablet */
+@media (orientation: landscape) and (max-height: 700px) {
+    #historyModal,
+    #rankingModal {
+        padding: 8px !important;
+        align-items: center !important;
+    }
+
+    #historyModal .report-modal,
+    #rankingModal .report-modal {
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+        max-height: calc(100dvh - 16px) !important;
+        border-radius: 12px !important;
+    }
+
+    #historyModal .report-modal-header,
+    #rankingModal .report-modal-header {
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+
+    #historyModal .report-modal-body-scroll,
+    #rankingModal .report-modal-body-scroll {
+        overflow-y: auto !important;
+        min-height: 0 !important;
+    }
+}
+
