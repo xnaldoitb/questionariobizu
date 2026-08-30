@@ -1,0 +1,63 @@
+/* Rodapé global: permanece disponível no login e na área autenticada. */
+body.pwa-install-available {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
+.install-app-footer {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 900;
+    display: flex;
+    justify-content: center;
+    padding: 9px max(14px, env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    background: color-mix(in srgb, var(--panel-surface) 94%, transparent);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 24px rgb(5 15 36 / 12%);
+    backdrop-filter: blur(12px);
+}
+
+.install-app-footer.hidden {
+    display: none;
+}
+
+#installAppBtn.install-app-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 9px 18px;
+    color: #f4f7fb;
+    background: #0b2145;
+    border: 1px solid #2c4468;
+    border-radius: 999px;
+    box-shadow: 0 6px 18px rgb(5 15 36 / 22%);
+    white-space: nowrap;
+    cursor: pointer;
+    font: 700 12px/1 var(--type-ui);
+}
+
+#installAppBtn.install-app-button:hover {
+    color: #fff;
+    background: #123367;
+    border-color: #c8102e;
+}
+
+@media (max-width: 760px) {
+    body.pwa-install-available {
+        padding-bottom: calc(68px + env(safe-area-inset-bottom));
+    }
+
+    .install-app-footer {
+        padding-top: 8px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    }
+
+    #installAppBtn.install-app-button {
+        width: min(100%, 320px);
+        min-height: 42px;
+        font-size: 11px;
+    }
+}

@@ -1,0 +1,486 @@
+<section class="hidden" id="adminView">
+    <div class="section-title admin-title-row">
+        <div>
+            <h2>Administração</h2>
+            <p class="muted" id="adminPermissionInfo"></p>
+        </div>
+        <button class="ui-button quiet-action" id="adminRefreshCurrent" type="button">Atualizar painel</button>
+    </div>
+
+    <nav class="admin-tabs admin-tabs-v2" aria-label="Áreas administrativas">
+        <button class="ui-button quiet-action admin-tab active" data-admin="overviewPanel" type="button">Visão geral</button>
+        <button class="ui-button quiet-action admin-tab" data-admin="usersPanel" type="button">Usuários</button>
+        <button class="ui-button quiet-action admin-tab" data-admin="paymentsPanel" type="button">Planos e pagamentos</button>
+        <button class="ui-button quiet-action admin-tab supreme-only" data-admin="contentPanel" type="button">Conteúdo</button>
+        <button class="ui-button quiet-action admin-tab supreme-only" data-admin="questionsPanel" type="button">Questões</button>
+        <button class="ui-button quiet-action admin-tab supreme-only" data-admin="transferPanel" type="button">Importar / Exportar</button>
+        <button class="ui-button quiet-action admin-tab supreme-only danger-tab" data-admin="maintenancePanel" type="button">Manutenção</button>
+    </nav>
+
+    <section class="admin-panel" id="overviewPanel">
+        <div class="admin-summary-grid">
+            <article class="admin-summary-card">
+                <span>Usuários</span>
+                <strong id="adminStatUsers">—</strong>
+                <small id="adminStatActiveUsers">— ativos</small>
+            </article>
+            <article class="admin-summary-card">
+                <span>Pendentes</span>
+                <strong id="adminStatPending">—</strong>
+                <small>aguardando aprovação</small>
+            </article>
+            <article class="admin-summary-card">
+                <span>Validade vencida</span>
+                <strong id="adminStatExpired">—</strong>
+                <small>acesso bloqueado</small>
+            </article>
+            <article class="admin-summary-card supreme-only">
+                <span>Disciplinas</span>
+                <strong id="adminStatDisciplines">—</strong>
+                <small id="adminStatChapters">— capítulos</small>
+            </article>
+            <article class="admin-summary-card supreme-only">
+                <span>Questões</span>
+                <strong id="adminStatQuestions">—</strong>
+                <small id="adminStatActiveQuestions">— ativas</small>
+            </article>
+        </div>
+
+        <div class="panel admin-quick-panel">
+            <div class="panel-head">
+                <div>
+                    <h3>Acesso rápido</h3>
+                    <p class="muted">As tarefas mais usadas ficam aqui; ações críticas estão separadas em Manutenção.</p>
+                </div>
+            </div>
+            <div class="admin-quick-actions">
+                <button class="ui-button main-action" data-admin-jump="usersPanel" type="button">Gerenciar usuários</button>
+                <button class="ui-button quiet-action" data-admin-jump="paymentsPanel" type="button">Planos e pagamentos</button>
+                <button class="ui-button quiet-action supreme-only" data-admin-jump="questionsPanel" type="button">Banco de questões</button>
+                <button class="ui-button quiet-action supreme-only" data-admin-jump="transferPanel" type="button">Importar / Exportar</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-panel hidden" id="usersPanel">
+        <div class="panel admin-toolbar-panel">
+            <div class="admin-toolbar-grid">
+                <label class="admin-filter-field">
+                    Pesquisar
+                    <input id="userSearch" placeholder="Nome ou AL SD PM Nº" type="search" autocomplete="off"/>
+                </label>
+                <label class="admin-filter-field">
+                    Situação
+                    <select id="userStatusFilter">
+                        <option value="todos">Todos</option>
+                        <option value="pendente">Pendentes</option>
+                        <option value="ativo">Ativos</option>
+                        <option value="teste">Teste de 30 min ativo</option>
+                        <option value="teste_expirado">Teste encerrado</option>
+                        <option value="expirado">Acesso às questões vencido</option>
+                        <option value="desativado">Desativados</option>
+                        <option value="negado">Negados</option>
+                    </select>
+                </label>
+                <label class="admin-filter-field">
+                    Perfil
+                    <select id="userRoleFilter">
+                        <option value="todos">Todos</option>
+                        <option value="aluno">Alunos</option>
+                        <option value="admin">Administradores</option>
+                        <option value="supremo">Desenvolvedor</option>
+                    </select>
+                </label>
+                <label class="admin-filter-field supreme-only">
+                    Responsável
+                    <select id="userResponsibleFilter">
+                        <option value="todos">Todos os responsáveis</option>
+                        <option value="sem_responsavel">Sem responsável</option>
+                    </select>
+                </label>
+                <button class="ui-button quiet-action admin-toolbar-button" id="refreshUsers" type="button">Atualizar</button>
+            </div>
+            <div class="admin-list-meta" id="userListMeta">Carregando usuários...</div>
+        </div>
+
+        <details class="panel admin-create-box">
+            <summary>Novo usuário</summary>
+            <form class="admin-form-grid" id="userForm">
+                <label>Nome de Guerra<input name="nome" required/></label>
+                <label>AL SD PM Nº<input name="usuario" inputmode="numeric" required/></label>
+                <label>Senha<input minlength="6" name="senha" required type="password"/></label>
+                <label>WhatsApp<input name="whatsapp" inputmode="tel" placeholder="5591982575188"/></label>
+                <label>
+                    Perfil
+                    <select id="newUserRole" name="perfil">
+                        <option value="aluno">Aluno</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </label>
+                <label>
+                    Validade do acesso
+                    <input id="newUserValidity" name="validade_ate" type="date"/>
+                    <small class="field-help">Data futura concede Premium. Vazio = teste encerrado; novo ciclo em 8h.</small>
+                </label>
+                <label class="supreme-only">
+                    ADM responsável
+                    <select id="newUserResponsible" name="responsavel_admin_id"></select>
+                    <small class="field-help">O Desenvolvedor pode alterar o responsável depois.</small>
+                </label>
+                <label class="admin-vip-toggle">
+                    <input id="newUserVip" name="vip" type="checkbox" value="true"/>
+                    <span><strong>Vitalício / VIP</strong><small>Acesso permanente, sem vencimento, sob responsabilidade do ADM que cadastrou.</small></span>
+                </label>
+                <div class="admin-form-submit">
+                    <button class="ui-button main-action" type="submit">Cadastrar usuário</button>
+                </div>
+            </form>
+        </details>
+
+        <div class="panel wide admin-list-panel">
+            <div class="panel-head">
+                <div>
+                    <h3>Contas cadastradas</h3>
+                    <p class="muted">A validade é conferida também durante sessões já abertas.</p>
+                </div>
+            </div>
+            <div id="usersList"></div>
+        </div>
+    </section>
+
+    <section class="admin-panel hidden" id="paymentsPanel">
+        <div class="admin-summary-grid payment-summary-grid">
+            <article class="admin-summary-card"><span>Pendentes</span><strong id="paymentStatPending">0</strong><small>aguardando pagamento</small></article>
+            <article class="admin-summary-card"><span>Aprovados</span><strong id="paymentStatApproved">0</strong><small>acessos liberados</small></article>
+            <article class="admin-summary-card"><span>Cancelados</span><strong id="paymentStatCancelled">0</strong><small>cancelados ou recusados</small></article>
+        </div>
+
+        <details class="panel admin-create-box supreme-only" id="planEditorBox">
+            <summary>Criar ou alterar plano</summary>
+            <form class="admin-form-grid" id="planForm">
+                <input id="planEditId" type="hidden"/>
+                <label>Nome do plano<input id="planName" required placeholder="Ex.: Semestral"/></label>
+                <label>Preço (R$)<input id="planPrice" min="0.01" step="0.01" type="number" required/></label>
+                <label>Duração em dias<input id="planDays" min="1" step="1" type="number" required/></label>
+                <label>Ordem<input id="planOrder" step="1" type="number" value="0"/></label>
+                <label class="admin-vip-toggle"><input id="planPermanent" type="checkbox"/><span><strong>Acesso permanente</strong><small>O plano não terá data de vencimento.</small></span></label>
+                <div class="admin-form-submit"><button class="ui-button main-action" type="submit">Salvar plano</button><button class="ui-button quiet-action" id="planCancelEdit" type="button">Limpar</button></div>
+            </form>
+        </details>
+
+        <div class="panel wide admin-list-panel">
+            <div class="panel-head"><div><h3>Planos disponíveis</h3><p class="muted">Preço, duração e disponibilidade no checkout.</p></div></div>
+            <div class="admin-plan-list" id="adminPlanList"></div>
+        </div>
+
+        <div class="panel wide admin-list-panel">
+            <div class="panel-head"><div><h3>Liberar acesso ou gerar cobrança</h3><p class="muted">A renovação antecipada soma o novo período à validade atual.</p></div></div>
+            <div class="admin-form-grid admin-payment-action-grid">
+                <label>Usuário<select id="paymentUserSelect"></select></label>
+                <label>Plano<select id="paymentPlanSelect"></select></label>
+                <div class="admin-form-submit">
+                    <button class="ui-button main-action" id="manualGrantBtn" type="button">Liberar manualmente</button>
+                    <button class="ui-button quiet-action" id="generateChargeBtn" type="button">Gerar nova cobrança</button>
+                </div>
+            </div>
+            <p class="muted" id="paymentActionStatus"></p>
+        </div>
+
+        <div class="panel wide admin-list-panel">
+            <div class="panel-head"><div><h3>Histórico de pagamentos</h3><p class="muted">Cobranças pendentes, aprovadas, canceladas e liberações manuais.</p></div><button class="ui-button quiet-action" id="refreshPayments" type="button">Atualizar</button></div>
+            <div class="admin-toolbar-grid">
+                <label class="admin-filter-field">Pesquisar<input id="paymentSearch" type="search" placeholder="Nome, AL ou WhatsApp"/></label>
+                <label class="admin-filter-field">Situação<select id="paymentStatusFilter"><option value="todos">Todos</option><option value="pendente">Pendentes</option><option value="approved">Aprovados</option><option value="cancelado">Cancelados/recusados</option></select></label>
+            </div>
+            <div class="admin-list-meta" id="paymentListMeta">Carregando pagamentos…</div>
+            <div id="paymentHistoryList"></div>
+        </div>
+    </section>
+
+    <section class="admin-panel hidden" id="contentPanel">
+        <div class="admin-grid admin-create-grid">
+            <details class="panel admin-create-box">
+                <summary>Adicionar disciplina</summary>
+                <form id="disciplineForm">
+                    <label>Código<input name="id" placeholder="ex.: constitucional" required/></label>
+                    <label>Título<input name="nome" required/></label>
+                    <label>Descrição<textarea name="descricao"></textarea></label>
+                    <label>Ordem<input name="ordem" type="number" value="0"/></label>
+                    <button class="ui-button main-action full" type="submit">Adicionar disciplina</button>
+                </form>
+            </details>
+
+            <details class="panel admin-create-box">
+                <summary>Adicionar capítulo</summary>
+                <form id="chapterForm">
+                    <label>Disciplina<select id="chapterSubject" name="disciplina_id" required></select></label>
+                    <label>Título do capítulo<input name="nome" required/></label>
+                    <label>Ordem<input name="indice" type="number"/></label>
+                    <button class="ui-button main-action full" type="submit">Adicionar capítulo</button>
+                </form>
+            </details>
+        </div>
+
+        <div class="panel wide admin-list-panel">
+            <div class="panel-head">
+                <div>
+                    <h3>Disciplinas e capítulos</h3>
+                    <p class="muted">Edite, ative ou desative. Exclusões definitivas ficam em Manutenção.</p>
+                </div>
+                <button class="ui-button quiet-action" id="refreshCatalogAdmin" type="button">Atualizar</button>
+            </div>
+            <div id="catalogAdminList"></div>
+        </div>
+    </section>
+
+    <section class="admin-panel hidden" id="questionsPanel">
+        <details class="panel admin-create-box">
+            <summary>Cadastrar nova questão</summary>
+            <form class="admin-question-create" id="questionForm">
+                <div class="admin-form-grid">
+                    <label>Disciplina<select id="adminSubject" name="disciplina_id" required></select></label>
+                    <label>Capítulo<select id="adminChapter" name="capitulo_id" required></select></label>
+                    <label>
+                        Tipo de questão
+                        <select id="questionType" name="tipo">
+                            <option value="multipla_escolha">Múltipla escolha (A–D ou A–E)</option>
+                            <option value="certo_errado">Certo ou errado</option>
+                        </select>
+                    </label>
+                </div>
+                <label>Enunciado<textarea name="enunciado" required></textarea></label>
+                <div id="alternativeInputs"></div>
+                <label>Resposta correta<select id="correctAnswer" name="resposta_correta"></select></label>
+                <label>Resolução<textarea name="resolucao" required></textarea></label>
+                <button class="ui-button main-action" type="submit">Cadastrar questão</button>
+            </form>
+        </details>
+
+        <div class="panel wide admin-list-panel">
+            <div class="panel-head">
+                <div>
+                    <h3>Banco de questões</h3>
+                    <p class="muted">Pesquise, filtre, edite, duplique, ative ou desative questões.</p>
+                </div>
+                <button class="ui-button quiet-action" id="questionRefreshBtn" type="button">Atualizar</button>
+            </div>
+
+            <div class="admin-question-filters">
+                <label>Pesquisar<input id="questionSearch" placeholder="Trecho do enunciado" type="search" autocomplete="off"/></label>
+                <label>Disciplina<select id="questionFilterSubject"></select></label>
+                <label>Capítulo<select id="questionFilterChapter"><option value="">Todos</option></select></label>
+                <label>
+                    Tipo
+                    <select id="questionFilterType">
+                        <option value="">Todos</option>
+                        <option value="multipla_escolha">Múltipla escolha</option>
+                        <option value="certo_errado">Certo / Errado</option>
+                    </select>
+                </label>
+                <label>
+                    Status
+                    <select id="questionFilterStatus">
+                        <option value="todas">Todas</option>
+                        <option value="ativas">Ativas</option>
+                        <option value="inativas">Inativas</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="admin-list-meta" id="questionListMeta">Carregando questões...</div>
+            <div id="questionsAdminList"></div>
+            <div class="admin-pagination">
+                <button class="ui-button quiet-action mini" id="questionPagerPrev" type="button">Anterior</button>
+                <span id="questionPagerInfo">Página 1</span>
+                <button class="ui-button quiet-action mini" id="questionPagerNext" type="button">Próxima</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-panel hidden" id="transferPanel">
+        <div class="admin-grid">
+            <div class="panel wide">
+                <div class="panel-head">
+                    <div>
+                        <h3>Importar conteúdo</h3>
+                        <p class="muted">Excel (.xlsx), CSV ou JSON com disciplinas, capítulos, questões, gabaritos e resoluções.</p>
+                    </div>
+                </div>
+                <label>Arquivo<input accept=".xlsx,.xls,.csv,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,application/json" id="importFile" type="file"/></label>
+                <label>
+                    Modo de importação
+                    <select id="importMode">
+                        <option value="merge">Mesclar com o conteúdo existente</option>
+                        <option value="replace">Substituir completamente (deletar questões/capítulos anteriores)</option>
+                    </select>
+                </label>
+                <div class="data-actions">
+                    <button class="ui-button quiet-action" id="analyzeImportBtn" type="button">Analisar arquivo</button>
+                    <button class="ui-button main-action" disabled id="importBtn" type="button">Confirmar importação</button>
+                    <a class="ui-button quiet-action" download href="/modelo-importacao-questoes.xlsx">Modelo Excel</a>
+                    <a class="ui-button quiet-action" download href="/modelo-importacao-disciplina.json">Modelo JSON</a>
+                </div>
+                <p class="muted" id="importStatus"></p>
+                <p class="field-help">No modo Substituir, as questões e capítulos anteriores são excluídos fisicamente. O histórico e o ranking já registrados são preservados pelo snapshot das respostas.</p>
+                <div class="import-preview hidden" id="importPreview"></div>
+            </div>
+
+            <div class="panel wide">
+                <div class="panel-head"><h3>Exportar disciplina</h3></div>
+                <label>Disciplina<select id="exportSubject"></select></label>
+                <div class="data-actions">
+                    <button class="ui-button main-action" id="exportBtn" type="button">Baixar JSON</button>
+                    <button class="ui-button quiet-action" id="exportExcelBtn" type="button">Baixar Excel (.xlsx)</button>
+                </div>
+                <p class="muted">Os arquivos exportados podem ser importados novamente.</p>
+            </div>
+
+            <div class="panel wide admin-backup-panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Backup de conteúdo</h3>
+                        <p class="muted">Gera um JSON com disciplinas, capítulos e questões. Contas e senhas não são incluídas.</p>
+                    </div>
+                </div>
+                <button class="ui-button quiet-action" id="backupContentBtn" type="button">Baixar backup geral</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-panel hidden" id="maintenancePanel">
+        <div class="danger-zone-v2">
+            <div class="danger-zone-heading">
+                <div>
+                    <p class="section-kicker">ZONA DE PERIGO</p>
+                    <h3>Manutenção</h3>
+                    <p>Somente o Desenvolvedor. As ações abaixo exigem confirmação.</p>
+                </div>
+            </div>
+
+            <article class="danger-action-card">
+                <div>
+                    <strong>Encerrar sessões ativas de alunos</strong>
+                    <p>Força o logout das sessões exclusivas atuais. Não apaga histórico.</p>
+                </div>
+                <button class="ui-button quiet-action danger" id="endSessionsBtn" type="button">Encerrar sessões</button>
+            </article>
+
+            <article class="danger-action-card">
+                <div>
+                    <strong>Limpar todos os resultados</strong>
+                    <p>Apaga sessões, respostas, histórico e ranking, mantendo usuários e questões.</p>
+                </div>
+                <button class="ui-button danger-fill" id="clearResultsBtn" type="button">Limpar resultados</button>
+            </article>
+
+            <article class="danger-action-card">
+                <div class="danger-action-copy">
+                    <strong>Excluir uma disciplina definitivamente</strong>
+                    <p>Remove disciplina, capítulos, questões e dados de estudo vinculados.</p>
+                    <select id="maintenanceDiscipline"></select>
+                </div>
+                <button class="ui-button danger-fill" id="purgeSelectedDisciplineBtn" type="button">Excluir disciplina</button>
+            </article>
+
+            <article class="danger-action-card danger-action-critical">
+                <div>
+                    <strong>Excluir todas as disciplinas</strong>
+                    <p>Remove permanentemente todas as disciplinas, capítulos, questões e resultados. Usuários são preservados.</p>
+                </div>
+                <button class="ui-button danger-fill" id="deleteAllDisciplinesBtn" type="button">Excluir todas / geral</button>
+            </article>
+        </div>
+    </section>
+
+    <div class="admin-modal hidden" id="userEditModal" role="dialog" aria-modal="true" aria-labelledby="userEditTitle">
+        <div class="admin-modal-card">
+            <div class="admin-modal-head">
+                <div><p class="section-kicker">USUÁRIO</p><h3 id="userEditTitle">Editar conta</h3></div>
+                <button class="ui-button quiet-action mini" data-close-admin-modal="userEditModal" type="button">Fechar</button>
+            </div>
+            <form id="userEditForm">
+                <input id="editUserId" name="id" type="hidden"/>
+                <label>Nome de Guerra<input id="editUserName" name="nome" required/></label>
+                <label>AL SD PM Nº<input id="editUserLogin" name="usuario" required/></label>
+                <label>WhatsApp<input id="editUserWhatsapp" inputmode="tel" name="whatsapp"/></label>
+                <label class="supreme-only">ADM responsável<select id="editUserResponsible"></select></label>
+                <label class="admin-vip-toggle">
+                    <input id="editUserVip" type="checkbox"/>
+                    <span><strong>Usuário VIP</strong><small>O ADM responsável pode conceder ou remover o acesso permanente.</small></span>
+                </label>
+                <label class="supreme-only" id="editUserPasswordField">Nova senha (opcional)<input id="editUserPassword" minlength="6" name="senha" type="password"/></label>
+                <button class="ui-button main-action full" type="submit">Salvar alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-modal hidden" id="validityModal" role="dialog" aria-modal="true" aria-labelledby="validityTitle">
+        <div class="admin-modal-card">
+            <div class="admin-modal-head">
+                <div><p class="section-kicker">VALIDADE</p><h3 id="validityTitle">Prazo de acesso</h3></div>
+                <button class="ui-button quiet-action mini" data-close-admin-modal="validityModal" type="button">Fechar</button>
+            </div>
+            <p class="muted" id="validityUserInfo"></p>
+            <div class="validity-presets">
+                <button class="ui-button quiet-action mini" data-validity-days="7" type="button">+7 dias</button>
+                <button class="ui-button quiet-action mini" data-validity-days="15" type="button">+15 dias</button>
+                <button class="ui-button quiet-action mini" data-validity-days="30" type="button">+30 dias</button>
+                <button class="ui-button quiet-action mini" data-validity-days="60" type="button">+60 dias</button>
+                <button class="ui-button quiet-action mini" data-validity-days="90" type="button">+90 dias</button>
+            </div>
+            <form id="validityForm">
+                <input id="validityUserId" type="hidden"/>
+                <label>Validade até<input id="validityDate" type="date"/></label>
+                <div class="data-actions">
+                    <button class="ui-button main-action" type="submit">Aplicar validade</button>
+                    <button class="ui-button quiet-action" id="removeValidityBtn" type="button">Sem prazo</button>
+                    <button class="ui-button quiet-action" id="permanentValidityBtn" type="button">Vitalício / VIP</button>
+                </div>
+                <p class="field-help">Data = Premium. Vitalício = VIP. Sem prazo = teste encerrado, com novo teste disponível em 8h.</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-modal hidden" id="contentEditModal" role="dialog" aria-modal="true" aria-labelledby="contentEditTitle">
+        <div class="admin-modal-card">
+            <div class="admin-modal-head">
+                <div><p class="section-kicker">CONTEÚDO</p><h3 id="contentEditTitle">Editar item</h3></div>
+                <button class="ui-button quiet-action mini" data-close-admin-modal="contentEditModal" type="button">Fechar</button>
+            </div>
+            <form id="contentEditForm">
+                <input id="contentEditType" type="hidden"/>
+                <input id="contentEditId" type="hidden"/>
+                <label>Nome<input id="contentEditName" required/></label>
+                <label id="contentDescriptionField">Descrição<textarea id="contentEditDescription"></textarea></label>
+                <label>Ordem<input id="contentEditOrder" type="number"/></label>
+                <button class="ui-button main-action full" type="submit">Salvar alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-modal hidden" id="questionEditModal" role="dialog" aria-modal="true" aria-labelledby="questionEditTitle">
+        <div class="admin-modal-card admin-modal-card-wide">
+            <div class="admin-modal-head">
+                <div><p class="section-kicker">QUESTÃO</p><h3 id="questionEditTitle">Editar questão</h3></div>
+                <button class="ui-button quiet-action mini" data-close-admin-modal="questionEditModal" type="button">Fechar</button>
+            </div>
+            <form id="questionEditForm">
+                <input id="questionEditId" type="hidden"/>
+                <div class="admin-form-grid">
+                    <label>Disciplina<select id="questionEditSubject" required></select></label>
+                    <label>Capítulo<select id="questionEditChapter" required></select></label>
+                    <label>Tipo<select id="questionEditType"><option value="multipla_escolha">Múltipla escolha</option><option value="certo_errado">Certo / Errado</option></select></label>
+                </div>
+                <label>Enunciado<textarea id="questionEditStatement" required></textarea></label>
+                <div id="questionEditAlternatives"></div>
+                <label>Resposta correta<select id="questionEditCorrect"></select></label>
+                <label>Resolução<textarea id="questionEditResolution" required></textarea></label>
+                <div class="admin-form-grid">
+                    <label>Dificuldade<select id="questionEditDifficulty"><option value="facil">Fácil</option><option value="media">Média</option><option value="dificil">Difícil</option></select></label>
+                    <label>Fonte<input id="questionEditSource"/></label>
+                </div>
+                <button class="ui-button main-action full" type="submit">Salvar questão</button>
+            </form>
+        </div>
+    </div>
+</section>

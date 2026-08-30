@@ -1,0 +1,15 @@
+.git/
+.github/
+.env
+.env.*
+!.env.example
+node_modules/
+questions-source.json
+scripts/
+supabase/
+*.sql
+*.zip
+*.log
+README*.md
+ATUALIZACAO*.md
+ESTRUTURA*.md

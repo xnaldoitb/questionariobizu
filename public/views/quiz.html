@@ -1,0 +1,42 @@
+<section class="hidden" id="quizView">
+<div class="quiz-head">
+<button class="ui-button quiet-action" id="backBtn">← Voltar</button>
+<div class="progress-wrap">
+<div class="progress">
+<span id="quizProgressBar"></span>
+</div>
+<small id="progressText"></small>
+</div>
+<strong id="scoreText"></strong>
+</div>
+<article class="question-card" id="questionCard">
+<div class="question-meta">
+<span id="questionChapter"></span>
+<span id="questionNumber"></span>
+</div>
+<h2 id="questionText"></h2>
+<p class="answer-tools-hint" id="answerToolsHint"><span aria-hidden="true">✂</span> Use a tesoura para riscar alternativas que considerar incorretas. Depois selecione sua resposta e confirme.</p>
+<div class="answer-list" id="answerList"></div>
+<div class="answer-explanation hidden" id="resolution">
+<div class="answer-feedback" id="answerFeedback" role="status" aria-live="polite"></div>
+<strong>Resolução comentada</strong>
+<p id="resolutionText"></p>
+</div>
+<div class="quiz-controls">
+<button class="ui-button quiet-action" id="skipBtn">Pular</button>
+<button class="ui-button confirm-answer-action" disabled id="confirmAnswerBtn" type="button">Confirmar resposta</button>
+<button class="ui-button main-action" disabled id="nextBtn">Próxima →</button>
+</div>
+</article>
+<article class="access-blocked-card hidden" id="accessBlockedCard">
+    <div class="access-blocked-icon" id="accessBlockedIcon" aria-hidden="true">🔒</div>
+    <p class="section-kicker"><span class="kicker-mark"></span> acesso às questões</p>
+    <h2 id="accessBlockedTitle">Acesso às questões indisponível</h2>
+    <p id="accessBlockedText">Escolha um plano e pague com Pix para liberar seu acesso.</p>
+    <div class="access-blocked-note">
+        Sua conta continua disponível normalmente para consultar perfil, histórico, ranking e comunidade.
+    </div>
+    <button class="ui-button main-action" id="blockedPlansBtn" type="button">Ver planos e pagar com Pix</button>
+    <button class="ui-button quiet-action" type="button" onclick="document.getElementById('navHome')?.click()">← Voltar para o início</button>
+</article>
+</section>

@@ -1,0 +1,9 @@
+node_modules/
+.netlify/
+.env
+.env.*
+!.env.example
+*.log
+.env.local
+.vercel/
+/regularizar-2005.sql

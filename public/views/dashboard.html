@@ -1,0 +1,123 @@
+<section id="dashboard">
+    <div class="profile-dashboard" aria-label="Resumo do aluno">
+        <div class="profile-identity">
+            <div class="profile-avatar" id="profileAvatar" aria-hidden="true">AL</div>
+            <div class="profile-copy">
+                <span class="profile-kicker" id="profileKicker">Aluno conectado</span>
+                <h1 id="profileWarName">—</h1>
+                <p id="profileRegistration">AL SD PM Nº: —</p>
+            </div>
+        </div>
+
+        <div class="profile-metrics">
+            <article class="profile-metric profile-rank">
+                <span>Colocação</span>
+                <strong id="profileRanking">—</strong>
+                <small>geral</small>
+            </article>
+            <article class="profile-metric">
+                <span>Respondidas</span>
+                <strong id="profileAnswered">0</strong>
+                <small>questões</small>
+            </article>
+            <article class="profile-metric profile-hits">
+                <span>Acertos</span>
+                <strong id="profileCorrect">0</strong>
+                <small>corretas</small>
+            </article>
+        </div>
+    </div>
+
+    <aside class="access-notice hidden" id="accessNotice" role="status" aria-live="polite">
+        <div class="access-notice-icon" aria-hidden="true">⏱</div>
+        <div>
+            <strong id="accessNoticeTitle">Teste gratuito</strong>
+            <p id="accessNoticeText"></p>
+            <button class="access-plans-button" id="accessNoticePlans" type="button">Ver planos e pagar com Pix</button>
+        </div>
+    </aside>
+
+    <div class="community-strip" aria-label="Comunidade online">
+        <div class="community-presence">
+            <span class="presence-dot" aria-hidden="true"></span>
+            <strong id="onlineCount">0 online agora</strong>
+            <span class="presence-divider" aria-hidden="true">·</span>
+            <span id="onlineSpotlight">Conectando à comunidade…</span>
+        </div>
+        <button class="community-chat-button" id="openChatBtn" type="button">
+            <span aria-hidden="true">💬</span>
+            <span>Chat</span>
+            <b id="chatOnlineCount">0</b>
+        </button>
+    </div>
+
+    <div class="study-intro compact-study-intro">
+        <div>
+            <p class="section-kicker"><span class="kicker-mark"></span> questões bizuradas</p>
+            <p>
+                Escolha uma disciplina, um ou mais capítulos e a quantidade de questões.
+                Seu desempenho será registrado automaticamente.
+            </p>
+        </div>
+    </div>
+
+    <div class="panel study-panel">
+        <div class="filters-grid">
+            <label>
+                Disciplina
+                <select id="subjectSelect"></select>
+            </label>
+            <div class="chapter-filter">
+                <span id="chapterFilterLabel">Capítulos</span>
+                <details id="chapterSelect" class="chapter-select" aria-labelledby="chapterFilterLabel"></details>
+            </div>
+            <label>
+                Quantidade
+                <select id="limitSelect">
+                    <option value="all" selected>Todas</option>
+                    <option value="10">10 questões</option>
+                    <option value="20">20 questões</option>
+                    <option value="30">30 questões</option>
+                    <option value="50">50 questões</option>
+                    <option value="100">100 questões</option>
+                </select>
+            </label>
+            <button class="ui-button main-action start-button" id="startBtn" type="button">Iniciar simulado</button>
+        </div>
+        <label class="study-review-filter" for="reviewPendingOnly">
+            <input id="reviewPendingOnly" type="checkbox"/>
+            <span><strong>Revisão inteligente</strong> — responder somente questões ainda não respondidas ou cuja resposta mais recente esteja errada.</span>
+        </label>
+    </div>
+
+    <div class="modal-overlay hidden" id="chatModal" role="dialog" aria-modal="true" aria-labelledby="chatTitle">
+        <section class="report-modal chat-modal">
+            <header class="report-modal-header chat-modal-header">
+                <div>
+                    <p class="section-kicker"><span class="kicker-mark"></span> sala temporária</p>
+                    <h2 id="chatTitle">Chat de estudos</h2>
+                    <p><span class="presence-dot inline-dot" aria-hidden="true"></span><strong id="chatHeaderOnline">0 online</strong> · a conversa é apagada quando a sala fica sem usuários ativos.</p>
+                </div>
+                <button class="modal-close" id="chatClose" type="button" aria-label="Fechar chat">×</button>
+            </header>
+
+            <div class="chat-body">
+                <div class="chat-privacy-note">
+                    <span aria-hidden="true">◷</span>
+                    <span>Chat efêmero: sem histórico permanente. Após 5 min sem atividade você deixa de aparecer como online; após 10 min sua presença é removida.</span>
+                </div>
+                <div class="chat-messages" id="chatMessages" aria-live="polite">
+                    <div class="chat-empty">Carregando conversa…</div>
+                </div>
+                <form class="chat-compose" id="chatForm">
+                    <label class="sr-only" for="chatInput">Mensagem</label>
+                    <textarea id="chatInput" rows="2" maxlength="400" placeholder="Digite uma mensagem…" autocomplete="off"></textarea>
+                    <div class="chat-compose-footer">
+                        <span id="chatCounter">0/400</span>
+                        <button class="ui-button main-action" id="chatSend" type="submit">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</section>
