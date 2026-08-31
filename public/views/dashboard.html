@@ -63,25 +63,26 @@
 
     <div class="panel study-panel">
         <div class="filters-grid">
-            <label>
-                Disciplina
-                <select id="subjectSelect"></select>
-            </label>
+            <div class="discipline-filter">
+                <span id="subjectFilterLabel">Disciplina</span>
+                <details id="subjectPicker" class="discipline-select" aria-labelledby="subjectFilterLabel"></details>
+                <select id="subjectSelect" class="sr-only" tabindex="-1" aria-hidden="true"></select>
+            </div>
             <div class="chapter-filter">
                 <span id="chapterFilterLabel">Capítulos</span>
                 <details id="chapterSelect" class="chapter-select" aria-labelledby="chapterFilterLabel"></details>
             </div>
-            <label>
-                Quantidade
-                <select id="limitSelect">
-                    <option value="all" selected>Todas</option>
-                    <option value="10">10 questões</option>
-                    <option value="20">20 questões</option>
-                    <option value="30">30 questões</option>
-                    <option value="50">50 questões</option>
-                    <option value="100">100 questões</option>
-                </select>
-            </label>
+            <fieldset class="limit-filter">
+                <legend>Quantidade</legend>
+                <div class="limit-segments" role="radiogroup" aria-label="Quantidade de questões">
+                    <label><input type="radio" name="questionLimit" value="all" checked><span>Todas</span></label>
+                    <label><input type="radio" name="questionLimit" value="10"><span>10</span></label>
+                    <label><input type="radio" name="questionLimit" value="20"><span>20</span></label>
+                    <label><input type="radio" name="questionLimit" value="30"><span>30</span></label>
+                    <label><input type="radio" name="questionLimit" value="50"><span>50</span></label>
+                    <label><input type="radio" name="questionLimit" value="100"><span>100</span></label>
+                </div>
+            </fieldset>
             <button class="ui-button main-action start-button" id="startBtn" type="button">Iniciar simulado</button>
         </div>
         <label class="study-review-filter" for="reviewPendingOnly">

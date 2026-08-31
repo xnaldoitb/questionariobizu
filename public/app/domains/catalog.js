@@ -2,6 +2,7 @@ import { requestJson } from '../foundation/request.js';
 import { one, safeText } from '../foundation/selectors.js';
 import { appState } from '../foundation/model.js';
 import { renderChapterSelection } from './chapter-selection.js';
+import { renderDisciplineSelection } from './discipline-selection.js';
 
 let onCatalogLoaded = () => {};
 
@@ -32,6 +33,13 @@ export function populateSubjectSelectors() {
             element.innerHTML = options;
         }
     });
+
+    renderDisciplineSelection(
+        one('#subjectPicker'),
+        one('#subjectSelect'),
+        appState.catalog.disciplinas,
+        appState.catalog.capitulos,
+    );
 
     populateChapterSelector('#subjectSelect', '#chapterSelect', true);
     populateChapterSelector('#adminSubject', '#adminChapter', false);

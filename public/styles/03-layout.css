@@ -142,7 +142,7 @@
 
 .filters-grid {
     display: grid;
-    grid-template-columns: 1.2fr 1.5fr .8fr auto;
+    grid-template-columns: minmax(190px, 1.15fr) minmax(220px, 1.35fr) minmax(210px, .9fr) auto;
     align-items: end;
     gap: 12px;
 }
@@ -165,4 +165,3 @@
     bottom: auto !important;
     z-index: auto !important;
 }
-

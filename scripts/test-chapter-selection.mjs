@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 import { parseChapterIds } from '../server/platform/chapter-filter.mjs';
-import { renderChapterSelection, selectedChapterIds } from '../public/app/domains/chapter-selection.js';
+import { chapterSelectionIsValid, renderChapterSelection, selectedChapterIds } from '../public/app/domains/chapter-selection.js';
 
 assert.deepEqual(parseChapterIds({}), []);
 assert.deepEqual(parseChapterIds({ capitulo: '2' }), [2]);
@@ -11,7 +11,8 @@ for (const value of ['0', '-1', '1,no', '1,', '1.2', '9007199254740992', ['1','2
     assert.throws(() => parseChapterIds({ capitulos: value }));
 }
 const inputs = [{ value:'2', checked:false }, { value:'3', checked:false }];
-const all = { checked:true };
+inputs.forEach(input => { input.matches = selector => selector === '[data-chapter]'; });
+const all = { checked:true, matches:selector => selector === '[data-all]' };
 const summary = { textContent:'', focus() {} };
 const root = {
     querySelectorAll: (selector) => selector.includes(':checked') ? inputs.filter(x => x.checked) : inputs,
@@ -19,19 +20,22 @@ const root = {
 };
 const chapters = [{ id:2,nome:'Primeiro' }, { id:3,nome:'Segundo' }];
 renderChapterSelection(root, chapters);
-const change = (isAll = false) => root.onchange({ target:{ matches:()=>isAll } });
-inputs[0].checked = true; change();
+inputs[0].checked = true; root.onchange({ target:inputs[0] });
 assert.deepEqual(selectedChapterIds(root), ['2']);
 assert.equal(summary.textContent, 'Primeiro');
 assert.equal(all.checked, false);
-inputs[1].checked = true; change();
+inputs[1].checked = true; root.onchange({ target:inputs[1] });
 assert.deepEqual(selectedChapterIds(root), ['2','3']);
 assert.equal(summary.textContent, '2 capítulos selecionados');
-inputs[0].checked = false; change();
+inputs[0].checked = false; root.onchange({ target:inputs[0] });
 assert.deepEqual(selectedChapterIds(root), ['3']);
-change(true);
+inputs[1].checked = false; root.onchange({ target:inputs[1] });
+assert.equal(chapterSelectionIsValid(root), false);
+assert.equal(summary.textContent, 'Nenhum capítulo selecionado');
+all.checked = true; root.onchange({ target:all });
 assert.deepEqual(selectedChapterIds(root), []);
 assert.equal(all.checked, true);
+assert.equal(chapterSelectionIsValid(root), true);
 
 // Route tests with an in-memory database: no network or real student records.
 let actor = { id:'student', acesso_questoes:true };

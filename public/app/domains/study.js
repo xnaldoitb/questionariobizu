@@ -4,7 +4,7 @@ import { appState } from '../foundation/model.js';
 import { openScreen } from '../foundation/navigation.js';
 import { prepareQuestionView, refreshAccessState, renderAccessBlocked } from './access.js';
 import { syncSessionActivity } from './session-activity.js';
-import { selectedChapterIds } from './chapter-selection.js';
+import { chapterSelectionIsValid, selectedChapterIds } from './chapter-selection.js';
 
 let selectedAnswerIndex = null;
 let eliminatedAnswerIndexes = new Set();
@@ -69,10 +69,11 @@ async function startStudySession() {
 
         prepareQuestionView();
         const disciplineId = one('#subjectSelect').value;
+        if (!chapterSelectionIsValid()) throw new Error('Selecione pelo menos um capítulo ou escolha todos.');
         const chapterIds = selectedChapterIds();
         const chapterId = chapterIds.join(',');
         one('#chapterSelect').open = false;
-        const limitValue = one('#limitSelect').value;
+        const limitValue = one('input[name="questionLimit"]:checked')?.value || 'all';
         const reviewOnly = Boolean(one('#reviewPendingOnly')?.checked);
         const allQuestions = limitValue === 'all';
         const limit = allQuestions ? 'all' : Number(limitValue);
