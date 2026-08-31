@@ -43,7 +43,7 @@ export function populateSubjectSelectors() {
     }
 
     renderDisciplineSelection(
-        one('#subjectPicker'),
+        one('#subjectOptions'),
         subjectControl,
         appState.catalog.disciplinas,
         appState.catalog.capitulos,

@@ -65,12 +65,34 @@
         <div class="filters-grid">
             <div class="discipline-filter">
                 <span id="subjectFilterLabel">Disciplina</span>
-                <details id="subjectPicker" class="discipline-select" aria-labelledby="subjectFilterLabel"></details>
+                <button id="subjectPicker" class="study-filter-trigger" type="button"
+                    aria-labelledby="subjectFilterLabel subjectSelectionSummary"
+                    aria-haspopup="dialog" aria-controls="subjectModal">
+                    <span class="study-filter-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M5 5.8A2.8 2.8 0 0 1 7.8 3H19v15H7.8A2.8 2.8 0 0 0 5 20.8V5.8Z"/><path d="M5 20.8A2.8 2.8 0 0 1 7.8 18H19M9 7h6M9 11h5"/></svg>
+                    </span>
+                    <span class="study-filter-copy">
+                        <strong id="subjectSelectionSummary">Carregando…</strong>
+                        <small id="subjectSelectionMeta">Toque para escolher</small>
+                    </span>
+                    <span class="study-filter-arrow" aria-hidden="true">›</span>
+                </button>
                 <input id="subjectSelect" type="hidden">
             </div>
             <div class="chapter-filter">
                 <span id="chapterFilterLabel">Capítulos</span>
-                <details id="chapterSelect" class="chapter-select" aria-labelledby="chapterFilterLabel"></details>
+                <button id="chapterPicker" class="study-filter-trigger" type="button"
+                    aria-labelledby="chapterFilterLabel chapterSelectionSummary"
+                    aria-haspopup="dialog" aria-controls="chapterModal">
+                    <span class="study-filter-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4-8-4Z"/><path d="m4 12 8 4 8-4M4 17l8 4 8-4"/></svg>
+                    </span>
+                    <span class="study-filter-copy">
+                        <strong id="chapterSelectionSummary">Todos os capítulos</strong>
+                        <small id="chapterSelectionMeta">Toque para escolher</small>
+                    </span>
+                    <span class="study-filter-arrow" aria-hidden="true">›</span>
+                </button>
             </div>
             <fieldset class="limit-filter">
                 <legend>Quantidade</legend>
@@ -89,6 +111,40 @@
             <input id="reviewPendingOnly" type="checkbox"/>
             <span><strong>Revisão inteligente</strong> — responder somente questões ainda não respondidas ou cuja resposta mais recente esteja errada.</span>
         </label>
+    </div>
+
+    <div class="modal-overlay study-filter-overlay hidden" id="subjectModal" role="dialog" aria-modal="true" aria-labelledby="subjectModalTitle">
+        <section class="report-modal study-filter-modal">
+            <header class="study-filter-modal-header">
+                <span class="study-modal-heading-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M5 5.8A2.8 2.8 0 0 1 7.8 3H19v15H7.8A2.8 2.8 0 0 0 5 20.8V5.8Z"/><path d="M5 20.8A2.8 2.8 0 0 1 7.8 18H19"/></svg>
+                </span>
+                <div><small>Simulado</small><h2 id="subjectModalTitle">Escolha a disciplina</h2></div>
+                <button class="study-modal-close" id="subjectModalClose" type="button" aria-label="Fechar seleção de disciplina">×</button>
+            </header>
+            <div class="study-filter-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+                <input id="subjectSearch" type="search" placeholder="Pesquisar disciplina" aria-label="Pesquisar disciplina" autocomplete="off">
+            </div>
+            <div class="discipline-option-list" id="subjectOptions" role="listbox" aria-label="Disciplinas"></div>
+        </section>
+    </div>
+
+    <div class="modal-overlay study-filter-overlay hidden" id="chapterModal" role="dialog" aria-modal="true" aria-labelledby="chapterModalTitle">
+        <section class="report-modal study-filter-modal">
+            <header class="study-filter-modal-header">
+                <span class="study-modal-heading-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4-8-4Z"/><path d="m4 12 8 4 8-4M4 17l8 4 8-4"/></svg>
+                </span>
+                <div><small>Simulado</small><h2 id="chapterModalTitle">Escolha os capítulos</h2></div>
+                <button class="study-modal-close" id="chapterModalClose" type="button" aria-label="Fechar seleção de capítulos">×</button>
+            </header>
+            <div id="chapterSelect" class="chapter-selector-body" role="group" aria-label="Selecionar capítulos"></div>
+            <footer class="study-filter-modal-footer">
+                <span id="chapterModalStatus">Todos selecionados</span>
+                <button class="ui-button main-action" id="chapterDone" type="button">Concluir</button>
+            </footer>
+        </section>
     </div>
 
     <div class="modal-overlay hidden" id="chatModal" role="dialog" aria-modal="true" aria-labelledby="chatTitle">

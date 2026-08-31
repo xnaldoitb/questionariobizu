@@ -72,7 +72,6 @@ async function startStudySession() {
         if (!chapterSelectionIsValid()) throw new Error('Selecione pelo menos um capítulo ou escolha todos.');
         const chapterIds = selectedChapterIds();
         const chapterId = chapterIds.join(',');
-        one('#chapterSelect').open = false;
         const limitValue = one('input[name="questionLimit"]:checked')?.value || 'all';
         const reviewOnly = Boolean(one('#reviewPendingOnly')?.checked);
         const allQuestions = limitValue === 'all';

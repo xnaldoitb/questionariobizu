@@ -14,6 +14,17 @@ const inputs = [{ value:'2', checked:false }, { value:'3', checked:false }];
 inputs.forEach(input => { input.matches = selector => selector === '[data-chapter]'; });
 const all = { checked:true, matches:selector => selector === '[data-all]' };
 const summary = { textContent:'', focus() {} };
+const meta = { textContent:'' };
+const status = { textContent:'' };
+const picker = { classList:{ toggle() {} } };
+globalThis.document = {
+    querySelector: (selector) => ({
+        '#chapterSelectionSummary': summary,
+        '#chapterSelectionMeta': meta,
+        '#chapterModalStatus': status,
+        '#chapterPicker': picker,
+    })[selector] || null,
+};
 const root = {
     querySelectorAll: (selector) => selector.includes(':checked') ? inputs.filter(x => x.checked) : inputs,
     querySelector: (selector) => selector === 'summary' ? summary : all,
@@ -31,7 +42,7 @@ inputs[0].checked = false; root.onchange({ target:inputs[0] });
 assert.deepEqual(selectedChapterIds(root), ['3']);
 inputs[1].checked = false; root.onchange({ target:inputs[1] });
 assert.equal(chapterSelectionIsValid(root), false);
-assert.equal(summary.textContent, 'Nenhum capítulo selecionado');
+assert.equal(summary.textContent, 'Escolha os capítulos');
 all.checked = true; root.onchange({ target:all });
 assert.deepEqual(selectedChapterIds(root), []);
 assert.equal(all.checked, true);
@@ -90,4 +101,5 @@ actor = { acesso_questoes:false };
 assert.equal((await call()).statusCode,403);
 actor = null;
 assert.equal((await call()).statusCode,401);
+delete globalThis.document;
 console.log('Capítulos: seleção múltipla, Todos, validação, paginação, revisão e acesso passaram.');

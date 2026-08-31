@@ -10,6 +10,7 @@ import {
     onCatalogReady
 } from './domains/catalog.js';
 import { bindStudyEvents } from './domains/study.js';
+import { bindStudyFilterModals } from './domains/study-filter-modals.js';
 import { bindPerformanceEvents } from './domains/performance.js';
 import { startCommunity } from './domains/community.js';
 import { bindPaymentEvents, startAccessIndicator } from './domains/access.js';
@@ -146,6 +147,7 @@ async function bootstrap() {
 
     bindIdentityEvents(enterWorkspace);
     bindPrimaryNavigation();
+    bindStudyFilterModals();
     bindStudyEvents();
     bindPerformanceEvents();
     bindPaymentEvents();
