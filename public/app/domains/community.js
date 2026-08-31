@@ -2,6 +2,7 @@ import { requestJson } from '../foundation/request.js';
 import { accountBadges } from '../foundation/badges.js';
 import { appState } from '../foundation/model.js';
 import { one, safeText, notify } from '../foundation/selectors.js';
+import { bindEmojiPicker, countGraphemes } from './emoji-picker.js';
 
 const HEARTBEAT_MS = 90_000;
 const PRESENCE_REFRESH_MS = 60_000;
@@ -191,6 +192,7 @@ async function submitChat(event) {
     const button = one('#chatSend');
     const message = input.value.trim();
     if (!message) return;
+    if (countGraphemes(message) > 400) return notify('A mensagem pode ter no máximo 400 caracteres.');
 
     button.disabled = true;
     try {
@@ -211,6 +213,7 @@ async function submitChat(event) {
 }
 
 function bindChat() {
+    bindEmojiPicker();
     one('#openChatBtn')?.addEventListener('click', openChatModal);
     one('#chatClose')?.addEventListener('click', closeChatModal);
     one('#chatModal')?.addEventListener('click', (event) => {
@@ -218,7 +221,7 @@ function bindChat() {
     });
     one('#chatForm')?.addEventListener('submit', submitChat);
     one('#chatInput')?.addEventListener('input', (event) => {
-        one('#chatCounter').textContent = `${event.currentTarget.value.length}/400`;
+        one('#chatCounter').textContent = `${countGraphemes(event.currentTarget.value)}/400`;
     });
     one('#chatInput')?.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {

@@ -268,11 +268,141 @@
     gap: 10px;
     margin-top: 6px;
 }
-.chat-compose-footer > span {
+.chat-compose-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.chat-compose-tools > span {
     color: var(--text-muted);
     font: 600 9px var(--type-ui);
 }
 .chat-compose-footer .ui-button { min-height: 32px; padding: 6px 14px; }
+.emoji-toggle {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: var(--canvas-soft);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 17px;
+}
+.emoji-toggle:hover,
+.emoji-toggle[aria-expanded="true"] {
+    background: color-mix(in srgb, var(--navy-mid) 10%, var(--canvas-soft));
+    border-color: var(--navy-mid);
+}
+.openmoji-picker {
+    margin-top: 7px;
+    overflow: hidden;
+    background: var(--canvas);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(9, 27, 52, .14);
+}
+.openmoji-header {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px;
+    background: var(--canvas-soft);
+    border-bottom: 1px solid var(--line);
+}
+.openmoji-header input {
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 9px;
+    color: var(--text-main);
+    background: var(--panel-surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font: 600 11px var(--type-ui);
+}
+.openmoji-header button {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    padding: 0;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: 22px;
+}
+.openmoji-categories {
+    display: flex;
+    gap: 4px;
+    padding: 6px 8px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--line);
+}
+.openmoji-categories button {
+    display: grid;
+    place-items: center;
+    min-width: 34px;
+    height: 31px;
+    padding: 0 7px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+}
+.openmoji-categories button:hover,
+.openmoji-categories button.is-active {
+    background: color-mix(in srgb, var(--navy-mid) 10%, var(--canvas-soft));
+    border-color: color-mix(in srgb, var(--navy-mid) 45%, var(--line));
+}
+.openmoji-grid {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(34px, 1fr));
+    gap: 3px;
+    max-height: 180px;
+    padding: 8px;
+    overflow-y: auto;
+}
+.openmoji-item {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    height: 40px;
+    padding: 4px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    cursor: pointer;
+}
+.openmoji-item:hover,
+.openmoji-item:focus-visible {
+    background: var(--canvas-soft);
+    border-color: var(--line);
+    outline: none;
+}
+.openmoji-item img {
+    display: block;
+    width: 30px;
+    height: 30px;
+}
+.openmoji-picker > small {
+    display: block;
+    padding: 6px 9px;
+    color: var(--text-muted);
+    background: var(--canvas-soft);
+    border-top: 1px solid var(--line);
+    font: 500 8px/1.35 var(--type-ui);
+    text-align: right;
+}
+.openmoji-picker > small a { color: var(--text-accent); }
+.openmoji-empty {
+    grid-column: 1 / -1;
+    margin: 18px 0;
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 11px;
+}
 
 @media (max-width: 820px) {
     .profile-dashboard {
@@ -319,4 +449,5 @@
     .chat-message { width: 92%; }
     .chat-modal .report-modal-header { padding: 16px 17px 14px; }
     .chat-modal .report-modal-header h2 { font-size: 21px; }
+    .openmoji-grid { grid-template-columns: repeat(7, minmax(34px, 1fr)); }
 }

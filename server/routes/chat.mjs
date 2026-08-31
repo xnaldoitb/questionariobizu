@@ -11,6 +11,13 @@ import {
 const MAX_MESSAGE_LENGTH = 400;
 const MESSAGE_LIMIT = 60;
 
+function messageLength(value) {
+    if (globalThis.Intl?.Segmenter) {
+        return [...new Intl.Segmenter('pt-BR', { granularity: 'grapheme' }).segment(value)].length;
+    }
+    return Array.from(value).length;
+}
+
 function normalizeMessage(value) {
     return String(value ?? '')
         .replace(/\r\n?/g, '\n')
@@ -75,7 +82,7 @@ export const handler = async (event) => {
 
             const message = normalizeMessage(parseBody(event).mensagem);
             if (!message) return json(400, { erro: 'Digite uma mensagem.' });
-            if (message.length > MAX_MESSAGE_LENGTH) {
+            if (messageLength(message) > MAX_MESSAGE_LENGTH) {
                 return json(400, { erro: `A mensagem pode ter no máximo ${MAX_MESSAGE_LENGTH} caracteres.` });
             }
 

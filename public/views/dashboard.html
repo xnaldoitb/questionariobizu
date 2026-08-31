@@ -111,9 +111,21 @@
                 </div>
                 <form class="chat-compose" id="chatForm">
                     <label class="sr-only" for="chatInput">Mensagem</label>
-                    <textarea id="chatInput" rows="2" maxlength="400" placeholder="Digite uma mensagem…" autocomplete="off"></textarea>
+                    <textarea id="chatInput" rows="2" maxlength="1600" placeholder="Digite uma mensagem…" autocomplete="off"></textarea>
+                    <div class="openmoji-picker hidden" id="emojiPicker" aria-label="Seletor de emojis OpenMoji">
+                        <div class="openmoji-header">
+                            <input id="emojiSearch" type="search" placeholder="Buscar emoji…" aria-label="Buscar emoji">
+                            <button id="emojiClose" type="button" aria-label="Fechar seletor de emojis">×</button>
+                        </div>
+                        <div class="openmoji-categories" id="emojiCategories" role="tablist" aria-label="Categorias de emojis"></div>
+                        <div class="openmoji-grid" id="emojiGrid"></div>
+                        <small>Emojis por <a href="https://openmoji.org/" target="_blank" rel="noopener noreferrer">OpenMoji</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a></small>
+                    </div>
                     <div class="chat-compose-footer">
-                        <span id="chatCounter">0/400</span>
+                        <div class="chat-compose-tools">
+                            <button class="emoji-toggle" id="emojiToggle" type="button" aria-label="Abrir emojis" aria-controls="emojiPicker" aria-expanded="false">😊</button>
+                            <span id="chatCounter">0/400</span>
+                        </div>
                         <button class="ui-button main-action" id="chatSend" type="submit">Enviar</button>
                     </div>
                 </form>

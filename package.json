@@ -1,6 +1,6 @@
 {
   "name": "banco-questoes-CFP",
-  "version": "4.29.0",
+  "version": "4.30.0",
   "description": "Questionário Bizu — sistema modular de estudos e banco de questões",
   "author": "Ronaldo Amorim",
   "private": true,
@@ -8,7 +8,7 @@
   "scripts": {
     "seed": "node --env-file=.env scripts/seed.mjs",
     "create-admin": "node --env-file=.env scripts/create-admin.mjs",
-    "check": "node scripts/check-project.mjs && node scripts/test-body-limits.mjs && node scripts/test-payment-reconciliation.mjs && node scripts/test-scheduled-payments.mjs && node scripts/test-access-policy.mjs && node --experimental-vm-modules scripts/test-access-session.mjs && node --experimental-vm-modules scripts/test-admin-access.mjs && node scripts/test-device-sessions.mjs && node scripts/test-vendor-permissions.mjs && node --experimental-vm-modules scripts/test-chapter-selection.mjs && node --experimental-vm-modules scripts/test-management-startup.mjs && node scripts/test-request-url.mjs && node --experimental-vm-modules scripts/test-security-hardening.mjs"
+    "check": "node scripts/check-project.mjs && node scripts/test-body-limits.mjs && node scripts/test-payment-reconciliation.mjs && node scripts/test-scheduled-payments.mjs && node scripts/test-access-policy.mjs && node --experimental-vm-modules scripts/test-access-session.mjs && node --experimental-vm-modules scripts/test-admin-access.mjs && node scripts/test-device-sessions.mjs && node scripts/test-vendor-permissions.mjs && node --experimental-vm-modules scripts/test-chapter-selection.mjs && node --experimental-vm-modules scripts/test-management-startup.mjs && node scripts/test-request-url.mjs && node --experimental-vm-modules scripts/test-security-hardening.mjs && node scripts/test-chat-emojis.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
