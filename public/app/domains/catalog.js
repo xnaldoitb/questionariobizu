@@ -27,16 +27,24 @@ export function buildSubjectOptions(selected = '') {
 export function populateSubjectSelectors() {
     const options = buildSubjectOptions();
 
-    ['#subjectSelect', '#adminSubject', '#chapterSubject', '#exportSubject'].forEach((selector) => {
+    ['#adminSubject', '#chapterSubject', '#exportSubject'].forEach((selector) => {
         const element = one(selector);
         if (element) {
             element.innerHTML = options;
         }
     });
 
+    const subjectControl = one('#subjectSelect');
+    const selectedStillExists = appState.catalog.disciplinas.some(
+        (discipline) => String(discipline.id) === String(subjectControl?.value),
+    );
+    if (subjectControl && !selectedStillExists) {
+        subjectControl.value = appState.catalog.disciplinas[0]?.id ?? '';
+    }
+
     renderDisciplineSelection(
         one('#subjectPicker'),
-        one('#subjectSelect'),
+        subjectControl,
         appState.catalog.disciplinas,
         appState.catalog.capitulos,
     );

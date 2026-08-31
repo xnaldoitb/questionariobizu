@@ -1062,10 +1062,8 @@ html[data-theme="dark"] .account-insignia.vip-insignia {
     border-radius: 8px;
     box-shadow: 0 8px 20px rgb(0 0 0 / 15%);
 }
-.discipline-search-wrap,
-.chapter-search-wrap { padding: 7px; border-bottom: 1px solid var(--line); }
-.discipline-search-wrap input,
-.chapter-search-wrap input {
+.discipline-search-wrap { padding: 7px; border-bottom: 1px solid var(--line); }
+.discipline-search-wrap input {
     width: 100%;
     min-height: 36px;
     padding: 7px 9px;
@@ -1181,8 +1179,7 @@ html[data-theme="dark"] .account-insignia.vip-insignia {
     color: var(--danger);
     border-color: color-mix(in srgb, var(--danger) 55%, var(--line));
 }
-.discipline-empty,
-.chapter-empty {
+.discipline-empty {
     margin: 16px 8px;
     color: var(--text-muted);
     font: 500 11px var(--type-ui);

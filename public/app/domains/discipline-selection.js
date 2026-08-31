@@ -100,7 +100,6 @@ export function renderDisciplineSelection(root, select, disciplines, chapters) {
         const search = root.querySelector('[data-discipline-search]');
         search.value = '';
         search.dispatchEvent(new Event('input', { bubbles: true }));
-        search.focus();
     };
     update();
 }

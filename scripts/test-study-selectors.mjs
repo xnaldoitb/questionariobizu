@@ -16,11 +16,13 @@ const view = await readFile(new URL('../public/views/dashboard.html', import.met
 const chapters = await readFile(new URL('../public/app/domains/chapter-selection.js', import.meta.url), 'utf8');
 const study = await readFile(new URL('../public/app/domains/study.js', import.meta.url), 'utf8');
 assert(view.includes('id="subjectPicker"'));
+assert(view.includes('id="subjectSelect" type="hidden"'));
+assert(!view.includes('<select id="subjectSelect"'));
 assert(view.includes('role="radiogroup"'));
 assert.equal((view.match(/name="questionLimit"/g) || []).length, 6);
-assert(chapters.includes('data-chapter-search'));
+assert(!chapters.includes('data-chapter-search'));
 assert(chapters.includes('data-chapter-action="clear"'));
 assert(study.includes('chapterSelectionIsValid()'));
 assert(study.includes('input[name="questionLimit"]:checked'));
 
-console.log('Seletores: ícones OpenMoji, busca de disciplinas/capítulos, seleção vazia e quantidades segmentadas validados.');
+console.log('Seletores: disciplina visual, busca sob toque, capítulos sem busca, seleção vazia e quantidades segmentadas validados.');
