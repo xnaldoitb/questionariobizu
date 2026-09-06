@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="190" height="72" viewBox="0 0 190 72" role="img" aria-labelledby="title desc">
+  <title id="title">Questionário Bizu</title>
+  <desc id="desc">Seu bizu para a aprovação — preparação CFP PMPA</desc>
+  <defs>
+    <linearGradient id="brand-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#102d58"/>
+      <stop offset="1" stop-color="#06162f"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="188" height="70" rx="9" fill="url(#brand-bg)" stroke="#38557d"/>
+  <rect x="5" y="5" width="180" height="62" rx="6" fill="none" stroke="#c9bf8a" stroke-opacity=".28"/>
+
+  <g transform="translate(11 12)">
+    <rect width="45" height="45" rx="11" fill="#f5f2e8"/>
+    <path d="M11 10h23a4 4 0 0 1 4 4v15a4 4 0 0 1-4 4H21l-7 6 2-6h-5a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4Z" fill="#0b2145"/>
+    <path d="M18 19c0-3.1 2.3-5 5.7-5 3.2 0 5.5 1.8 5.5 4.6 0 4.6-5.1 4.5-5.1 8" fill="none" stroke="#f5f2e8" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="24.1" cy="30.8" r="1.55" fill="#f5f2e8"/>
+    <circle cx="35" cy="34.5" r="7" fill="#c8102e"/>
+    <path d="m31.5 34.4 2.3 2.2 4.3-5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text x="64" y="17" fill="#aebfd7" font-family="Arial, Helvetica, sans-serif" font-size="5.6" font-weight="700" letter-spacing="1.15">PREPARAÇÃO CFP PMPA</text>
+  <text x="63" y="35" fill="#f5f2e8" font-family="Arial, Helvetica, sans-serif" font-size="13.2" font-weight="800" letter-spacing=".35">QUESTIONÁRIO</text>
+  <text x="63" y="53" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="900" letter-spacing="1.8">BIZU</text>
+  <rect x="113" y="45.5" width="60" height="2" rx="1" fill="#c8102e"/>
+  <text x="63" y="64" fill="#c9d4e4" font-family="Arial, Helvetica, sans-serif" font-size="5.2" font-weight="700" letter-spacing=".55">SEU BIZU PARA A APROVAÇÃO</text>
+</svg>

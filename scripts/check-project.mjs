@@ -29,6 +29,8 @@ const requiredFiles = [
     'public/assets/icons/icon-192.png',
     'public/assets/icons/icon-512.png',
     'public/assets/icons/icon-maskable-512.png',
+    'public/assets/icons/questionario-bizu-icon.svg',
+    'public/assets/logo-questionario-bizu.svg',
     'public/styles/10-pwa-brand.css',
     'api/[...route].js',
     'server/platform/auth.mjs',
@@ -456,4 +458,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.33.0: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.34.0: verificações estruturais concluídas.');
