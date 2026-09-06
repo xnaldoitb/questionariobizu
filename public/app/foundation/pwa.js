@@ -1,7 +1,8 @@
 import { one, notify } from './selectors.js';
 
-const APP_VERSION = '4.35.0';
+const APP_VERSION = '4.35.2';
 const UPDATE_INTERVAL_MS = 15 * 60 * 1000;
+const INSTALL_DISMISSED_KEY = 'bizu-install-dismissed-session';
 let installPrompt = null;
 let waitingWorker = null;
 let refreshing = false;
@@ -18,7 +19,8 @@ function updateInstallButton() {
     const button = one('#installAppBtn');
     const footer = one('#installAppFooter');
     if (!button) return;
-    const available = !isInstalled() && Boolean(installPrompt || isIos());
+    const dismissed = sessionStorage.getItem(INSTALL_DISMISSED_KEY) === '1';
+    const available = !isInstalled() && !dismissed;
     footer?.classList.toggle('hidden', !available);
     document.body.classList.toggle('pwa-install-available', available);
 }
@@ -34,10 +36,13 @@ async function installApplication() {
         installPrompt.prompt();
         const choice = await installPrompt.userChoice;
         installPrompt = null;
+        if (choice.outcome === 'accepted') sessionStorage.setItem(INSTALL_DISMISSED_KEY, '1');
         updateInstallButton();
         notify(choice.outcome === 'accepted' ? 'Aplicativo instalado com sucesso.' : 'Instalação cancelada.');
     } else if (isIos()) {
         notify('No Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”.', 6500);
+    } else {
+        notify('Abra o menu do navegador e escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.', 6500);
     }
 }
 
@@ -69,6 +74,10 @@ async function registerServiceWorker() {
 export function bindPwaInstall() {
     let alreadyControlled = Boolean(navigator.serviceWorker?.controller);
     one('#installAppBtn')?.addEventListener('click', installApplication);
+    one('#installAppClose')?.addEventListener('click', () => {
+        sessionStorage.setItem(INSTALL_DISMISSED_KEY, '1');
+        updateInstallButton();
+    });
     one('#applyAppUpdate')?.addEventListener('click', () => {
         if (!waitingWorker) return window.location.reload();
         one('#applyAppUpdate').disabled = true;
@@ -83,6 +92,7 @@ export function bindPwaInstall() {
     });
     window.addEventListener('appinstalled', () => {
         installPrompt = null;
+        sessionStorage.setItem(INSTALL_DISMISSED_KEY, '1');
         updateInstallButton();
         notify('Questionário Bizu instalado com sucesso.');
     });

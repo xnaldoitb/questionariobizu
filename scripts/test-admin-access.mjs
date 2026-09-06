@@ -6,14 +6,15 @@ const target = { id:'student',perfil:'aluno',ativo:true,status_aprovacao:'aprova
 let saved;
 const context = vm.createContext({Date,JSON,Boolean,String,Number,Set,Map,console});
 const modules = new Map();
+let loginLimitCleared = false;
 function mock(name,exports) { const m=new vm.SyntheticModule(Object.keys(exports),function(){for(const [k,v] of Object.entries(exports))this.setExport(k,v);},{context,identifier:name});modules.set(name,m); }
 mock('bcryptjs',{default:{hash:async()=> 'test-hash'}});
 mock('auth.mjs',{requireUser:async()=>actor});
 mock('question-access.mjs',{resolveQuestionAccess:()=>({})});
 mock('admin-audit.mjs',{auditAdmin:async()=>true});
-mock('rate-limit.mjs',{clearRateLimit:async()=>true});
+mock('rate-limit.mjs',{clearRateLimit:async()=>{loginLimitCleared=true;}});
 mock('db.mjs',{db:()=>({from:()=>{
-    const q = {select:()=>q,eq:()=>q,neq:()=>q,in:()=>q,maybeSingle:async()=>({data:target,error:null}),
+    const q = {select:()=>q,eq:()=>q,neq:()=>q,in:()=>q,delete:()=>q,maybeSingle:async()=>({data:target,error:null}),
         update:payload=>{saved=payload;return q;},insert:payload=>{saved=payload;return q;},
         single:async()=>({data:saved,error:null}),then:resolve=>resolve({error:null})}; return q;
 }})});
@@ -45,4 +46,7 @@ assert.equal((await call('PUT',{id:target.id,action:'set_validity',vitalicio:tru
 assert.equal(saved.vip,true);
 assert.equal(saved.premium,false);
 assert.equal(saved.validade_ate,null);
+assert.equal((await call('PUT',{id:target.id,action:'end_sessions'})).statusCode,200);
+assert.equal(saved.sessao_ativa_id,null);
+assert.equal(loginLimitCleared,true);
 console.log('ADM: criação/edição Premium e controle integral de VIP próprio passaram (banco simulado).');

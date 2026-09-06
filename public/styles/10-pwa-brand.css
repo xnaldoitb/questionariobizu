@@ -1,21 +1,18 @@
 /* Rodapé global: permanece disponível no login e na área autenticada. */
 body.pwa-install-available {
-    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+    padding-bottom: calc(62px + env(safe-area-inset-bottom));
 }
 
 .install-app-footer {
     position: fixed;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: calc(12px + env(safe-area-inset-bottom));
     z-index: 900;
-    display: flex;
-    justify-content: center;
-    padding: 9px max(14px, env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
-    background: color-mix(in srgb, var(--panel-surface) 94%, transparent);
-    border-top: 1px solid var(--line);
-    box-shadow: 0 -8px 24px rgb(5 15 36 / 12%);
-    backdrop-filter: blur(12px);
+    display: block;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    padding: 0;
+    background: transparent;
 }
 
 .install-app-footer.hidden {
@@ -27,8 +24,9 @@ body.pwa-install-available {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 42px;
-    padding: 9px 18px;
+    width: auto;
+    min-height: 38px;
+    padding: 8px 13px;
     color: #f4f7fb;
     background: #0b2145;
     border: 1px solid #2c4468;
@@ -36,7 +34,39 @@ body.pwa-install-available {
     box-shadow: 0 6px 18px rgb(5 15 36 / 22%);
     white-space: nowrap;
     cursor: pointer;
-    font: 700 12px/1 var(--type-ui);
+    font: 700 10px/1 var(--type-ui);
+}
+
+.install-app-compact {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px;
+    background: color-mix(in srgb, var(--panel-surface) 94%, transparent);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgb(5 15 36 / 20%);
+    backdrop-filter: blur(12px);
+}
+
+.install-app-close {
+    display: grid;
+    place-items: center;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    font: 500 20px/1 var(--type-ui);
+}
+
+.install-app-close:hover {
+    color: var(--text-main);
+    background: var(--canvas-soft);
 }
 
 #installAppBtn.install-app-button:hover {
@@ -47,17 +77,19 @@ body.pwa-install-available {
 
 @media (max-width: 760px) {
     body.pwa-install-available {
-        padding-bottom: calc(68px + env(safe-area-inset-bottom));
+        padding-bottom: calc(60px + env(safe-area-inset-bottom));
     }
 
     .install-app-footer {
-        padding-top: 8px;
-        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+        right: 50%;
+        bottom: calc(9px + env(safe-area-inset-bottom));
+        transform: translateX(50%);
     }
 
     #installAppBtn.install-app-button {
-        width: min(100%, 320px);
-        min-height: 42px;
-        font-size: 11px;
+        width: auto;
+        min-height: 36px;
+        padding: 7px 11px;
+        font-size: 9px;
     }
 }

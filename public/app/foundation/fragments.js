@@ -40,10 +40,13 @@ export async function mountInterface() {
             </main>
         </div>
         <footer class="install-app-footer hidden" id="installAppFooter" aria-label="Instalação do aplicativo">
-            <button class="install-app-button" id="installAppBtn" type="button" title="Instalar aplicativo" aria-label="Instalar aplicativo">
-                <span class="action-icon" aria-hidden="true">⇩</span>
-                <span>Instalar aplicativo</span>
-            </button>
+            <div class="install-app-compact">
+                <button class="install-app-button" id="installAppBtn" type="button" title="Instalar aplicativo" aria-label="Instalar aplicativo">
+                    <span class="action-icon" aria-hidden="true">⇩</span>
+                    <span>Instalar aplicativo</span>
+                </button>
+                <button class="install-app-close" id="installAppClose" type="button" title="Fechar" aria-label="Ocultar botão de instalação">×</button>
+            </div>
         </footer>
         <aside class="app-update-notice hidden" id="appUpdateNotice" role="status" aria-live="polite">
             <div><strong>Nova versão disponível</strong><span>Atualize agora para usar as melhorias mais recentes.</span></div>

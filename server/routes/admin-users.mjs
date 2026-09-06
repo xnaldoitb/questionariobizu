@@ -385,17 +385,32 @@ export const handler = async (event) => {
                 return json(400, { erro: 'O encerramento de sessões é aplicável somente a alunos.' });
             }
 
-            await Promise.all([
-                revokeDeviceSessions(id),
-                clearRateLimit('login-conta', target.usuario, { includeIp: false }),
-            ]);
-            const { error } = await db().from('usuarios').update(clearSessionFields({})).eq('id', id);
-            if (error) return json(400, { erro: 'Não foi possível encerrar as sessões do usuário.' });
+            try {
+                await revokeDeviceSessions(id);
+                const { error } = await db().from('usuarios').update(clearSessionFields({})).eq('id', id);
+                if (error) throw error;
+            } catch (error) {
+                console.error('Falha ao encerrar sessões do usuário:', error.message);
+                return json(400, {
+                    erro: 'Não foi possível encerrar as sessões. Confirme se as migrations de dispositivos foram executadas.',
+                });
+            }
+
+            let loginLiberado = true;
+            try {
+                await clearRateLimit('login-conta', target.usuario, { includeIp: false });
+            } catch (error) {
+                loginLiberado = false;
+                console.warn('Sessões encerradas, mas não foi possível limpar as tentativas da conta:', error.message);
+            }
 
             return audited(actor, 'sessoes_encerradas', id, json(200, {
                 ok: true,
-                mensagem: 'Sessões encerradas e tentativas de login da conta liberadas.',
-            }), { login_liberado: true });
+                login_liberado: loginLiberado,
+                mensagem: loginLiberado
+                    ? 'Sessões encerradas e tentativas de login da conta liberadas.'
+                    : 'Sessões encerradas. O bloqueio de tentativas será liberado automaticamente em até 15 minutos.',
+            }), { login_liberado: loginLiberado });
         }
 
         if (action === 'set_validity') {
