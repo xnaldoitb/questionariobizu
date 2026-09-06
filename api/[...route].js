@@ -12,6 +12,9 @@ import { handler as sessoes } from '../server/routes/sessoes.mjs';
 import { handler as ranking } from '../server/routes/ranking.mjs';
 import { handler as presenca } from '../server/routes/presenca.mjs';
 import { handler as chat } from '../server/routes/chat.mjs';
+import { handler as chatSalas } from '../server/routes/chat-salas.mjs';
+import { handler as suporte } from '../server/routes/suporte.mjs';
+import { handler as topicos } from '../server/routes/topicos.mjs';
 import { handler as pagamentoCriar } from '../server/routes/pagamento-criar.mjs';
 import { handler as pagamentoStatus } from '../server/routes/pagamento-status.mjs';
 import { handler as pagamentoWebhook } from '../server/routes/pagamento-webhook.mjs';
@@ -43,6 +46,9 @@ const routes = new Map([
     ['ranking', ranking],
     ['presenca', presenca],
     ['chat', chat],
+    ['chat-salas', chatSalas],
+    ['suporte', suporte],
+    ['topicos', topicos],
     ['pagamento-criar', pagamentoCriar],
     ['pagamento-status', pagamentoStatus],
     ['pagamento-webhook', pagamentoWebhook],

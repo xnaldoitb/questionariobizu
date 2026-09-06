@@ -26,7 +26,7 @@ export async function cleanupCommunity() {
 
     // Limite de segurança: nenhuma mensagem do chat efêmero sobrevive por horas.
     await client
-        .from('chat_temporario')
+        .from('chat_mensagens')
         .delete()
         .lt('criado_em', isoBefore(MESSAGE_MAX_AGE_MS));
 
@@ -45,7 +45,7 @@ export async function cleanupCommunity() {
     if (!Number(count || 0)) {
         const future = new Date(Date.now() + 60_000).toISOString();
         await client
-            .from('chat_temporario')
+            .from('chat_mensagens')
             .delete()
             .lt('criado_em', future);
     }

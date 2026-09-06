@@ -119,6 +119,9 @@ function renderUserCard(user) {
                     ${isSupreme()
                         ? `<button data-user-command="reset_history" data-user-id="${user.id}" type="button">Resetar histórico / ranking</button>`
                         : ''}
+                    ${isStudent
+                        ? `<button data-user-command="end_sessions" data-user-id="${user.id}" type="button">Encerrar sessões e liberar login</button>`
+                        : ''}
                     <button class="danger-menu-action" data-user-command="delete" data-user-id="${user.id}" type="button">Apagar conta</button>
                 </div>
             </details>
@@ -288,6 +291,7 @@ async function handleUserCommand(button) {
         promote_admin: 'Tornar este aluno administrador?',
         demote_admin: 'Remover os privilégios administrativos desta conta?',
         reset_history: 'Apagar todo o histórico e ranking deste usuário?',
+        end_sessions: 'Desconectar este aluno de todos os dispositivos e liberar as tentativas de login da conta?',
         delete: user.vip
             ? 'Apagar esta conta VIP e todo o histórico dela? Esta ação é definitiva.'
             : 'Apagar esta conta e todo o histórico dela? Esta ação é definitiva.',
@@ -306,6 +310,8 @@ async function handleUserCommand(button) {
             const result = await sendUserAction(id, command);
             if (command === 'approve' && result.expirado) {
                 notify('Cadastro aprovado, mas a validade venceu. Defina um novo prazo para liberar o acesso.', 4800);
+            } else if (command === 'end_sessions') {
+                notify(result.mensagem || 'Sessões encerradas e login liberado.', 4800);
             } else {
                 notify(command === 'reset_history' ? 'Histórico e ranking resetados.' : 'Conta atualizada.');
             }

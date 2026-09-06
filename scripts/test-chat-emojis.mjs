@@ -17,7 +17,7 @@ assert(community.includes('bindEmojiPicker()'));
 assert(community.includes('countGraphemes(message) > 400'));
 assert(view.includes('id="emojiPicker"'));
 assert(view.includes('CC BY-SA 4.0'));
-assert(route.includes('messageLength(message) > MAX_MESSAGE_LENGTH'));
+assert(route.includes('graphemeLength(message) > MAX_MESSAGE_LENGTH'));
 assert(license.includes('Creative Commons Attribution-ShareAlike 4.0'));
 
 console.log(`OpenMoji: ${assets.length} SVGs locais, busca, categorias, recentes, atribuição e contagem Unicode validados.`);

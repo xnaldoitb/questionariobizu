@@ -26,12 +26,14 @@ const requiredFiles = [
     'public/app/domains/admin/payments.js',
     'public/manifest.webmanifest',
     'public/service-worker.js',
-    'public/assets/icons/icon-192.png',
-    'public/assets/icons/icon-512.png',
-    'public/assets/icons/icon-maskable-512.png',
+    'public/assets/icons/icon-192-v435.png',
+    'public/assets/icons/icon-512-v435.png',
+    'public/assets/icons/icon-maskable-512-v435.png',
     'public/assets/icons/questionario-bizu-icon.svg',
     'public/assets/logo-questionario-bizu.svg',
     'public/styles/10-pwa-brand.css',
+    'public/styles/12-community-hub.css',
+    'public/styles/13-visual-refinement.css',
     'api/[...route].js',
     'server/platform/auth.mjs',
     'server/platform/access-validity.mjs',
@@ -42,6 +44,9 @@ const requiredFiles = [
     'server/routes/login.mjs',
     'server/routes/presenca.mjs',
     'server/routes/chat.mjs',
+    'server/routes/chat-salas.mjs',
+    'server/routes/suporte.mjs',
+    'server/routes/topicos.mjs',
     'server/routes/admin-users.mjs',
     'server/routes/admin-catalogo.mjs',
     'server/routes/admin-questions.mjs',
@@ -66,6 +71,7 @@ const requiredFiles = [
     'supabase/migration-v4.11-saldo-mercado-pago.sql',
     'supabase/migration-v4.17-protecao-cadastros.sql',
     'supabase/migration-v4.18-sessao-mesmo-dispositivo.sql',
+    'supabase/migration-v4.35-comunidade-suporte-topicos.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -331,8 +337,8 @@ if (!apiRouter.includes("['presenca', presenca]") || !apiRouter.includes("['chat
     throw new Error('Rotas de presença/chat v4.6 não estão registradas.');
 }
 
-if (!presenceRoute.includes('cleanupCommunity') || !chatRoute.includes('chat-temporario')) {
-    throw new Error('Proteções do chat temporário v4.6 estão incompletas.');
+if (!presenceRoute.includes('cleanupCommunity') || !chatRoute.includes("from('chat_mensagens')")) {
+    throw new Error('Proteções e persistência do chat por salas estão incompletas.');
 }
 
 for (const marker of ['community-strip', 'chat-modal', 'profile-dashboard .profile-metric']) {
@@ -458,4 +464,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.34.0: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.35.0: verificações estruturais concluídas.');

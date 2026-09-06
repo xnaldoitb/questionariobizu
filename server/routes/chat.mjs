@@ -2,37 +2,16 @@ import { db } from '../platform/db.mjs';
 import { requireUser } from '../platform/auth.mjs';
 import { json, parseBody } from '../platform/http.mjs';
 import { consumeRateLimit } from '../platform/rate-limit.mjs';
-import {
-    cleanupCommunity,
-    listActiveUsers,
-    touchPresence,
-} from '../platform/community.mjs';
+import { cleanupCommunity, listActiveUsers, touchPresence } from '../platform/community.mjs';
+import { cleanText, graphemeLength, roomForUser } from '../platform/community-access.mjs';
 
 const MAX_MESSAGE_LENGTH = 400;
-const MESSAGE_LIMIT = 60;
+const MESSAGE_LIMIT = 80;
 
-function messageLength(value) {
-    if (globalThis.Intl?.Segmenter) {
-        return [...new Intl.Segmenter('pt-BR', { granularity: 'grapheme' }).segment(value)].length;
-    }
-    return Array.from(value).length;
-}
-
-function normalizeMessage(value) {
-    return String(value ?? '')
-        .replace(/\r\n?/g, '\n')
-        .replace(/[\t ]+/g, ' ')
-        .replace(/\n{3,}/g, '\n\n')
-        .trim();
-}
-
-async function loadMessages() {
-    const { data, error } = await db()
-        .from('chat_temporario')
-        .select('id,mensagem,criado_em,usuario_id,usuarios(nome,perfil,vip)')
-        .order('id', { ascending: false })
-        .limit(MESSAGE_LIMIT);
-
+async function loadMessages(roomId) {
+    const { data, error } = await db().from('chat_mensagens')
+        .select('id,mensagem,criado_em,usuario_id,usuarios(nome,perfil,vip,premium)')
+        .eq('sala_id', roomId).order('id', { ascending: false }).limit(MESSAGE_LIMIT);
     if (error) throw error;
 
     return (data || []).reverse().map((row) => ({
@@ -44,6 +23,7 @@ async function loadMessages() {
             nome: row.usuarios?.nome || 'Usuário',
             perfil: row.usuarios?.perfil || 'aluno',
             vip: Boolean(row.usuarios?.vip),
+            premium: Boolean(row.usuarios?.premium),
         },
     }));
 }
@@ -53,61 +33,35 @@ export const handler = async (event) => {
     if (!user) return json(401, { erro: 'Não autenticado.' });
 
     try {
+        const body = event.httpMethod === 'POST' ? parseBody(event) : {};
+        const roomId = body.sala_id || event.queryStringParameters?.sala;
+        const room = await roomForUser(user, roomId);
+        if (!room) return json(403, { erro: 'Sala indisponível ou sem permissão de acesso.' });
+
         if (event.httpMethod === 'GET') {
             await cleanupCommunity();
-            const [messages, active] = await Promise.all([
-                loadMessages(),
-                listActiveUsers(),
-            ]);
-
-            return json(200, {
-                mensagens: messages,
-                online: active.count,
-            });
+            const [messages, active] = await Promise.all([loadMessages(room.id), listActiveUsers()]);
+            return json(200, { sala: room, mensagens: messages, online: active.count });
         }
 
         if (event.httpMethod === 'POST') {
-            const rate = await consumeRateLimit(
-                event,
-                'chat-temporario',
-                { limit: 20, windowSeconds: 60 },
-                user.id,
-            );
+            const rate = await consumeRateLimit(event, 'chat-sala', { limit: 24, windowSeconds: 60 }, user.id);
+            if (!rate.allowed) return json(429, { erro: 'Você enviou muitas mensagens. Aguarde alguns segundos.' }, { 'retry-after': '60' });
 
-            if (!rate.allowed) {
-                return json(429, {
-                    erro: 'Você enviou muitas mensagens em pouco tempo. Aguarde alguns segundos.',
-                }, { 'retry-after': '60' });
-            }
-
-            const message = normalizeMessage(parseBody(event).mensagem);
+            const message = cleanText(body.mensagem, MAX_MESSAGE_LENGTH);
             if (!message) return json(400, { erro: 'Digite uma mensagem.' });
-            if (messageLength(message) > MAX_MESSAGE_LENGTH) {
+            if (graphemeLength(message) > MAX_MESSAGE_LENGTH) {
                 return json(400, { erro: `A mensagem pode ter no máximo ${MAX_MESSAGE_LENGTH} caracteres.` });
             }
 
-            // Enviar mensagem é atividade real e reativa a presença do usuário.
             await cleanupCommunity();
             await touchPresence(user.id, { activity: true });
-
-            const { data, error } = await db()
-                .from('chat_temporario')
-                .insert({ usuario_id: user.id, mensagem: message })
-                .select('id,mensagem,criado_em,usuario_id')
-                .single();
-
+            const { data, error } = await db().from('chat_mensagens')
+                .insert({ sala_id: room.id, usuario_id: user.id, mensagem: message })
+                .select('id,mensagem,criado_em,usuario_id,sala_id').single();
             if (error) throw error;
 
-            return json(201, {
-                mensagem: {
-                    ...data,
-                    usuario: {
-                        nome: user.nome,
-                        perfil: user.perfil,
-                        vip: Boolean(user.vip),
-                    },
-                },
-            });
+            return json(201, { mensagem: { ...data, usuario: user } });
         }
 
         return json(405, { erro: 'Método não permitido.' });

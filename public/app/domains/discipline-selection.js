@@ -26,7 +26,7 @@ export function renderDisciplineSelection(root, select, disciplines, chapters) {
         const count = chapterCount.get(String(discipline.id)) || 0;
         return `<button type="button" role="option" data-discipline-id="${safeText(discipline.id)}"
             data-search="${safeText(normalized(discipline.nome))}">
-            <span class="discipline-line-icon">${studyIcon(disciplineIcon(discipline.nome))}</span>
+            <span class="discipline-line-icon" data-icon="${disciplineIcon(discipline.nome)}">${studyIcon(disciplineIcon(discipline.nome))}</span>
             <span><strong>${safeText(discipline.nome)}</strong><small>${count} ${count === 1 ? 'capítulo' : 'capítulos'}</small></span>
             <i aria-hidden="true">✓</i>
         </button>`;

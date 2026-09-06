@@ -11,6 +11,7 @@ mock('bcryptjs',{default:{hash:async()=> 'test-hash'}});
 mock('auth.mjs',{requireUser:async()=>actor});
 mock('question-access.mjs',{resolveQuestionAccess:()=>({})});
 mock('admin-audit.mjs',{auditAdmin:async()=>true});
+mock('rate-limit.mjs',{clearRateLimit:async()=>true});
 mock('db.mjs',{db:()=>({from:()=>{
     const q = {select:()=>q,eq:()=>q,neq:()=>q,in:()=>q,maybeSingle:async()=>({data:target,error:null}),
         update:payload=>{saved=payload;return q;},insert:payload=>{saved=payload;return q;},

@@ -135,6 +135,11 @@
         font-size: 23px;
     }
 
+    .review-modal-scroll {
+        padding: 16px;
+        max-height: calc(92vh - 96px);
+    }
+
     .report-summary,
     .ranking-podium {
         padding-left: 14px;

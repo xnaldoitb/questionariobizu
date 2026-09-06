@@ -14,14 +14,24 @@ function clientIp(event) {
         || 'unknown';
 }
 
+function rateLimitKey(subject = '', includeIp = true, event = {}) {
+    const rawKey = `${includeIp ? clientIp(event) : 'global'}:${String(subject).trim().toLowerCase()}`;
+    return createHash('sha256').update(rawKey).digest('hex');
+}
+
+export async function clearRateLimit(scope, subject = '', { includeIp = false, event = {} } = {}) {
+    const key = rateLimitKey(subject, includeIp, event);
+    const { error } = await db().from('rate_limits').delete().eq('scope', scope).eq('key', key);
+    if (error) throw error;
+}
+
 export async function consumeRateLimit(
     event,
     scope,
     { limit, windowSeconds, failClosed = false, includeIp = true },
     subject = '',
 ) {
-    const rawKey = `${includeIp ? clientIp(event) : 'global'}:${String(subject).trim().toLowerCase()}`;
-    const key = createHash('sha256').update(rawKey).digest('hex');
+    const key = rateLimitKey(subject, includeIp, event);
     const { data, error } = await db().rpc('consume_rate_limit', {
         p_scope: scope,
         p_key: key,

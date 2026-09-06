@@ -45,5 +45,10 @@ export async function mountInterface() {
                 <span>Instalar aplicativo</span>
             </button>
         </footer>
+        <aside class="app-update-notice hidden" id="appUpdateNotice" role="status" aria-live="polite">
+            <div><strong>Nova versão disponível</strong><span>Atualize agora para usar as melhorias mais recentes.</span></div>
+            <button class="ui-button main-action mini" id="applyAppUpdate" type="button">Atualizar</button>
+            <button class="update-later" id="dismissAppUpdate" type="button" aria-label="Lembrar depois">Depois</button>
+        </aside>
     `;
 }

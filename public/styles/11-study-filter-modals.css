@@ -315,8 +315,8 @@
 .study-filter-modal-footer .ui-button { min-height: 36px; padding: 7px 15px; font-size: 10px; }
 
 @media (max-width: 520px) {
-    .study-filter-overlay { align-items: end; padding: 0; }
-    .study-filter-modal { width: 100%; max-height: 80svh; border-radius: 15px 15px 0 0; }
+    .study-filter-overlay { align-items: center; padding: 16px; }
+    .study-filter-modal { width: min(91vw, 410px); max-height: 82svh; border-radius: 14px; }
     .study-filter-modal-header { padding: 13px 14px; }
     .study-filter-modal-header h2 { font-size: 17px; }
     .study-filter-modal .chapter-option-list { max-height: 48svh; }

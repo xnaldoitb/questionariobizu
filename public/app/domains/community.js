@@ -4,253 +4,325 @@ import { appState } from '../foundation/model.js';
 import { one, safeText, notify } from '../foundation/selectors.js';
 import { bindEmojiPicker, countGraphemes } from './emoji-picker.js';
 
+const GENERAL_ROOM_ID = '00000000-0000-4000-8000-000000000001';
 const HEARTBEAT_MS = 90_000;
 const PRESENCE_REFRESH_MS = 60_000;
 const CHAT_REFRESH_MS = 10_000;
+const SUPPORT_REFRESH_MS = 12_000;
 const ACTIVITY_PING_THROTTLE_MS = 30_000;
-const SPOTLIGHT_ROTATION_MS = 8_000;
 
 let initialized = false;
 let onlineUsers = [];
-let lastSpotlightId = null;
 let lastActivityPing = 0;
-let heartbeatTimer = null;
-let presenceTimer = null;
-let spotlightTimer = null;
-let chatTimer = null;
-let chatOpen = false;
+let heartbeatTimer;
+let presenceTimer;
+let spotlightTimer;
+let communityTimer;
+let activeModal = null;
+let rooms = [];
+let currentRoomId = GENERAL_ROOM_ID;
+let supportConversationId = null;
+let activeTopicId = null;
 
-function openChatModal() {
-    const modal = one('#chatModal');
-    if (!modal) return;
-    modal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
-    chatOpen = true;
-    sendActivityPing();
-    refreshChat({ quiet: false });
-    one('#chatInput')?.focus();
-    clearInterval(chatTimer);
-    chatTimer = window.setInterval(() => refreshChat({ quiet: true }), CHAT_REFRESH_MS);
+function formatTime(value, includeDate = false) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString('pt-BR', includeDate
+        ? { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }
+        : { hour: '2-digit', minute: '2-digit' });
 }
 
-function closeChatModal() {
-    one('#chatModal')?.classList.add('hidden');
-    chatOpen = false;
-    clearInterval(chatTimer);
-    chatTimer = null;
-    if (!document.querySelector('.modal-overlay:not(.hidden)')) {
-        document.body.classList.remove('modal-open');
-    }
+function openModal(id) {
+    const modal = one(`#${id}`);
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.classList.add('community-open');
+    document.body.classList.add('modal-open');
+    activeModal = id;
+}
+
+function closeModal(id) {
+    const modal = one(`#${id}`);
+    modal?.classList.add('hidden');
+    modal?.classList.remove('community-open');
+    if (activeModal === id) activeModal = null;
+    clearInterval(communityTimer);
+    communityTimer = null;
+    if (!document.querySelector('.modal-overlay:not(.hidden)')) document.body.classList.remove('modal-open');
 }
 
 function updatePresence(payload = {}) {
     const count = Number(payload.online || 0);
-    onlineUsers = Array.isArray(payload.usuarios) ? payload.usuarios : [];
-
-    if (one('#onlineCount')) {
-        one('#onlineCount').textContent = `${count} ${count === 1 ? 'online agora' : 'online agora'}`;
-    }
+    onlineUsers = Array.isArray(payload.usuarios) ? payload.usuarios : onlineUsers;
+    if (one('#onlineCount')) one('#onlineCount').textContent = `${count} online agora`;
     if (one('#chatOnlineCount')) one('#chatOnlineCount').textContent = String(count);
     if (one('#chatHeaderOnline')) one('#chatHeaderOnline').textContent = `${count} online`;
-
     rotateSpotlight();
 }
 
 function rotateSpotlight() {
     const target = one('#onlineSpotlight');
     if (!target) return;
-
     if (!onlineUsers.length) {
-        target.textContent = 'Nenhum usuário ativo neste momento';
-        lastSpotlightId = null;
+        target.textContent = 'Comunidade disponível';
         return;
     }
-
-    const others = onlineUsers.filter((user) => user.id !== appState.user?.id);
-    const pool = others.length ? others : onlineUsers;
-    const alternatives = pool.filter((user) => user.id !== lastSpotlightId);
-    const candidates = alternatives.length ? alternatives : pool;
+    const pool = onlineUsers.filter((user) => user.id !== appState.user?.id);
+    const candidates = pool.length ? pool : onlineUsers;
     const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-
-    if (!chosen) return;
-    lastSpotlightId = chosen.id;
-
-    const own = chosen.id === appState.user?.id;
-    target.innerHTML = own
-        ? `Você está online ${accountBadges(chosen)}`
-        : `${safeText(chosen.nome)} está online ${accountBadges(chosen)}`;
+    const own = chosen?.id === appState.user?.id;
+    target.innerHTML = chosen ? `${own ? 'Você' : safeText(chosen.nome)} está online ${accountBadges(chosen)}` : 'Comunidade disponível';
 }
 
 async function sendPresence({ activity = false } = {}) {
     try {
-        const payload = await requestJson('presenca', {
-            method: 'POST',
-            body: JSON.stringify({ atividade: Boolean(activity) }),
-        });
-        updatePresence(payload);
-    } catch {
-        // Presença é complementar e não deve interromper o estudo.
-    }
+        updatePresence(await requestJson('presenca', { method: 'POST', body: JSON.stringify({ atividade: Boolean(activity) }) }));
+    } catch { /* Presença não interrompe o estudo. */ }
 }
 
 async function refreshPresence() {
-    try {
-        updatePresence(await requestJson('presenca'));
-    } catch {
-        if (one('#onlineSpotlight')) one('#onlineSpotlight').textContent = 'Presença temporariamente indisponível';
-    }
+    try { updatePresence(await requestJson('presenca')); }
+    catch { if (one('#onlineSpotlight')) one('#onlineSpotlight').textContent = 'Comunidade disponível'; }
 }
 
 function sendActivityPing() {
-    const now = Date.now();
-    if (now - lastActivityPing < ACTIVITY_PING_THROTTLE_MS) return;
-    lastActivityPing = now;
+    if (Date.now() - lastActivityPing < ACTIVITY_PING_THROTTLE_MS) return;
+    lastActivityPing = Date.now();
     sendPresence({ activity: true });
 }
 
-function bindActivityTracking() {
-    const activity = () => {
-        if (document.visibilityState === 'visible') sendActivityPing();
-    };
-
-    ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach((eventName) => {
-        window.addEventListener(eventName, activity, { passive: true });
-    });
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') sendActivityPing();
-    });
-
-    window.addEventListener('pagehide', () => {
-        try {
-            fetch('/api/presenca', {
-                method: 'DELETE',
-                credentials: 'include',
-                keepalive: true,
-            });
-        } catch {
-            // A limpeza automática do servidor cobre fechamentos abruptos.
-        }
-    });
-}
-
-function formatTime(value) {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-}
-
-function renderChat(messages = []) {
-    const list = one('#chatMessages');
+function renderMessages(target, messages, { support = false } = {}) {
+    const list = one(target);
     if (!list) return;
-
-    const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
-
+    const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 90;
     if (!messages.length) {
-        list.innerHTML = '<div class="chat-empty">A sala está vazia. Envie a primeira mensagem.</div>';
+        list.innerHTML = `<div class="chat-empty">${support ? 'Envie uma mensagem para iniciar o atendimento.' : 'Nenhuma mensagem nesta sala.'}</div>`;
         return;
     }
-
     list.innerHTML = messages.map((item) => {
-        const own = item.usuario_id === appState.user?.id;
-        const author = item.usuario || {};
-        return `
-            <article class="chat-message ${own ? 'is-own' : ''}">
-                <div class="chat-message-head">
-                    <strong>${safeText(own ? 'Você' : (author.nome || 'Usuário'))}</strong>
-                    ${accountBadges(author)}
-                    <time datetime="${safeText(item.criado_em)}">${safeText(formatTime(item.criado_em))}</time>
-                </div>
-                <p>${safeText(item.mensagem).replace(/\n/g, '<br>')}</p>
-            </article>
-        `;
+        const authorId = support ? item.autor_id : item.usuario_id;
+        const author = support ? (item.usuarios || {}) : (item.usuario || {});
+        const own = authorId === appState.user?.id;
+        return `<article class="chat-message ${own ? 'is-own' : ''}">
+            <div class="chat-message-head"><strong>${safeText(own ? 'Você' : (author.nome || 'Usuário'))}</strong>${accountBadges(author)}<time>${safeText(formatTime(item.criado_em))}</time></div>
+            <p>${safeText(item.mensagem).replace(/\n/g, '<br>')}</p>
+        </article>`;
     }).join('');
-
-    if (nearBottom || !list.dataset.loaded) {
-        list.scrollTop = list.scrollHeight;
-    }
+    if (nearBottom || !list.dataset.loaded) list.scrollTop = list.scrollHeight;
     list.dataset.loaded = '1';
 }
 
+function renderRooms() {
+    const target = one('#chatRoomList');
+    if (!target) return;
+    target.innerHTML = rooms.map((room) => `<button class="chat-room-item ${room.id === currentRoomId ? 'is-active' : ''}" type="button" data-room-id="${room.id}">
+        <span class="room-color room-${room.tipo}" aria-hidden="true"></span><span><strong>${safeText(room.nome)}</strong><small>${room.tipo === 'privada' ? 'Privada' : 'Pública'}</small></span>
+    </button>`).join('') || '<div class="chat-empty">Nenhuma sala disponível.</div>';
+}
+
+async function loadRooms() {
+    const payload = await requestJson('chat-salas');
+    rooms = payload.salas || [];
+    if (!rooms.some((room) => room.id === currentRoomId)) currentRoomId = rooms[0]?.id || GENERAL_ROOM_ID;
+    renderRooms();
+}
+
 async function refreshChat({ quiet = true } = {}) {
-    if (!chatOpen) return;
+    if (activeModal !== 'chatModal') return;
     try {
-        const payload = await requestJson('chat');
-        if (one('#chatHeaderOnline')) one('#chatHeaderOnline').textContent = `${Number(payload.online || 0)} online`;
-        renderChat(payload.mensagens || []);
-    } catch (error) {
-        if (!quiet) {
-            one('#chatMessages').innerHTML = '<div class="chat-empty">Não foi possível carregar o chat.</div>';
-            notify(error.message);
-        }
-    }
+        const payload = await requestJson(`chat?sala=${encodeURIComponent(currentRoomId)}`);
+        const room = payload.sala || rooms.find((item) => item.id === currentRoomId) || {};
+        one('#chatRoomName').textContent = room.nome || 'Sala';
+        one('#chatRoomPrivacy').textContent = room.tipo === 'privada' ? 'Sala privada' : 'Sala pública';
+        updatePresence({ online: payload.online });
+        renderMessages('#chatMessages', payload.mensagens || []);
+    } catch (error) { if (!quiet) notify(error.message); }
+}
+
+async function openChat() {
+    openModal('chatModal');
+    try { await loadRooms(); await refreshChat({ quiet: false }); }
+    catch (error) { notify(error.message); }
+    one('#chatInput')?.focus();
+    clearInterval(communityTimer);
+    communityTimer = setInterval(() => refreshChat({ quiet: true }), CHAT_REFRESH_MS);
 }
 
 async function submitChat(event) {
     event.preventDefault();
     const input = one('#chatInput');
-    const button = one('#chatSend');
     const message = input.value.trim();
     if (!message) return;
     if (countGraphemes(message) > 400) return notify('A mensagem pode ter no máximo 400 caracteres.');
-
-    button.disabled = true;
+    one('#chatSend').disabled = true;
     try {
-        await requestJson('chat', {
-            method: 'POST',
-            body: JSON.stringify({ mensagem: message }),
-        });
+        await requestJson('chat', { method: 'POST', body: JSON.stringify({ sala_id: currentRoomId, mensagem: message }) });
         input.value = '';
         one('#chatCounter').textContent = '0/400';
-        lastActivityPing = Date.now();
-        await Promise.all([refreshChat({ quiet: true }), refreshPresence()]);
-        input.focus();
-    } catch (error) {
-        notify(error.message);
-    } finally {
-        button.disabled = false;
-    }
+        await refreshChat();
+    } catch (error) { notify(error.message); }
+    finally { one('#chatSend').disabled = false; }
 }
 
-function bindChat() {
-    bindEmojiPicker();
-    one('#openChatBtn')?.addEventListener('click', openChatModal);
-    one('#chatClose')?.addEventListener('click', closeChatModal);
-    one('#chatModal')?.addEventListener('click', (event) => {
-        if (event.target === event.currentTarget) closeChatModal();
-    });
-    one('#chatForm')?.addEventListener('submit', submitChat);
-    one('#chatInput')?.addEventListener('input', (event) => {
-        one('#chatCounter').textContent = `${countGraphemes(event.currentTarget.value)}/400`;
-    });
-    one('#chatInput')?.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            one('#chatForm')?.requestSubmit();
+async function createRoom(event) {
+    event.preventDefault();
+    try {
+        const payload = await requestJson('chat-salas', { method: 'POST', body: JSON.stringify({
+            nome: one('#chatRoomNameInput').value,
+            tipo: one('#chatRoomType').value,
+            participantes: one('#chatRoomParticipants').value,
+        }) });
+        currentRoomId = payload.sala.id;
+        event.currentTarget.reset();
+        one('#chatRoomParticipants').classList.add('hidden');
+        one('#chatRoomForm').classList.add('hidden');
+        await loadRooms();
+        await refreshChat({ quiet: false });
+    } catch (error) { notify(error.message); }
+}
+
+function renderSupportConversations(items) {
+    const list = one('#supportConversations');
+    if (!list) return;
+    list.classList.remove('hidden');
+    list.innerHTML = items.map((item) => `<button type="button" class="support-conversation ${item.id === supportConversationId ? 'is-active' : ''}" data-support-id="${item.id}">
+        <strong>${safeText(item.usuarios?.nome || 'Aluno')}</strong><small>${safeText(item.usuarios?.usuario || '')} · ${safeText(item.status)}</small>
+    </button>`).join('') || '<div class="chat-empty">Nenhum atendimento.</div>';
+}
+
+async function loadSupport({ quiet = false } = {}) {
+    try {
+        if (appState.user?.perfil === 'supremo') {
+            const directory = await requestJson('suporte?listar=1');
+            if (!supportConversationId) supportConversationId = directory.conversas?.[0]?.id || null;
+            renderSupportConversations(directory.conversas || []);
         }
-    });
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && chatOpen) closeChatModal();
-    });
+        const query = supportConversationId ? `?conversa_id=${encodeURIComponent(supportConversationId)}` : '';
+        const payload = await requestJson(`suporte${query}`);
+        supportConversationId = payload.conversa?.id || supportConversationId;
+        renderMessages('#supportMessages', payload.mensagens || [], { support: true });
+    } catch (error) { if (!quiet) notify(error.message); }
+}
+
+async function openSupport() {
+    openModal('supportModal');
+    await loadSupport();
+    one('#supportInput')?.focus();
+    clearInterval(communityTimer);
+    communityTimer = setInterval(() => activeModal === 'supportModal' && loadSupport({ quiet: true }), SUPPORT_REFRESH_MS);
+}
+
+async function submitSupport(event) {
+    event.preventDefault();
+    const input = one('#supportInput');
+    try {
+        await requestJson('suporte', { method: 'POST', body: JSON.stringify({ conversa_id: supportConversationId, mensagem: input.value }) });
+        input.value = '';
+        await loadSupport();
+    } catch (error) { notify(error.message); }
+}
+
+const categoryNames = { duvida: 'Dúvida', discussao: 'Discussão', estudo: 'Estudo', aviso: 'Aviso' };
+
+function renderTopics(items) {
+    const list = one('#topicList');
+    list.classList.remove('hidden');
+    list.innerHTML = items.map((topic) => `<button class="topic-card" type="button" data-topic-id="${topic.id}">
+        <span class="topic-category category-${topic.categoria}">${categoryNames[topic.categoria] || 'Tópico'}</span>
+        <strong>${safeText(topic.titulo)}</strong><p>${safeText(topic.conteudo)}</p>
+        <small>${safeText(topic.usuarios?.nome || 'Usuário')} · ${safeText(formatTime(topic.atualizado_em, true))}${topic.fechado ? ' · Encerrado' : ''}</small>
+    </button>`).join('') || '<div class="chat-empty">Nenhum tópico ainda. Crie o primeiro.</div>';
+}
+
+async function loadTopics() {
+    const payload = await requestJson('topicos');
+    renderTopics(payload.topicos || []);
+}
+
+async function openTopic(id) {
+    const payload = await requestJson(`topicos?id=${encodeURIComponent(id)}`);
+    const topic = payload.topico;
+    if (!topic) return notify('Tópico não encontrado.');
+    activeTopicId = String(topic.id);
+    one('#topicList').classList.add('hidden');
+    one('#topicForm').classList.add('hidden');
+    const replies = (payload.respostas || []).map((reply) => `<article class="topic-answer"><strong>${safeText(reply.usuarios?.nome || 'Usuário')}</strong><p>${safeText(reply.conteudo).replace(/\n/g, '<br>')}</p><small>${safeText(formatTime(reply.criado_em, true))}</small></article>`).join('');
+    one('#topicDetailContent').innerHTML = `<header class="topic-detail-head"><span class="topic-category category-${topic.categoria}">${categoryNames[topic.categoria]}</span><h3>${safeText(topic.titulo)}</h3><small>${safeText(topic.usuarios?.nome || 'Usuário')} · ${safeText(formatTime(topic.criado_em, true))}</small></header><p class="topic-main-content">${safeText(topic.conteudo).replace(/\n/g, '<br>')}</p><div class="topic-answers">${replies || '<div class="chat-empty">Ainda não há respostas.</div>'}</div>`;
+    one('#topicReplyForm').classList.toggle('hidden', Boolean(topic.fechado));
+    one('#topicDetail').classList.remove('hidden');
+}
+
+async function openTopics() {
+    openModal('topicsModal');
+    one('#topicNoticeOption').disabled = appState.user?.perfil !== 'supremo';
+    one('#topicDetail').classList.add('hidden');
+    one('#topicForm').classList.add('hidden');
+    await loadTopics().catch((error) => notify(error.message));
+}
+
+async function submitTopic(event) {
+    event.preventDefault();
+    try {
+        const result = await requestJson('topicos', { method: 'POST', body: JSON.stringify({
+            action: 'criar', titulo: one('#topicTitleInput').value, categoria: one('#topicCategory').value, conteudo: one('#topicContentInput').value,
+        }) });
+        event.currentTarget.reset();
+        one('#topicForm').classList.add('hidden');
+        await loadTopics();
+        await openTopic(result.topico_id);
+    } catch (error) { notify(error.message); }
+}
+
+async function submitTopicReply(event) {
+    event.preventDefault();
+    try {
+        await requestJson('topicos', { method: 'POST', body: JSON.stringify({ action: 'responder', topico_id: activeTopicId, conteudo: one('#topicReplyInput').value }) });
+        one('#topicReplyInput').value = '';
+        await openTopic(activeTopicId);
+    } catch (error) { notify(error.message); }
+}
+
+function bindCommunityUi() {
+    bindEmojiPicker();
+    one('#openChatBtn')?.addEventListener('click', openChat);
+    one('#openSupportBtn')?.addEventListener('click', openSupport);
+    one('#openTopicsBtn')?.addEventListener('click', openTopics);
+    [['chatClose', 'chatModal'], ['supportClose', 'supportModal'], ['topicsClose', 'topicsModal']].forEach(([button, modal]) => one(`#${button}`)?.addEventListener('click', () => closeModal(modal)));
+    ['chatModal', 'supportModal', 'topicsModal'].forEach((id) => one(`#${id}`)?.addEventListener('click', (event) => { if (event.target === event.currentTarget) closeModal(id); }));
+    one('#chatForm')?.addEventListener('submit', submitChat);
+    one('#chatInput')?.addEventListener('input', (event) => { one('#chatCounter').textContent = `${countGraphemes(event.currentTarget.value)}/400`; });
+    one('#chatInput')?.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); one('#chatForm').requestSubmit(); } });
+    one('#chatRoomsToggle')?.addEventListener('click', () => one('#chatRoomPanel').classList.toggle('hidden'));
+    one('#chatCreateRoomToggle')?.addEventListener('click', () => one('#chatRoomForm').classList.toggle('hidden'));
+    one('#chatRoomType')?.addEventListener('change', (event) => one('#chatRoomParticipants').classList.toggle('hidden', event.target.value !== 'privada'));
+    one('#chatRoomForm')?.addEventListener('submit', createRoom);
+    one('#chatRoomList')?.addEventListener('click', async (event) => { const button = event.target.closest('[data-room-id]'); if (!button) return; currentRoomId = button.dataset.roomId; renderRooms(); one('#chatRoomPanel').classList.add('hidden'); await refreshChat({ quiet: false }); });
+    one('#supportForm')?.addEventListener('submit', submitSupport);
+    one('#supportConversations')?.addEventListener('click', async (event) => { const button = event.target.closest('[data-support-id]'); if (!button) return; supportConversationId = button.dataset.supportId; await loadSupport(); });
+    one('#topicForm')?.addEventListener('submit', submitTopic);
+    one('#topicReplyForm')?.addEventListener('submit', submitTopicReply);
+    one('#newTopicBtn')?.addEventListener('click', () => { one('#topicDetail').classList.add('hidden'); one('#topicList').classList.add('hidden'); one('#topicForm').classList.remove('hidden'); one('#topicTitleInput').focus(); });
+    one('#topicCancel')?.addEventListener('click', () => { one('#topicForm').classList.add('hidden'); one('#topicList').classList.remove('hidden'); });
+    one('#topicBack')?.addEventListener('click', () => { one('#topicDetail').classList.add('hidden'); one('#topicList').classList.remove('hidden'); activeTopicId = null; });
+    one('#topicList')?.addEventListener('click', (event) => { const button = event.target.closest('[data-topic-id]'); if (button) openTopic(button.dataset.topicId).catch((error) => notify(error.message)); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && activeModal) closeModal(activeModal); });
+}
+
+function bindActivityTracking() {
+    const activity = () => document.visibilityState === 'visible' && sendActivityPing();
+    ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach((name) => window.addEventListener(name, activity, { passive: true }));
+    document.addEventListener('visibilitychange', activity);
+    window.addEventListener('pagehide', () => { try { fetch('/api/presenca', { method: 'DELETE', credentials: 'include', keepalive: true }); } catch { /* limpeza no servidor */ } });
 }
 
 export function startCommunity() {
-    if (initialized) {
-        sendActivityPing();
-        refreshPresence();
-        return;
-    }
+    if (initialized) { sendActivityPing(); refreshPresence(); return; }
     initialized = true;
-
-    bindChat();
+    bindCommunityUi();
     bindActivityTracking();
     sendActivityPing();
     refreshPresence();
-
-    heartbeatTimer = window.setInterval(() => {
-        if (document.visibilityState === 'visible') sendPresence({ activity: false });
-    }, HEARTBEAT_MS);
-
-    presenceTimer = window.setInterval(refreshPresence, PRESENCE_REFRESH_MS);
-    spotlightTimer = window.setInterval(rotateSpotlight, SPOTLIGHT_ROTATION_MS);
+    heartbeatTimer = setInterval(() => document.visibilityState === 'visible' && sendPresence(), HEARTBEAT_MS);
+    presenceTimer = setInterval(refreshPresence, PRESENCE_REFRESH_MS);
+    spotlightTimer = setInterval(rotateSpotlight, 8_000);
 }

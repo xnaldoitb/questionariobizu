@@ -1,17 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title id="title">Ícone do Questionário Bizu</title>
-  <desc id="desc">Balão de questão com marca de acerto</desc>
+  <desc id="desc">Livro aberto com marca de acerto</desc>
   <defs>
     <linearGradient id="icon-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#123565"/>
-      <stop offset="1" stop-color="#06162f"/>
+      <stop offset="0" stop-color="#143b70"/>
+      <stop offset="1" stop-color="#07172f"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#icon-bg)"/>
-  <rect x="28" y="28" width="456" height="456" rx="88" fill="none" stroke="#c9bf8a" stroke-width="6" stroke-opacity=".42"/>
-  <path d="M125 109h262a39 39 0 0 1 39 39v169a39 39 0 0 1-39 39H244l-80 67 25-67h-64a39 39 0 0 1-39-39V148a39 39 0 0 1 39-39Z" fill="#f5f2e8"/>
-  <path d="M194 201c0-44 32-70 77-70 43 0 75 25 75 64 0 62-69 61-69 108" fill="none" stroke="#0b2145" stroke-width="34" stroke-linecap="round"/>
-  <circle cx="277" cy="327" r="20" fill="#0b2145"/>
-  <circle cx="384" cy="362" r="76" fill="#c8102e"/>
-  <path d="m345 361 26 25 48-56" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="28" y="28" width="456" height="456" rx="88" fill="none" stroke="#c9bf8a" stroke-width="6" stroke-opacity=".45"/>
+  <path d="M72 153c61-33 121-29 176 14v215c-57-39-116-44-176-13V153Z" fill="#f7f4eb"/>
+  <path d="M440 153c-61-33-121-29-176 14v215c57-39 116-44 176-13V153Z" fill="#e4eaf2"/>
+  <path d="M256 167v215" stroke="#c9bf8a" stroke-width="12" stroke-linecap="round"/>
+  <path d="M109 208c40-14 74-10 101 11M109 264c40-14 74-10 101 11M403 208c-40-14-74-10-101 11M403 264c-40-14-74-10-101 11" fill="none" stroke="#183c6d" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="381" cy="365" r="76" fill="#cf1738"/>
+  <path d="m342 364 26 25 50-57" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

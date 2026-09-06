@@ -5,7 +5,7 @@ OUTPUT = Path("public/assets/icons")
 SUPERSAMPLING = 4
 
 
-def bezier(points, steps=36):
+def cubic(points, steps=36):
     p0, p1, p2, p3 = points
     result = []
     for index in range(steps + 1):
@@ -25,48 +25,47 @@ def create_icon(size, filename):
     def p(value):
         return round(value * scale)
 
-    def point(pair):
-        return tuple(p(value) for value in pair)
+    def points(values):
+        return [(p(x), p(y)) for x, y in values]
 
-    image = Image.new("RGB", (work_size, work_size), "#06162f")
+    image = Image.new("RGB", (work_size, work_size), "#07172f")
     draw = ImageDraw.Draw(image)
+    draw.rounded_rectangle((0, 0, work_size - 1, work_size - 1), radius=p(112), fill="#0d315f")
+    draw.rounded_rectangle((p(28), p(28), p(484), p(484)), radius=p(88), outline="#918a60", width=p(6))
 
-    draw.rounded_rectangle((0, 0, work_size - 1, work_size - 1), radius=p(112), fill="#0b2851")
-    draw.rounded_rectangle(
-        (p(28), p(28), p(484), p(484)),
-        radius=p(88), outline="#8d875f", width=max(2, p(6))
-    )
+    left = [(72, 153)]
+    left += cubic([(72, 153), (133, 120), (193, 124), (248, 167)])[1:]
+    left += [(248, 382)]
+    left += cubic([(248, 382), (191, 343), (132, 338), (72, 369)])[1:]
+    draw.polygon(points(left), fill="#f7f4eb")
 
-    draw.rounded_rectangle(
-        (p(86), p(109), p(426), p(356)),
-        radius=p(39), fill="#f5f2e8"
-    )
-    draw.polygon([point((164, 337)), point((139, 423)), point((244, 337))], fill="#f5f2e8")
+    right = [(440, 153)]
+    right += cubic([(440, 153), (379, 120), (319, 124), (264, 167)])[1:]
+    right += [(264, 382)]
+    right += cubic([(264, 382), (321, 343), (380, 338), (440, 369)])[1:]
+    draw.polygon(points(right), fill="#e4eaf2")
 
-    question = bezier([(194, 201), (194, 157), (226, 131), (271, 131)])
-    question += bezier([(271, 131), (314, 131), (346, 156), (346, 195)])[1:]
-    question += bezier([(346, 195), (346, 257), (277, 256), (277, 303)])[1:]
-    question = [point(pair) for pair in question]
-    question_width = p(34)
-    draw.line(question, fill="#0b2145", width=question_width, joint="curve")
-    radius = question_width // 2
-    for x, y in (question[0], question[-1]):
-        draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill="#0b2145")
-    draw.ellipse((p(257), p(307), p(297), p(347)), fill="#0b2145")
+    draw.line(points([(256, 167), (256, 382)]), fill="#c9bf8a", width=p(12))
+    for line in [
+        [(109, 208), (143, 196), (176, 199), (210, 219)],
+        [(109, 264), (143, 252), (176, 255), (210, 275)],
+        [(403, 208), (369, 196), (336, 199), (302, 219)],
+        [(403, 264), (369, 252), (336, 255), (302, 275)],
+    ]:
+        draw.line(points(line), fill="#183c6d", width=p(14), joint="curve")
 
-    draw.ellipse((p(308), p(286), p(460), p(438)), fill="#c8102e")
-    check = [point((345, 361)), point((371, 386)), point((419, 330))]
-    check_width = p(22)
-    draw.line(check, fill="#ffffff", width=check_width, joint="curve")
-    check_radius = check_width // 2
+    draw.ellipse((p(305), p(289), p(457), p(441)), fill="#cf1738")
+    check = points([(342, 364), (368, 389), (418, 332)])
+    width = p(22)
+    draw.line(check, fill="#fff", width=width, joint="curve")
+    radius = width // 2
     for x, y in check:
-        draw.ellipse((x - check_radius, y - check_radius, x + check_radius, y + check_radius), fill="#ffffff")
+        draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill="#fff")
 
-    image = image.resize((size, size), Image.Resampling.LANCZOS)
-    image.save(OUTPUT / filename, optimize=True)
+    image.resize((size, size), Image.Resampling.LANCZOS).save(OUTPUT / filename, optimize=True)
 
 
 OUTPUT.mkdir(parents=True, exist_ok=True)
-create_icon(192, "icon-192.png")
-create_icon(512, "icon-512.png")
-create_icon(512, "icon-maskable-512.png")
+create_icon(192, "icon-192-v435.png")
+create_icon(512, "icon-512-v435.png")
+create_icon(512, "icon-maskable-512-v435.png")

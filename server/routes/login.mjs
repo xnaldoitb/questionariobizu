@@ -26,7 +26,12 @@ export const handler = async (event) => {
 
         const rates = await Promise.all([
             consumeRateLimit(event, 'login-ip', { limit: 30, windowSeconds: 15 * 60, failClosed: true }),
-            consumeRateLimit(event, 'login-conta', { limit: 10, windowSeconds: 15 * 60, failClosed: true }, login),
+            consumeRateLimit(event, 'login-conta', {
+                limit: 10,
+                windowSeconds: 15 * 60,
+                failClosed: true,
+                includeIp: false,
+            }, login),
         ]);
         if (rates.some((rate) => !rate.allowed)) {
             if (rates.some((rate) => rate.unavailable)) {

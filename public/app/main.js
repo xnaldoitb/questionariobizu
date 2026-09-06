@@ -28,8 +28,10 @@ let lastProfileRefresh = 0;
 function refreshThemeControl() {
     const dark = document.documentElement.dataset.theme === 'dark';
     const icon = document.querySelector('.theme-action-icon');
+    const label = document.querySelector('.theme-action-label');
 
     if (icon) icon.textContent = dark ? '☀' : '☾';
+    if (label) label.textContent = dark ? 'Modo claro' : 'Modo escuro';
 
     one('#themeBtn')?.setAttribute(
         'aria-label',

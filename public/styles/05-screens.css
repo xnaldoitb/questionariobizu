@@ -747,7 +747,8 @@ body.modal-open {
 .history-answer-copy { min-width:0; }
 .history-answer-chapter { display:block; margin-bottom:3px; color:var(--signal); font:700 10px 'JetBrains Mono',monospace; letter-spacing:.06em; text-transform:uppercase; }
 .history-answer-copy strong { display:block; color:var(--text-main); font:600 16px/1.35 'Bitter',Georgia,serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.review-modal { max-width:820px; }
+.review-modal { display:flex; flex-direction:column; max-width:820px; }
+.review-modal-scroll { min-height:0; padding:20px 24px 24px; overflow-y:auto; overscroll-behavior:contain; }
 .review-question-meta { color:var(--signal); font:700 10px 'JetBrains Mono',monospace; text-transform:uppercase; }
 .review-question-title { color:var(--text-main); font:700 20px/1.5 'Bitter',Georgia,serif; }
 .review-options { display:grid; gap:8px; }
@@ -812,52 +813,6 @@ body.modal-open {
 
 .admin-user-actions {
     flex-wrap: wrap;
-}
-
-
-/* Contatos dos administradores na tela de login */
-.admin-contact {
-    position: relative;
-    z-index: 1;
-    margin-top: 24px;
-    padding-top: 18px;
-    border-top: 1px solid var(--line);
-    text-align: center;
-}
-.admin-contact strong {
-    display: block;
-    color: var(--text-accent);
-    font: 700 11px var(--type-ui);
-    letter-spacing: .08em;
-    text-transform: uppercase;
-}
-.admin-contact p {
-    margin: 8px 0 12px;
-    color: var(--text-muted);
-    font-size: 13px;
-    line-height: 1.45;
-}
-.admin-contact-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-}
-.admin-contact-links a {
-    padding: 8px 10px;
-    color: var(--text-accent);
-    background: var(--canvas-soft);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    font: 600 11px var(--type-ui);
-    text-decoration: none;
-}
-.admin-contact-links a:hover {
-    border-color: var(--signal);
-}
-@media (max-width: 520px) {
-    .admin-contact-links { flex-direction: column; }
-    .admin-contact-links a { width: 100%; }
 }
 
 

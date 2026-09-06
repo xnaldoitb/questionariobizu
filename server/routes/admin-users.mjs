@@ -9,6 +9,7 @@ import {
 } from '../platform/access-validity.mjs';
 import { resolveQuestionAccess } from '../platform/question-access.mjs';
 import { auditAdmin } from '../platform/admin-audit.mjs';
+import { clearRateLimit } from '../platform/rate-limit.mjs';
 
 const MANAGEMENT_ROLES = ['admin', 'supremo'];
 const COMMON_ADMIN_ACTIONS = new Set([
@@ -17,6 +18,7 @@ const COMMON_ADMIN_ACTIONS = new Set([
     'set_validity',
     'toggle_active',
     'update_user',
+    'end_sessions',
 ]);
 
 const V43_COLUMNS = [
@@ -376,6 +378,24 @@ export const handler = async (event) => {
 
             return error ? json(400, { erro: 'Não foi possível negar o cadastro.' })
                 : audited(actor, 'usuario_negado', id, json(200, { ok: true }));
+        }
+
+        if (action === 'end_sessions') {
+            if (target.perfil !== 'aluno') {
+                return json(400, { erro: 'O encerramento de sessões é aplicável somente a alunos.' });
+            }
+
+            await Promise.all([
+                revokeDeviceSessions(id),
+                clearRateLimit('login-conta', target.usuario, { includeIp: false }),
+            ]);
+            const { error } = await db().from('usuarios').update(clearSessionFields({})).eq('id', id);
+            if (error) return json(400, { erro: 'Não foi possível encerrar as sessões do usuário.' });
+
+            return audited(actor, 'sessoes_encerradas', id, json(200, {
+                ok: true,
+                mensagem: 'Sessões encerradas e tentativas de login da conta liberadas.',
+            }), { login_liberado: true });
         }
 
         if (action === 'set_validity') {

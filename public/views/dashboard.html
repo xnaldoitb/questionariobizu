@@ -44,11 +44,17 @@
             <span class="presence-divider" aria-hidden="true">·</span>
             <span id="onlineSpotlight">Conectando à comunidade…</span>
         </div>
-        <button class="community-chat-button" id="openChatBtn" type="button">
-            <span aria-hidden="true">💬</span>
-            <span>Chat</span>
-            <b id="chatOnlineCount">0</b>
-        </button>
+        <div class="community-actions">
+            <button class="community-chat-button" id="openChatBtn" type="button">
+                <span class="community-action-icon" aria-hidden="true">◌</span><span>Chat</span><b id="chatOnlineCount">0</b>
+            </button>
+            <button class="community-chat-button support-action" id="openSupportBtn" type="button">
+                <span class="community-action-icon" aria-hidden="true">?</span><span>Falar com suporte</span>
+            </button>
+            <button class="community-chat-button topics-action" id="openTopicsBtn" type="button">
+                <span class="community-action-icon" aria-hidden="true">#</span><span>Tópicos</span>
+            </button>
+        </div>
     </div>
 
     <div class="study-intro compact-study-intro">
@@ -149,19 +155,30 @@
 
     <div class="modal-overlay hidden" id="chatModal" role="dialog" aria-modal="true" aria-labelledby="chatTitle">
         <section class="report-modal chat-modal">
-            <header class="report-modal-header chat-modal-header">
-                <div>
-                    <p class="section-kicker"><span class="kicker-mark"></span> sala temporária</p>
-                    <h2 id="chatTitle">Chat de estudos</h2>
-                    <p><span class="presence-dot inline-dot" aria-hidden="true"></span><strong id="chatHeaderOnline">0 online</strong> · a conversa é apagada quando a sala fica sem usuários ativos.</p>
+            <header class="community-modal-header">
+                <div class="community-modal-title">
+                    <span class="community-modal-symbol" aria-hidden="true">◌</span>
+                    <div><h2 id="chatTitle">Chat</h2><small><strong id="chatRoomName">Sala geral</strong> · <span id="chatHeaderOnline">0 online</span></small></div>
+                </div>
+                <div class="community-header-actions">
+                    <button class="community-icon-button" id="chatRoomsToggle" type="button" aria-label="Escolher sala">Salas</button>
+                    <button class="community-icon-button" id="chatCreateRoomToggle" type="button" aria-label="Criar sala">＋</button>
                 </div>
                 <button class="modal-close" id="chatClose" type="button" aria-label="Fechar chat">×</button>
             </header>
 
             <div class="chat-body">
-                <div class="chat-privacy-note">
-                    <span aria-hidden="true">◷</span>
-                    <span>Chat efêmero: sem histórico permanente. Após 5 min sem atividade você deixa de aparecer como online; após 10 min sua presença é removida.</span>
+                <div class="chat-room-panel hidden" id="chatRoomPanel">
+                    <div class="chat-room-list" id="chatRoomList"></div>
+                </div>
+                <form class="chat-room-create hidden" id="chatRoomForm">
+                    <input id="chatRoomNameInput" maxlength="50" placeholder="Nome da nova sala" required>
+                    <select id="chatRoomType" aria-label="Privacidade da sala"><option value="publica">Pública</option><option value="privada">Privada</option></select>
+                    <input id="chatRoomParticipants" class="hidden" placeholder="ALs separados por vírgula" aria-label="Participantes da sala privada">
+                    <button class="ui-button main-action mini" type="submit">Criar</button>
+                </form>
+                <div class="chat-room-note" id="chatRoomNote">
+                    <span class="presence-dot inline-dot" aria-hidden="true"></span><span id="chatRoomPrivacy">Sala pública</span>
                 </div>
                 <div class="chat-messages" id="chatMessages" aria-live="polite">
                     <div class="chat-empty">Carregando conversa…</div>
@@ -186,6 +203,49 @@
                         <button class="ui-button main-action" id="chatSend" type="submit">Enviar</button>
                     </div>
                 </form>
+            </div>
+        </section>
+    </div>
+
+    <div class="modal-overlay hidden" id="supportModal" role="dialog" aria-modal="true" aria-labelledby="supportTitle">
+        <section class="report-modal community-modal support-modal">
+            <header class="community-modal-header">
+                <div class="community-modal-title"><span class="community-modal-symbol support-symbol" aria-hidden="true">?</span><div><h2 id="supportTitle">Falar com suporte</h2><small>Conversa privada com o Desenvolvedor</small></div></div>
+                <button class="modal-close" id="supportClose" type="button" aria-label="Fechar suporte">×</button>
+            </header>
+            <div class="support-layout">
+                <aside class="support-conversations hidden" id="supportConversations"></aside>
+                <div class="community-conversation">
+                    <div class="community-messages" id="supportMessages" aria-live="polite"><div class="chat-empty">Carregando…</div></div>
+                    <form class="community-compose" id="supportForm">
+                        <textarea id="supportInput" maxlength="1000" rows="2" placeholder="Como podemos ajudar?" required></textarea>
+                        <button class="ui-button main-action" type="submit">Enviar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="modal-overlay hidden" id="topicsModal" role="dialog" aria-modal="true" aria-labelledby="topicsTitle">
+        <section class="report-modal community-modal topics-modal">
+            <header class="community-modal-header">
+                <div class="community-modal-title"><span class="community-modal-symbol topics-symbol" aria-hidden="true">#</span><div><h2 id="topicsTitle">Tópicos</h2><small>Dúvidas, estudos e discussões</small></div></div>
+                <button class="community-icon-button" id="newTopicBtn" type="button">Novo tópico</button>
+                <button class="modal-close" id="topicsClose" type="button" aria-label="Fechar tópicos">×</button>
+            </header>
+            <div class="topics-body">
+                <form class="topic-create hidden" id="topicForm">
+                    <input id="topicTitleInput" maxlength="90" placeholder="Título do tópico" required>
+                    <select id="topicCategory"><option value="duvida">Dúvida</option><option value="discussao">Discussão</option><option value="estudo">Estudo</option><option value="aviso" id="topicNoticeOption">Aviso</option></select>
+                    <textarea id="topicContentInput" maxlength="2400" rows="4" placeholder="Descreva sua dúvida ou assunto…" required></textarea>
+                    <div class="topic-form-actions"><button class="ui-button quiet-action" id="topicCancel" type="button">Cancelar</button><button class="ui-button main-action" type="submit">Publicar</button></div>
+                </form>
+                <div class="topic-list" id="topicList"></div>
+                <article class="topic-detail hidden" id="topicDetail">
+                    <button class="topic-back" id="topicBack" type="button">← Voltar aos tópicos</button>
+                    <div id="topicDetailContent"></div>
+                    <form class="topic-reply" id="topicReplyForm"><textarea id="topicReplyInput" maxlength="1600" rows="3" placeholder="Escreva uma resposta…" required></textarea><button class="ui-button main-action" type="submit">Responder</button></form>
+                </article>
             </div>
         </section>
     </div>
