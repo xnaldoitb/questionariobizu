@@ -41,6 +41,8 @@ assert(!authView.includes('admin-contact-links'));
 assert(fragments.includes('id="installAppClose"'));
 assert(pwa.includes('!isInstalled() && !dismissed'));
 assert(pwa.includes("sessionStorage.setItem(INSTALL_DISMISSED_KEY, '1')"));
+assert(pwa.includes("window.addEventListener('beforeinstallprompt', captureInstallPrompt)"));
+assert(pwa.includes("'Preparando instalação…'"));
 assert(pwaBrand.includes('.install-app-compact'));
 assert(!pwaBrand.includes('width: min(100%, 320px)'));
 assert(communityCss.includes('.community-modal-header .modal-close'));

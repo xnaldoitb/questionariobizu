@@ -75,6 +75,19 @@ body.pwa-install-available {
     border-color: #c8102e;
 }
 
+#installAppBtn.install-app-button:disabled {
+    cursor: wait;
+    opacity: .78;
+}
+
+#installAppBtn.install-app-button.is-preparing .action-icon {
+    animation: install-preparing 1s linear infinite;
+}
+
+@keyframes install-preparing {
+    to { transform: translateY(2px); }
+}
+
 @media (max-width: 760px) {
     body.pwa-install-available {
         padding-bottom: calc(60px + env(safe-area-inset-bottom));

@@ -1,11 +1,24 @@
 import { one, notify } from './selectors.js';
 
-const APP_VERSION = '4.35.2';
+const APP_VERSION = '4.35.3';
 const UPDATE_INTERVAL_MS = 15 * 60 * 1000;
 const INSTALL_DISMISSED_KEY = 'bizu-install-dismissed-session';
 let installPrompt = null;
 let waitingWorker = null;
 let refreshing = false;
+let installPreparationFinished = false;
+
+function captureInstallPrompt(event) {
+    event.preventDefault();
+    installPrompt = event;
+    installPreparationFinished = true;
+    updateInstallButton();
+}
+
+// Precisa ser registrado durante a avaliação do módulo. A interface é montada
+// a partir de fragmentos e aguardar esse processo pode fazer o Chrome emitir o
+// evento antes de o listener existir, principalmente em links abertos em nova aba.
+window.addEventListener('beforeinstallprompt', captureInstallPrompt);
 
 function isInstalled() {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -21,6 +34,11 @@ function updateInstallButton() {
     if (!button) return;
     const dismissed = sessionStorage.getItem(INSTALL_DISMISSED_KEY) === '1';
     const available = !isInstalled() && !dismissed;
+    const preparing = available && !isIos() && !installPrompt && !installPreparationFinished;
+    const label = button.querySelector('span:last-child');
+    button.disabled = preparing;
+    button.classList.toggle('is-preparing', preparing);
+    if (label) label.textContent = preparing ? 'Preparando instalação…' : 'Instalar aplicativo';
     footer?.classList.toggle('hidden', !available);
     document.body.classList.toggle('pwa-install-available', available);
 }
@@ -85,11 +103,10 @@ export function bindPwaInstall() {
     });
     one('#dismissAppUpdate')?.addEventListener('click', () => one('#appUpdateNotice')?.classList.add('hidden'));
 
-    window.addEventListener('beforeinstallprompt', (event) => {
-        event.preventDefault();
-        installPrompt = event;
+    window.setTimeout(() => {
+        installPreparationFinished = true;
         updateInstallButton();
-    });
+    }, 4500);
     window.addEventListener('appinstalled', () => {
         installPrompt = null;
         sessionStorage.setItem(INSTALL_DISMISSED_KEY, '1');
