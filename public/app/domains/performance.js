@@ -216,20 +216,10 @@ async function openRanking() {
 async function refreshRanking() {
     one('#rankingList').innerHTML = '<div class="report-loading">Carregando ranking…</div>';
     one('#rankingPodium').innerHTML = '';
-    one('#myRankingCard').innerHTML = '';
 
     try {
         const ranking = (await requestJson('ranking')).ranking || [];
         const podium = ranking.slice(0, 3);
-        const myIndex = ranking.findIndex((entry) => entry.usuario_id === appState.user.id || entry.usuario === appState.user.usuario);
-        const mine = myIndex >= 0 ? ranking[myIndex] : null;
-
-        one('#myRankingCard').innerHTML = mine
-            ? `<div class="my-rank-position"><span>Sua colocação</span><strong>${myIndex + 1}º</strong></div>
-                ${patentButtonMarkup(mine.acertos, { compact: true, developer: developerEntry(mine) })}
-                <div class="my-rank-identity"><b>${safeText(mine.nome)} ${accountBadges(mine)}</b></div>
-                <div class="my-rank-stats"><span><strong>${mine.acertos}</strong> acertos</span><small>${mine.percentual}% · ${mine.respondidas} respondidas</small></div>`
-            : '<div class="my-rank-position"><span>Sua colocação</span><strong>—</strong></div><div class="my-rank-identity"><b>Sem pontuação</b><small>Responda uma questão para entrar no ranking.</small></div>';
 
         one('#rankingPodium').innerHTML = podium.length
             ? podium.map((entry, index) => `
@@ -256,7 +246,7 @@ async function refreshRanking() {
                     <div class="ranking-card-emblem">${patentButtonMarkup(entry.acertos, { developer: developerEntry(entry) })}</div>
                     <div class="ranking-person">
                         <div class="ranking-name-line"><strong>${safeText(entry.nome)} ${accountBadges(entry)}</strong></div>
-                        <small>AL SD PM Nº: ${safeText(entry.usuario)} · ${entry.sessoes} sessões</small>
+                        <small>AL SD PM Nº: ${safeText(entry.usuario)}</small>
                     </div>
                     <div class="ranking-card-score">
                         <span class="ranking-primary-score"><strong>${entry.acertos}</strong><small>acertos</small></span>

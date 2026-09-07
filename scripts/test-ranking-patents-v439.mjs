@@ -39,7 +39,9 @@ assert(dashboard.includes('profile-patent-button') && !dashboard.includes('class
 assert(!dashboard.includes('profilePatentName'));
 assert(performance.includes('patentButtonMarkup') && !performance.includes('ranking-avatar'));
 for (const hiddenName of ['rankingPatentName', 'podium-patent-name', 'ranking-patent-name']) assert(!performance.includes(hiddenName));
-for (const marker of ['my-rank-position', 'podium-results', 'ranking-person', 'ranking-primary-score']) assert(performance.includes(marker));
+for (const marker of ['podium-results', 'ranking-person', 'ranking-primary-score']) assert(performance.includes(marker));
+assert(!performance.includes('myRankingCard') && !modal.includes('myRankingCard'));
+assert(!performance.includes('${entry.sessoes} sessões'));
 assert(main.includes('checkPatentNotification') && main.includes('renderProfilePatent'));
 assert(main.includes("appState.user?.perfil === 'supremo'"));
 assert(topic.includes("PATENT_GUIDE_TOPIC_ID = 'guia-patentes'"));
@@ -49,9 +51,8 @@ assert(topic.includes('papiraoRow') && topic.includes('patent-guide-papirao'));
 assert(modal.includes('id="patentModal"') && modal.includes('id="patentProgressBar"'));
 assert(css.includes('.patent-insignia') && css.includes('.patent-guide-table'));
 assert(css.includes('@keyframes patent-hero-glow') && css.includes('.patent-hero-cluster'));
-assert(css.includes('.my-ranking-card { grid-template-columns:46px 42px minmax(0,1fr);'));
-assert(css.includes('.my-rank-stats { grid-column:1 / -1; grid-row:2; display:flex;'));
-assert(!performance.includes('${rankBadge(myIndex)}'));
+assert(css.includes('.ranking-list { display:grid; grid-template-columns:1fr;'));
+assert(css.includes('.ranking-card { grid-template-columns:32px 40px minmax(58px,1fr) minmax(88px,100px);'));
 assert(patentInsigniaMarkup(0).includes('patent-trainee-mark'));
 assert(patentInsigniaMarkup(20).includes('patent-enlisted-bars'));
 assert(patentInsigniaMarkup(175).includes('patent-sergeant-chevrons'));
@@ -94,4 +95,4 @@ assert(sessions.includes('patente_notificada_nivel: 0') && sessions.includes('pa
 assert(rankingRoute.includes(".from('usuarios')") && rankingRoute.includes('users.map'));
 assert(rankingMigration.includes('left join public.respostas') && !rankingMigration.includes('status_aprovacao'));
 
-console.log('Ranking v4.42.1: card pessoal móvel reorganizado e ranking completo validados.');
+console.log('Ranking v4.42.2: card pessoal removido e classificação geral em faixas validada.');

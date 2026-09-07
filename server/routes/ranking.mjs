@@ -13,7 +13,6 @@ function publicRankingEntry(entry) {
         vip: Boolean(entry.vip),
         premium: Boolean(entry.premium),
         plano_atual: entry.plano_atual || null,
-        sessoes: Number(entry.sessoes || 0),
         respondidas: Number(entry.respondidas || 0),
         acertos: Number(entry.acertos || 0),
         percentual: Number(entry.percentual || 0),
@@ -33,7 +32,7 @@ function sortRanking(entries) {
 async function loadFromView() {
     const { data, error } = await db()
         .from('ranking_usuarios')
-        .select('usuario_id,nome,usuario,perfil,vip,premium,plano_atual,sessoes,respondidas,acertos,percentual');
+        .select('usuario_id,nome,usuario,perfil,vip,premium,plano_atual,respondidas,acertos,percentual');
 
     if (error) throw error;
 
@@ -61,7 +60,7 @@ async function loadFallback() {
     while (true) {
         const { data, error } = await db()
             .from('respostas')
-            .select('id,usuario_id,sessao_id,acertou')
+            .select('id,usuario_id,acertou')
             .eq('pulada', false)
             .not('resposta_marcada', 'is', null)
             .order('id', { ascending: true })
@@ -81,7 +80,6 @@ async function loadFallback() {
         vip: Boolean(registeredUser.vip),
         premium: Boolean(registeredUser.premium),
         plano_atual: registeredUser.plano_atual || null,
-        sessionIds: new Set(),
         respondidas: 0,
         acertos: 0,
     }]));
@@ -89,7 +87,6 @@ async function loadFallback() {
         const entry = map.get(response.usuario_id);
         if (!entry) continue;
 
-        if (response.sessao_id) entry.sessionIds.add(response.sessao_id);
         entry.respondidas += 1;
         if (response.acertou) entry.acertos += 1;
     }
@@ -101,7 +98,6 @@ async function loadFallback() {
         vip: entry.vip,
         premium: entry.premium,
         plano_atual: entry.plano_atual,
-        sessoes: entry.sessionIds.size,
         respondidas: entry.respondidas,
         acertos: entry.acertos,
         percentual: entry.respondidas
