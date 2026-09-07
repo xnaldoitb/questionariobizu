@@ -6,7 +6,7 @@ export const PATENTS = [
     [1000, 'Segundo-Sargento da Disciplina II'], [1300, 'Segundo-Sargento da Disciplina III'],
     [1650, 'Segundo-Sargento da Disciplina IV'], [2050, 'Primeiro-Sargento das Questões I'],
     [2500, 'Primeiro-Sargento das Questões II'], [3000, 'Primeiro-Sargento das Questões III'],
-    [3600, 'Primeiro-Sargento das Questões IV'], [4300, 'Primeiro-Sargento das Questões V'],
+    [3600, 'Primeiro-Sargento das Questões IV'], [4300, 'Subtenente do Conhecimento'],
     [5000, 'Segundo-Tenente da Estratégia I'], [5400, 'Segundo-Tenente da Estratégia II'],
     [5800, 'Segundo-Tenente da Estratégia III'], [6200, 'Segundo-Tenente da Estratégia IV'],
     [6650, 'Oficial de Questões I'], [7100, 'Oficial de Questões II'],

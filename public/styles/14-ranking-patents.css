@@ -52,18 +52,29 @@
 .patent-tile-inner { fill:var(--patent-main); stroke:color-mix(in srgb,var(--patent-light) 54%,#111); stroke-width:1.2; }
 .patent-tile-bevel { fill:none; stroke:rgb(255 255 255 / 25%); stroke-width:1.1; stroke-linecap:round; }
 .patent-tile-gloss { fill:rgb(255 255 255 / 8%); }
-.patent-chevron,.patent-rocker,.patent-rank-bar,.patent-command-wing,.patent-hero-wings { fill:none; stroke:var(--patent-mark); stroke-linecap:round; stroke-linejoin:round; }
+.patent-chevron,.patent-rocker,.patent-rank-bar { fill:none; stroke:var(--patent-mark); stroke-linecap:round; stroke-linejoin:round; }
 .patent-chevron { stroke-width:3.8; }
 .patent-rocker { stroke-width:3.3; }
 .patent-rank-bar { stroke-width:4.4; }
 .patent-star,.patent-pip,.patent-grade-dot { fill:var(--patent-mark); stroke:color-mix(in srgb,var(--patent-light) 55%,#000); stroke-width:.8; }
 .patent-command-marks .patent-star { filter: drop-shadow(0 1px 1px rgb(0 0 0 / 24%)); }
-.patent-command-wing,.patent-hero-wings { stroke-width:2.5; }
-.patent-hero-marks { filter:drop-shadow(0 0 4px rgb(255 205 68 / 42%)); }
+.patent-command-stars .patent-star { filter:drop-shadow(0 1px 2px rgb(0 0 0 / 35%)); }
+.patent-subtenente-triangle { fill:rgb(242 202 75 / 16%); stroke:var(--patent-mark); stroke-width:4; stroke-linejoin:round; }
+.patent-subtenente-mark .patent-star { filter:drop-shadow(0 1px 2px rgb(0 0 0 / 35%)); }
+.patent-hero-marks { filter:drop-shadow(0 0 5px rgb(255 205 68 / 58%)); }
+.patent-hero-cluster { transform-origin:32px 32px; animation:patent-hero-glow 2.4s ease-in-out infinite; }
+.patent-hero-cluster .patent-star:first-child { fill:#fff0a3; stroke:#e3a72f; stroke-width:1.1; }
+.patent-hero-cluster .patent-star:not(:first-child) { fill:#ffd84f; stroke:#fff1aa; stroke-width:.75; }
+@keyframes patent-hero-glow {
+    0%,100% { filter:drop-shadow(0 0 2px rgb(255 206 61 / 50%)) drop-shadow(0 0 5px rgb(255 191 35 / 28%)); }
+    50% { filter:drop-shadow(0 0 4px rgb(255 235 143 / 88%)) drop-shadow(0 0 9px rgb(255 184 25 / 58%)); }
+}
 
 .patent-family-trainee { --patent-main:#151c21;--patent-light:#606e76;--patent-mark:#93a1a9; }
 .patent-family-enlisted { --patent-main:#11191e;--patent-light:#6d7e87;--patent-mark:#b7c5cb; }
 .patent-family-sergeant { --patent-main:#181712;--patent-light:#8b7444;--patent-mark:#d2ad51; }
+.patent-level-8,.patent-level-9,.patent-level-10,.patent-level-11 { --patent-main:#1b180d;--patent-light:#b18c36;--patent-mark:#f2ca4b; }
+.patent-sergeant-tier-1 .patent-rocker { stroke-width:3.1; }
 .patent-family-seniorSergeant { --patent-main:#1b180d;--patent-light:#b18c36;--patent-mark:#f2ca4b; }
 .patent-family-juniorOfficer { --patent-main:#07182a;--patent-light:#54738e;--patent-mark:#d0e0e8; }
 .patent-family-officer { --patent-main:#071c31;--patent-light:#6688a3;--patent-mark:#edf4f7; }
@@ -72,7 +83,7 @@
 .patent-family-lieutenantColonel { --patent-main:#102b29;--patent-light:#5f897b;--patent-mark:#e0ebe5; }
 .patent-family-colonel { --patent-main:#17301f;--patent-light:#78905e;--patent-mark:#f2cb45; }
 .patent-family-general { --patent-main:#4a1019;--patent-light:#a7553e;--patent-mark:#ffd044; }
-.patent-family-hero { --patent-main:#660f1e;--patent-light:#d09b36;--patent-mark:#ffe27a; }
+.patent-family-hero { --patent-main:#5b0c1a;--patent-light:#dfa83b;--patent-mark:#ffe27a; }
 .patent-family-hero .patent-tile-frame { stroke:#f0c24d; }
 .patent-family-hero .patent-tile-inner { stroke:#de9e31; }
 .patent-family-hero .patent-tile-gloss { fill:rgb(255 224 122 / 14%); }
@@ -274,4 +285,5 @@
 @media (prefers-reduced-motion: reduce) {
     .patent-modal-card.is-achievement { animation: none; }
     .patent-progress i,.patent-insignia { transition: none; }
+    .patent-hero-cluster { animation:none; }
 }

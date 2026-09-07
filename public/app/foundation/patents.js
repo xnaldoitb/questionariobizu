@@ -30,7 +30,7 @@ const DEFINITIONS = [
     [2500, 'Primeiro-Sargento das Questões II', 'seniorSergeant', 2],
     [3000, 'Primeiro-Sargento das Questões III', 'seniorSergeant', 3],
     [3600, 'Primeiro-Sargento das Questões IV', 'seniorSergeant', 4],
-    [4300, 'Primeiro-Sargento das Questões V', 'seniorSergeant', 5],
+    [4300, 'Subtenente do Conhecimento', 'seniorSergeant', 5],
     [5000, 'Segundo-Tenente da Estratégia I', 'juniorOfficer', 1],
     [5400, 'Segundo-Tenente da Estratégia II', 'juniorOfficer', 2],
     [5800, 'Segundo-Tenente da Estratégia III', 'juniorOfficer', 3],
@@ -140,8 +140,23 @@ function patentMarks(patent) {
         const bars = Array.from({ length: grade + 1 }, (_, index) => `<path class="patent-rank-bar" d="M19 ${23 + index * 9}h26"/>`).join('');
         return `<g class="patent-enlisted-bars">${bars}</g>`;
     }
-    if (family === 'sergeant') return `<g class="patent-sergeant-chevrons">${chevrons(Math.min(3, grade))}${grade === 4 ? gradeMarks(4) : ''}</g>`;
-    if (family === 'seniorSergeant') return `<g class="patent-senior-sergeant">${chevrons(3, 15)}${gradeMarks(grade, { y: 50, stars: true })}</g>`;
+    if (family === 'sergeant') {
+        if (level === 4) return `<g class="patent-sergeant-chevrons patent-sergeant-base">${chevrons(1)}</g>`;
+        const thirdSergeant = level <= 7;
+        if (thirdSergeant) {
+            const baseStart = 51 - ((grade - 1) * 5);
+            const progressiveBase = Array.from({ length: grade }, (_, index) => {
+                const inset = index * 2;
+                return `<path class="patent-rocker patent-progressive-base" d="M${20 + inset} ${baseStart + index * 5}h${24 - inset * 2}"/>`;
+            }).join('');
+            return `<g class="patent-sergeant-chevrons patent-sergeant-tier-1">${chevrons(2, 16)}${progressiveBase}</g>`;
+        }
+        return `<g class="patent-sergeant-chevrons patent-sergeant-tier-2">${chevrons(3, 15)}<g class="patent-progressive-dots">${gradeMarks(grade, { y: 49 })}</g></g>`;
+    }
+    if (family === 'seniorSergeant') {
+        if (level === 16) return `<g class="patent-subtenente-mark">${star(32, 15, 5.2)}<polygon class="patent-subtenente-triangle" points="32,25 18,49 46,49"/></g>`;
+        return `<g class="patent-senior-sergeant">${chevrons(4, 10)}<g class="patent-progressive-stars">${gradeMarks(grade, { y: 50, stars: true })}</g></g>`;
+    }
     if (family === 'juniorOfficer') return `<g class="patent-officer-pips">${officerPip(32, 29, 1.08)}${gradeMarks(grade)}</g>`;
     if (family === 'officer') return `<g class="patent-officer-pips">${officerPip(24, 29, .9)}${officerPip(40, 29, .9)}${gradeMarks(grade)}</g>`;
     if (family === 'captain') return `<g class="patent-officer-stars">${star(32, 29, 9)}${gradeMarks(grade)}</g>`;
@@ -150,12 +165,12 @@ function patentMarks(patent) {
         return `<g class="patent-field-officer patent-${family}">${star(32, 28, radius)}${gradeMarks(grade, { stars: family === 'colonel' })}</g>`;
     }
     if (family === 'general') {
-        if (level === 50) return `<g class="patent-command-marks patent-command-${level}">${star(32, 27, 11)}<path class="patent-command-wing" d="M15 43q17 12 34 0M18 48q14 8 28 0"/></g>`;
+        if (level === 50) return `<g class="patent-command-marks patent-command-${level} patent-command-stars">${star(32, 25, 10.5)}${gradeMarks(4, { y: 47, stars: true })}</g>`;
         const count = Math.min(4, grade);
         const positions = [[32, 22], [22, 36], [42, 36], [32, 46]];
         return `<g class="patent-command-marks patent-command-${level}">${positions.slice(0, count).map(([x, y]) => star(x, y, count === 1 ? 10 : 6.5)).join('')}</g>`;
     }
-    return `<g class="patent-hero-marks">${star(32, 30, 13)}<path class="patent-hero-wings" d="M10 24q8 1 13 8M54 24q-8 1-13 8M13 43q9 8 19 9 10-1 19-9"/></g>`;
+    return `<g class="patent-hero-marks patent-hero-cluster">${star(32, 32, 10.5)}${star(32, 13, 3.8)}${star(17, 23, 3.8)}${star(47, 23, 3.8)}${star(18, 46, 3.8)}${star(46, 46, 3.8)}</g>`;
 }
 
 function patentFrame(patent) {
