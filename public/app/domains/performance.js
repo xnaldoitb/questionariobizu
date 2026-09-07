@@ -227,7 +227,7 @@ async function refreshRanking() {
         one('#myRankingCard').innerHTML = mine
             ? `<div class="my-rank-position"><span>Sua colocação</span><strong>${myIndex + 1}º</strong></div>
                 ${patentButtonMarkup(mine.acertos, { compact: true, developer: developerEntry(mine) })}
-                <div class="my-rank-identity"><b>${safeText(mine.nome)} ${accountBadges(mine)} ${rankBadge(myIndex)}</b></div>
+                <div class="my-rank-identity"><b>${safeText(mine.nome)} ${accountBadges(mine)}</b></div>
                 <div class="my-rank-stats"><span><strong>${mine.acertos}</strong> acertos</span><small>${mine.percentual}% · ${mine.respondidas} respondidas</small></div>`
             : '<div class="my-rank-position"><span>Sua colocação</span><strong>—</strong></div><div class="my-rank-identity"><b>Sem pontuação</b><small>Responda uma questão para entrar no ranking.</small></div>';
 

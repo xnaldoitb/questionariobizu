@@ -49,7 +49,9 @@ assert(topic.includes('papiraoRow') && topic.includes('patent-guide-papirao'));
 assert(modal.includes('id="patentModal"') && modal.includes('id="patentProgressBar"'));
 assert(css.includes('.patent-insignia') && css.includes('.patent-guide-table'));
 assert(css.includes('@keyframes patent-hero-glow') && css.includes('.patent-hero-cluster'));
-assert(css.includes('.my-ranking-card { grid-template-columns:36px 40px minmax(0,1fr) auto;'));
+assert(css.includes('.my-ranking-card { grid-template-columns:46px 42px minmax(0,1fr);'));
+assert(css.includes('.my-rank-stats { grid-column:1 / -1; grid-row:2; display:flex;'));
+assert(!performance.includes('${rankBadge(myIndex)}'));
 assert(patentInsigniaMarkup(0).includes('patent-trainee-mark'));
 assert(patentInsigniaMarkup(20).includes('patent-enlisted-bars'));
 assert(patentInsigniaMarkup(175).includes('patent-sergeant-chevrons'));
@@ -92,4 +94,4 @@ assert(sessions.includes('patente_notificada_nivel: 0') && sessions.includes('pa
 assert(rankingRoute.includes(".from('usuarios')") && rankingRoute.includes('users.map'));
 assert(rankingMigration.includes('left join public.respostas') && !rankingMigration.includes('status_aprovacao'));
 
-console.log('Ranking v4.42: nomes somente no detalhe, todos os cadastros e card móvel compacto validados.');
+console.log('Ranking v4.42.1: card pessoal móvel reorganizado e ranking completo validados.');
