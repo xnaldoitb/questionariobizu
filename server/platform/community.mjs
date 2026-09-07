@@ -89,13 +89,13 @@ export async function removePresence(userId) {
     if (error) throw error;
 }
 
-export async function listActiveUsers(limit = 30) {
+export async function listActiveUsers(limit = 30, currentUserId = null) {
     const activeCutoff = isoBefore(ACTIVE_WINDOW_MS);
     const connectedCutoff = isoBefore(CONNECTED_WINDOW_MS);
 
     const { data, count, error } = await db()
         .from('presencas_online')
-        .select('usuario_id,atividade_em,usuarios(id,nome,usuario,perfil,vip,premium)', { count: 'exact' })
+        .select('usuario_id,atividade_em,usuarios(id,nome,perfil,vip,premium,plano_atual)', { count: 'exact' })
         .gte('visto_em', connectedCutoff)
         .gte('atividade_em', activeCutoff)
         .order('atividade_em', { ascending: false })
@@ -107,12 +107,12 @@ export async function listActiveUsers(limit = 30) {
         count: Number(count || 0),
         users: (data || [])
             .map((row) => ({
-                id: row.usuarios?.id || row.usuario_id,
                 nome: row.usuarios?.nome || 'Usuário',
-                usuario: row.usuarios?.usuario || '',
                 perfil: row.usuarios?.perfil || 'aluno',
                 vip: Boolean(row.usuarios?.vip),
                 premium: Boolean(row.usuarios?.premium),
+                plano_atual: row.usuarios?.plano_atual || null,
+                proprio: Boolean(currentUserId && (row.usuarios?.id || row.usuario_id) === currentUserId),
             })),
     };
 }

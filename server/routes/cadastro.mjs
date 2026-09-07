@@ -26,11 +26,30 @@ export const handler = async (event) => {
         return json(400, { erro: 'Não foi possível identificar este navegador. Atualize a página e tente novamente.' });
     }
 
+    if (!/^\d{3,12}$/.test(usuario)) {
+        return json(400, {
+            erro: 'O AL SD PM Nº deve conter de 3 a 12 números.',
+        });
+    }
+
+    if (nome.length < 2 || nome.length > 50) {
+        return json(400, { erro: 'Informe o Nome de Guerra.' });
+    }
+
+    if (senha.length < 8 || senha.length > 72) {
+        return json(400, { erro: 'A senha deve ter entre 8 e 72 caracteres.' });
+    }
+
+    if (!/^55\d{10,11}$/.test(whatsapp)) {
+        return json(400, { erro: 'Informe um WhatsApp válido com DDD. Ex.: 5591982575188.' });
+    }
+
+    // Só consome as cotas depois de validar o formulário. O WhatsApp não é usado
+    // como chave de bloqueio para impedir que terceiros travem um número legítimo.
     const limits = await Promise.all([
         consumeRateLimit(event, 'cadastro-ip-hora', { limit: 4, windowSeconds: 60 * 60, failClosed: true }),
         consumeRateLimit(event, 'cadastro-ip-dia', { limit: 10, windowSeconds: 24 * 60 * 60, failClosed: true }),
         consumeRateLimit(event, 'cadastro-dispositivo', { limit: 2, windowSeconds: 30 * 24 * 60 * 60, failClosed: true, includeIp: false }, deviceToken),
-        consumeRateLimit(event, 'cadastro-whatsapp', { limit: 3, windowSeconds: 24 * 60 * 60, failClosed: true, includeIp: false }, whatsapp),
     ]);
 
     if (limits.some((rate) => !rate.allowed)) {
@@ -42,24 +61,6 @@ export const handler = async (event) => {
                 : 'Limite de cadastros atingido neste dispositivo ou rede. Procure um administrador se precisar de ajuda.' },
             unavailable ? {} : { 'retry-after': '3600' },
         );
-    }
-
-    if (!/^\d{3,12}$/.test(usuario)) {
-        return json(400, {
-            erro: 'O AL SD PM Nº deve conter de 3 a 12 números.',
-        });
-    }
-
-    if (nome.length < 2 || nome.length > 50) {
-        return json(400, { erro: 'Informe o Nome de Guerra.' });
-    }
-
-    if (senha.length < 6 || senha.length > 72) {
-        return json(400, { erro: 'A senha deve ter entre 6 e 72 caracteres.' });
-    }
-
-    if (!/^55\d{10,11}$/.test(whatsapp)) {
-        return json(400, { erro: 'Informe um WhatsApp válido com DDD. Ex.: 5591982575188.' });
     }
 
     const deviceHash = createHash('sha256').update(deviceToken).digest('hex');

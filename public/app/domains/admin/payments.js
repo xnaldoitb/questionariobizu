@@ -5,6 +5,7 @@ import { adminState, formatDate, formatDateTime, isSupreme } from './common.js';
 import { refreshManagedUsers } from './users.js';
 
 const CANCELLED = new Set(['cancelled', 'canceled', 'rejected', 'refunded', 'charged_back', 'erro', 'revisao']);
+const REMOVABLE = new Set(['pendente', 'pending', 'in_process', 'cancelled', 'canceled', 'rejected', 'erro', 'failure']);
 
 function money(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value || 0));
@@ -18,6 +19,7 @@ function statusGroup(status) {
 
 function statusLabel(payment) {
     if (payment.origem === 'manual') return 'Liberação manual';
+    if (payment.origem === 'premio') return 'Prêmio';
     const labels = {
         approved: 'Aprovado', pending: 'Pendente', in_process: 'Em processamento',
         rejected: 'Recusado', cancelled: 'Cancelado', canceled: 'Cancelado',
@@ -95,9 +97,12 @@ function renderPayments() {
         const user = payment.usuario || {};
         const status = statusGroup(payment.status);
         return `<article class="admin-payment-card status-${status}">
-            <div class="admin-payment-main"><strong>${safeText(user.nome || 'Usuário removido')}</strong><span>AL ${safeText(user.usuario || '—')} · ${safeText(user.whatsapp || 'WhatsApp não informado')}</span><small>${safeText(payment.plano_nome || payment.plano)} · ${payment.origem === 'manual' ? 'Sem cobrança' : safeText(money(payment.valor))} · ${safeText(formatDateTime(payment.criado_em))}</small><small>Vencimento atual: ${safeText(user.vip ? 'permanente' : formatDate(user.validade_ate, 'sem prazo'))}</small></div>
+            <div class="admin-payment-main"><strong>${safeText(user.nome || 'Usuário removido')}</strong><span>AL ${safeText(user.usuario || '—')} · ${safeText(user.whatsapp || 'WhatsApp não informado')}</span><small>${safeText(payment.plano_nome || payment.plano)} · ${['manual', 'premio'].includes(payment.origem) ? 'Sem cobrança' : safeText(money(payment.valor))} · ${safeText(formatDateTime(payment.criado_em))}</small><small>Vencimento atual: ${safeText(user.vip ? 'permanente' : formatDate(user.validade_ate, 'sem prazo'))}</small></div>
             <span class="admin-status-pill status-${status}">${safeText(statusLabel(payment))}</span>
-            ${user.id && payment.plano ? `<button class="ui-button quiet-action mini" data-payment-action="regenerate" data-user-id="${safeText(user.id)}" data-plan-id="${safeText(payment.plano)}" type="button">Reenviar / nova cobrança</button>` : ''}
+            <div class="data-actions">
+                ${user.id && payment.plano ? `<button class="ui-button quiet-action mini" data-payment-action="regenerate" data-user-id="${safeText(user.id)}" data-plan-id="${safeText(payment.plano)}" type="button">Nova cobrança</button>` : ''}
+                ${REMOVABLE.has(String(payment.status || '').toLowerCase()) && payment.origem === 'mercado_pago' && !payment.aplicado_em ? `<button class="ui-button quiet-action danger mini" data-payment-action="delete" data-payment-id="${safeText(payment.id)}" type="button">Excluir</button>` : ''}
+            </div>
         </article>`;
     }).join('') : '<div class="admin-empty-state">Nenhum pagamento encontrado.</div>';
     renderPaymentStats();
@@ -169,13 +174,21 @@ async function planAction(button) {
 async function adminPaymentAction(action, userId = one('#paymentUserSelect')?.value, planId = one('#paymentPlanSelect')?.value) {
     if (!userId || !planId) return notify('Selecione um usuário e um plano.');
     if (action === 'manual_grant' && !confirm('Liberar este plano manualmente? O período será somado à validade atual.')) return;
+    if (action === 'award_plan' && !confirm('Premiar este usuário com o plano selecionado? O acesso será liberado e ele receberá uma mensagem ao entrar.')) return;
     const status = one('#paymentActionStatus');
-    status.textContent = action === 'manual_grant' ? 'Liberando acesso…' : 'Gerando cobrança…';
+    status.textContent = action === 'manual_grant' ? 'Liberando acesso…' : action === 'award_plan' ? 'Registrando prêmio…' : 'Gerando cobrança…';
     try {
-        const result = await requestJson('admin-payments', { method: 'POST', body: JSON.stringify({ action, usuario_id: userId, plano_id: planId }) });
+        const result = await requestJson('admin-payments', { method: 'POST', body: JSON.stringify({
+            action, usuario_id: userId, plano_id: planId,
+            mensagem: action === 'award_plan' ? one('#paymentAwardMessage')?.value : undefined,
+        }) });
         if (action === 'manual_grant') {
             status.textContent = 'Acesso liberado com sucesso.';
             notify('Acesso liberado. A renovação foi acumulada quando havia validade ativa.');
+        } else if (action === 'award_plan') {
+            status.textContent = 'Prêmio registrado. A mensagem aparecerá na próxima entrada do usuário.';
+            if (one('#paymentAwardMessage')) one('#paymentAwardMessage').value = '';
+            notify('Usuário premiado com sucesso.');
         } else {
             await navigator.clipboard?.writeText(result.checkout_url).catch(() => {});
             status.innerHTML = `Cobrança criada. <a href="${safeText(result.checkout_url)}" target="_blank" rel="noopener noreferrer">Abrir pagamento</a>`;
@@ -190,6 +203,22 @@ async function adminPaymentAction(action, userId = one('#paymentUserSelect')?.va
         await refreshManagedUsers({ quiet: true });
         await refreshAdminPayments({ quiet: true });
     } catch (error) { status.textContent = error.message; notify(error.message, 4500); }
+}
+
+async function deletePayment(paymentId) {
+    const payment = adminState.payments.find((item) => item.id === paymentId);
+    if (!payment) return;
+    if (!confirm(`Excluir a cobrança ${statusLabel(payment).toLowerCase()} de ${payment.usuario?.nome || 'este usuário'}? O link será encerrado e o registro sairá do painel.`)) return;
+    try {
+        await requestJson('admin-payments', {
+            method: 'POST',
+            body: JSON.stringify({ action: 'delete_payment', pagamento_id: payment.id }),
+        });
+        notify('Cobrança excluída do painel.');
+        await refreshAdminPayments({ quiet: true });
+    } catch (error) {
+        notify(error.message, 5000);
+    }
 }
 
 export function bindPaymentManagement() {
@@ -207,9 +236,12 @@ export function bindPaymentManagement() {
     one('#paymentSearch')?.addEventListener('input', renderPayments);
     one('#paymentStatusFilter')?.addEventListener('change', renderPayments);
     one('#manualGrantBtn')?.addEventListener('click', () => adminPaymentAction('manual_grant'));
+    one('#awardPlanBtn')?.addEventListener('click', () => adminPaymentAction('award_plan'));
     one('#generateChargeBtn')?.addEventListener('click', () => adminPaymentAction('generate_charge'));
     one('#paymentHistoryList')?.addEventListener('click', (event) => {
-        const button = event.target.closest('[data-payment-action="regenerate"]');
-        if (button) adminPaymentAction('generate_charge', button.dataset.userId, button.dataset.planId);
+        const button = event.target.closest('[data-payment-action]');
+        if (!button) return;
+        if (button.dataset.paymentAction === 'regenerate') adminPaymentAction('generate_charge', button.dataset.userId, button.dataset.planId);
+        if (button.dataset.paymentAction === 'delete') deletePayment(button.dataset.paymentId);
     });
 }

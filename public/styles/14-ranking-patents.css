@@ -1,0 +1,277 @@
+/* v4.41 · 52 patentes do ranking e guia fixo da comunidade */
+#historyModal .report-modal-header,
+#rankingModal .report-modal-header { align-items:center; padding:13px 18px; }
+#historyModal .report-title-minimal,
+#rankingModal .report-title-minimal { display:flex; align-items:center; gap:8px; margin:0; color:var(--signal-soft); font:800 13px/1.2 var(--type-heading); letter-spacing:.08em; }
+#historyModal .report-title-minimal .kicker-mark,
+#rankingModal .report-title-minimal .kicker-mark { flex:0 0 auto; }
+
+.patent-button,
+.profile-patent-button,
+.profile-patent-name {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.patent-button,
+.profile-patent-button {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    padding: 0;
+    border-radius: 10px;
+}
+
+.patent-button:focus-visible,
+.profile-patent-button:focus-visible,
+.profile-patent-name:focus-visible {
+    outline: 2px solid var(--signal-soft);
+    outline-offset: 3px;
+}
+
+.patent-insignia {
+    --patent-main: #527348;
+    --patent-light: #b9d792;
+    --patent-mark: #f7e9b1;
+    display: inline-grid;
+    place-items: center;
+    width: 60px;
+    height: 60px;
+    filter: drop-shadow(0 5px 5px rgb(5 15 30 / 22%));
+    transition: transform .18s ease, filter .18s ease;
+}
+
+.patent-button:hover .patent-insignia,
+.profile-patent-button:hover .patent-insignia { transform: translateY(-2px); filter: drop-shadow(0 7px 7px rgb(5 15 30 / 30%)); }
+.patent-insignia.is-compact { width: 46px; height: 46px; }
+.patent-insignia svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.patent-tile-shadow { fill:rgb(0 0 0 / 40%); }
+.patent-tile-frame { fill:#1b252d; stroke:var(--patent-light); stroke-width:1.6; }
+.patent-tile-inner { fill:var(--patent-main); stroke:color-mix(in srgb,var(--patent-light) 54%,#111); stroke-width:1.2; }
+.patent-tile-bevel { fill:none; stroke:rgb(255 255 255 / 25%); stroke-width:1.1; stroke-linecap:round; }
+.patent-tile-gloss { fill:rgb(255 255 255 / 8%); }
+.patent-chevron,.patent-rocker,.patent-rank-bar,.patent-command-wing,.patent-hero-wings { fill:none; stroke:var(--patent-mark); stroke-linecap:round; stroke-linejoin:round; }
+.patent-chevron { stroke-width:3.8; }
+.patent-rocker { stroke-width:3.3; }
+.patent-rank-bar { stroke-width:4.4; }
+.patent-star,.patent-pip,.patent-grade-dot { fill:var(--patent-mark); stroke:color-mix(in srgb,var(--patent-light) 55%,#000); stroke-width:.8; }
+.patent-command-marks .patent-star { filter: drop-shadow(0 1px 1px rgb(0 0 0 / 24%)); }
+.patent-command-wing,.patent-hero-wings { stroke-width:2.5; }
+.patent-hero-marks { filter:drop-shadow(0 0 4px rgb(255 205 68 / 42%)); }
+
+.patent-family-trainee { --patent-main:#151c21;--patent-light:#606e76;--patent-mark:#93a1a9; }
+.patent-family-enlisted { --patent-main:#11191e;--patent-light:#6d7e87;--patent-mark:#b7c5cb; }
+.patent-family-sergeant { --patent-main:#181712;--patent-light:#8b7444;--patent-mark:#d2ad51; }
+.patent-family-seniorSergeant { --patent-main:#1b180d;--patent-light:#b18c36;--patent-mark:#f2ca4b; }
+.patent-family-juniorOfficer { --patent-main:#07182a;--patent-light:#54738e;--patent-mark:#d0e0e8; }
+.patent-family-officer { --patent-main:#071c31;--patent-light:#6688a3;--patent-mark:#edf4f7; }
+.patent-family-captain { --patent-main:#071d33;--patent-light:#6c8ba2;--patent-mark:#e8eef1; }
+.patent-family-major { --patent-main:#0c2524;--patent-light:#537c72;--patent-mark:#cddbd5; }
+.patent-family-lieutenantColonel { --patent-main:#102b29;--patent-light:#5f897b;--patent-mark:#e0ebe5; }
+.patent-family-colonel { --patent-main:#17301f;--patent-light:#78905e;--patent-mark:#f2cb45; }
+.patent-family-general { --patent-main:#4a1019;--patent-light:#a7553e;--patent-mark:#ffd044; }
+.patent-family-hero { --patent-main:#660f1e;--patent-light:#d09b36;--patent-mark:#ffe27a; }
+.patent-family-hero .patent-tile-frame { stroke:#f0c24d; }
+.patent-family-hero .patent-tile-inner { stroke:#de9e31; }
+.patent-family-hero .patent-tile-gloss { fill:rgb(255 224 122 / 14%); }
+.patent-level-developer { --patent-main:#130e13;--patent-light:#b12e43;--patent-mark:#ffd24d; }
+.patent-level-developer .patent-tile-frame { stroke:#d3a949; }
+.patent-level-developer .patent-tile-inner { stroke:#b12e43; }
+.patent-code-mark { fill:none; stroke:#e8edf4; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 1px 1px #000); }
+.patent-dev-label { fill:#ffd24d; font:800 7px var(--type-ui); letter-spacing:1.2px; }
+
+.profile-dashboard .profile-identity { align-items: center; }
+.profile-dashboard .profile-patent-button { width: 62px; min-width: 62px; height: 60px; }
+.profile-dashboard .profile-patent-button .patent-insignia { width: 58px; height: 58px; }
+.profile-patent-name {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    margin-top: 3px;
+    padding: 0;
+    color: #f0ca6b;
+    font: 700 8px/1.3 var(--type-ui);
+    letter-spacing: .06em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.my-ranking-card {
+    grid-template-columns: auto auto minmax(0,1fr) auto;
+    gap: 16px;
+    padding: 15px 18px;
+    border-radius: 11px;
+}
+.my-rank-position { display:grid; min-width:74px; padding-right:15px; border-right:1px solid rgb(255 255 255 / 16%); }
+.my-rank-position span { color:var(--text-on-primary); font:700 8px var(--type-ui); letter-spacing:.06em; text-transform:uppercase; opacity:.74; }
+.my-rank-position strong { color:var(--signal-soft); font:800 28px var(--type-heading); }
+.my-ranking-card .patent-button { align-self:center; }
+.my-rank-identity { display:grid; min-width:0; gap:3px; }
+.my-rank-identity b { color:#fff; font:750 14px var(--type-heading); }
+.my-rank-identity small { color:#f0ca6b; font:700 9px var(--type-ui); letter-spacing:.05em; text-transform:uppercase; }
+.my-rank-stats { display:grid; justify-items:end; align-content:center; gap:2px; padding-left:15px; border-left:1px solid rgb(255 255 255 / 16%); }
+.my-rank-stats span { color:var(--text-on-primary); font:600 10px var(--type-ui); }
+.my-rank-stats span strong { color:#fff; font:800 18px var(--type-heading); }
+.my-rank-stats small { color:var(--text-on-primary); font:500 9px var(--type-ui); opacity:.7; }
+
+.ranking-podium { gap:12px; padding-top:20px; }
+.podium-card { position:relative; gap:9px; padding:14px 12px 12px; border-radius:11px; overflow:hidden; }
+.podium-emblem-row { display:flex; align-items:center; justify-content:center; gap:7px; min-height:92px; }
+.podium-card .podium-position { position:absolute; z-index:3; top:9px; left:9px; min-width:50px; height:27px; margin:0; padding:0 7px; box-sizing:border-box; }
+.podium-card .patent-button:not(.papirao-patent-button) { margin: 3px auto 0; }
+.podium-card .papirao-patent-button { margin: -4px auto 2px; }
+.podium-card .papirao-patent-button .podium-champion-crown { margin: 0; }
+.podium-identity { display:grid; justify-items:center; gap:3px; min-width:0; }
+.podium-identity > strong { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.podium-identity > small { color:var(--text-muted); font:500 9px var(--type-ui); }
+.podium-patent-name {
+    max-width: 100%;
+    color: var(--signal);
+    font: 700 9px/1.3 var(--type-ui);
+    letter-spacing: .04em;
+    text-align: center;
+    text-transform: uppercase;
+}
+.podium-results { display:grid; grid-template-columns:repeat(2,1fr); width:100%; margin-top:2px; overflow:hidden; border:1px solid var(--line); border-radius:8px; }
+.podium-results > span { display:grid; gap:0; padding:7px 5px; text-align:center; }
+.podium-results > span + span { border-left:1px solid var(--line); }
+.podium-results b { color:var(--text-accent); font:800 15px var(--type-heading); }
+.podium-results small { color:var(--text-muted); font:700 7px var(--type-ui); letter-spacing:.04em; text-transform:uppercase; }
+
+.ranking-list { grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); align-items:stretch; gap:10px; }
+.ranking-card { position:relative; display:grid; justify-items:center; align-content:start; gap:7px; min-width:0; min-height:210px; padding:13px 11px 11px; border-radius:10px; overflow:hidden; text-align:center; }
+.ranking-card-emblem { display:grid; place-items:center; min-height:66px; }
+.ranking-card-emblem .patent-insignia { width:58px; height:58px; }
+.ranking-card .ranking-position { position:absolute; z-index:2; top:8px; left:8px; display:grid; place-items:center; width:auto; min-width:29px; height:25px; padding:0 6px; border-radius:5px; }
+.ranking-person { display:grid; justify-items:center; min-width:0; width:100%; gap:2px; }
+.ranking-name-line { min-width:0; }
+.ranking-name-line > strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:750 14px var(--type-heading); }
+.ranking-patent-name { color: var(--signal); font-weight: 700; }
+.ranking-person > small { max-width:100%; overflow:hidden; color:var(--text-muted); font:500 8px var(--type-ui); text-overflow:ellipsis; white-space:nowrap; }
+.ranking-card-score { display:grid; grid-template-columns:repeat(2,1fr); align-self:end; width:100%; min-width:0; margin-top:auto; overflow:hidden; border:1px solid var(--line); border-radius:8px; }
+.ranking-card-score > span { display:grid; align-content:center; justify-items:center; min-width:0; padding:6px; }
+.ranking-card-score > span + span { border-left:1px solid var(--line); }
+.ranking-card-score .ranking-primary-score strong { color:var(--text-accent); font:800 19px var(--type-heading); }
+.ranking-card-score .ranking-secondary-score strong { color:var(--text-main); font:750 13px var(--type-heading); }
+.ranking-card-score small { color:var(--text-muted); font:700 7px var(--type-ui); letter-spacing:.04em; text-transform:uppercase; }
+
+.patent-overlay { z-index: 520; padding: 18px; }
+.patent-modal-card {
+    position: relative;
+    width: min(430px, calc(100vw - 36px));
+    max-height: calc(100dvh - 36px);
+    padding: 26px;
+    overflow-y: auto;
+    text-align: center;
+    border-radius: 16px;
+}
+.patent-modal-close {
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:40px;
+    height:40px;
+    color:#fff;
+    background:var(--signal);
+    border:2px solid #fff;
+    box-shadow:0 4px 12px rgb(7 20 42 / 28%);
+    font-weight:700;
+    line-height:1;
+}
+.patent-modal-close:hover { color:#fff; background:var(--signal-soft); border-color:#fff; }
+.patent-modal-close:focus-visible { outline:3px solid color-mix(in srgb,var(--signal) 35%,#fff); outline-offset:2px; }
+:root:not([data-theme="dark"]) .patent-modal-close,
+:root[data-theme="light"] .patent-modal-close { color:#fff; background:#b52135; border-color:#fff; box-shadow:0 3px 0 #7f1525,0 6px 16px rgb(7 20 42 / 25%); }
+.patent-modal-icon { display: grid; place-items: center; min-height: 88px; margin-bottom: 4px; }
+.patent-modal-icon .patent-insignia { width: 104px; height: 104px; filter: drop-shadow(0 8px 10px rgb(4 18 42 / 25%)); }
+.patent-modal-kicker { justify-content: center; margin: 2px 0 7px; }
+.patent-modal-card h2 { margin: 0; color: var(--text-accent); font: 800 25px/1.15 var(--type-heading); }
+.patent-modal-description { min-height: 38px; margin: 9px auto 15px; color: var(--text-muted); font-size: 13px; line-height: 1.45; }
+.patent-modal-stats { display: grid; grid-template-columns: .7fr 1.3fr; gap: 8px; margin-bottom: 13px; }
+.patent-modal-stats span { display: grid; gap: 4px; padding: 10px; background: var(--canvas-soft); border: 1px solid var(--line); border-radius: 9px; }
+.patent-modal-stats small { color: var(--text-muted); font: 700 8px var(--type-ui); letter-spacing: .07em; text-transform: uppercase; }
+.patent-modal-stats strong { color: var(--text-main); font: 750 13px var(--type-heading); }
+.patent-progress { height: 8px; overflow: hidden; background: var(--canvas-soft); border: 1px solid var(--line); border-radius: 999px; }
+.patent-progress i { display: block; width: 0; height: 100%; background: linear-gradient(90deg,#315f9b,#d5a83d); border-radius: inherit; transition: width .55s ease; }
+.patent-modal-next { margin: 7px 0 16px; color: var(--text-muted); font: 700 9px var(--type-ui); }
+.patent-continue { width: 100%; }
+.patent-modal-crown { display: grid; place-items: center; width: 132px; height: 104px; }
+.patent-modal-crown img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 12px rgb(232 182 44 / 48%)); }
+.patent-modal-card.is-achievement { animation: patent-arrival .48s cubic-bezier(.2,.9,.2,1) both; }
+.patent-modal-card.is-achievement::before { content:""; position:absolute; inset:0 0 auto; height:4px; background:linear-gradient(90deg,#1e4778,#e1b64d,#9d263e); }
+@keyframes patent-arrival { from { opacity:0; transform:translateY(12px) scale(.96); } to { opacity:1; transform:none; } }
+
+.system-topic-card { border-left: 4px solid #d1a53d; background: linear-gradient(110deg,color-mix(in srgb,#d1a53d 9%,var(--panel-surface)),var(--panel-surface)); }
+.patent-guide-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+.patent-guide-table { width: 100%; min-width: 720px; border-collapse: collapse; text-align: left; }
+.patent-guide-table th { padding: 10px 12px; color: var(--text-muted); background: var(--canvas-soft); font: 700 9px var(--type-ui); letter-spacing: .06em; text-transform: uppercase; }
+.patent-guide-table td { padding: 9px 12px; color: var(--text-muted); border-top: 1px solid var(--line); font-size: 11px; line-height: 1.4; vertical-align: middle; }
+.patent-guide-table td:first-child { width: 58px; text-align: center; }
+.patent-guide-table td:nth-child(2) { min-width: 180px; }
+.patent-guide-table td:nth-child(3) { width: 88px; color: var(--text-main); font-weight: 700; white-space: nowrap; }
+.patent-guide-table td strong,.patent-guide-table td small { display: block; }
+.patent-guide-table td strong { color: var(--text-main); font-family: var(--type-heading); }
+.patent-guide-table td small { margin-top: 2px; color: var(--signal); font: 700 8px var(--type-ui); text-transform: uppercase; }
+.patent-guide-special { background:color-mix(in srgb,#b52135 8%,var(--panel-surface)); }
+.patent-guide-special td { border-top-color:color-mix(in srgb,#d0a94d 45%,var(--line)); }
+.patent-guide-papirao { background:color-mix(in srgb,#d0a43d 12%,var(--panel-surface)); }
+.patent-guide-papirao td { border-top-color:color-mix(in srgb,#d0a94d 65%,var(--line)); }
+.patent-guide-crown { display:inline-grid; place-items:center; width:48px; height:48px; }
+.patent-guide-crown img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 0 6px rgb(224 176 53 / 35%)); }
+
+@media (max-width: 720px) {
+    .profile-dashboard .profile-patent-button { width: 50px; min-width: 50px; height: 49px; }
+    .profile-dashboard .profile-patent-button .patent-insignia { width: 48px; height: 48px; }
+    .my-ranking-card { grid-template-columns:auto auto minmax(0,1fr); gap:9px; }
+    .my-rank-position { min-width:58px; padding-right:8px; }
+    .my-rank-position strong { font-size:23px; }
+    .my-rank-stats { grid-column:1 / -1; grid-template-columns:1fr 1fr; justify-items:start; width:100%; padding:7px 0 0; border-top:1px solid rgb(255 255 255 / 16%); border-left:0; }
+    .my-rank-stats small { justify-self:end; align-self:center; }
+    .my-ranking-card .patent-insignia.is-compact { width: 42px; height: 42px; }
+    .ranking-podium { grid-template-columns:1fr !important; }
+    .podium-1 { transform:none; }
+    .podium-card { grid-template-columns:86px minmax(0,1fr) 126px; align-items:center; text-align:left; }
+    .podium-emblem-row { min-height:84px; padding-top:25px; box-sizing:border-box; }
+    .podium-emblem-row .podium-champion-crown { width:84px; height:70px; }
+    .podium-identity { justify-items:start; }
+    .podium-results { margin:0; }
+    .ranking-card-score { min-width:0; }
+    .ranking-card-score > span { min-width:0; padding-inline:6px; }
+    .patent-modal-card { padding: 23px 17px 18px; }
+    .patent-guide-table-wrap { overflow: visible; border: 0; }
+    .patent-guide-table,.patent-guide-table tbody { display: grid; min-width: 0; gap: 7px; }
+    .patent-guide-table thead { display: none; }
+    .patent-guide-table tr { display: grid; grid-template-columns: 50px 1fr auto; align-items: center; gap: 3px 9px; padding: 9px; background: var(--canvas-soft); border: 1px solid var(--line); border-radius: 9px; }
+    .patent-guide-table td { padding: 0; border: 0; }
+    .patent-guide-table td:first-child { grid-row: 1 / 3; width: 50px; }
+    .patent-guide-table td:nth-child(2) { min-width: 0; }
+    .patent-guide-table td:nth-child(3) { width: auto; font-size: 10px; }
+    .patent-guide-table td:nth-child(4) { grid-column: 2 / 4; font-size: 10px; }
+}
+
+@media (max-width: 520px) {
+    .podium-card { grid-template-columns:76px minmax(0,1fr); }
+    .podium-results { grid-column:1 / -1; }
+    .ranking-list { grid-template-columns:1fr; gap:8px; }
+    .ranking-card { grid-template-columns:76px minmax(0,1fr); align-items:center; justify-items:stretch; min-height:0; padding:10px 9px 9px; text-align:left; }
+    .ranking-card-emblem { grid-column:1; grid-row:1; place-items:center; min-height:64px; }
+    .ranking-card-emblem .patent-insignia { width:54px; height:54px; }
+    .ranking-card .ranking-position { top:6px; left:6px; min-width:25px; height:22px; padding-inline:5px; font-size:9px; }
+    .ranking-card .ranking-position { right:6px; left:auto; }
+    .ranking-card .ranking-person { padding-right:34px; }
+    .ranking-person { grid-column:2; grid-row:1; justify-items:start; text-align:left; }
+    .ranking-name-line > strong { font-size:13px; }
+    .ranking-patent-name { font-size:9px; line-height:1.25; }
+    .ranking-person > small { font-size:8px; line-height:1.35; }
+    .ranking-card-score { grid-column:1 / -1; grid-row:2; min-width:0; }
+    .ranking-card-score > span { min-width:0; padding:5px 4px; }
+    .ranking-card-score .ranking-secondary-score strong { font-size:12px; }
+    .ranking-card-score small { font-size:7px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .patent-modal-card.is-achievement { animation: none; }
+    .patent-progress i,.patent-insignia { transition: none; }
+}

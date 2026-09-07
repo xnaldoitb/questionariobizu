@@ -5,13 +5,15 @@
  * - Desenvolvedor: usa somente a insígnia exclusiva de Desenvolvedor.
  * - Administrador: recebe a insígnia ADM e também a identificação do plano, quando houver.
  * - Aluno VIP: VIP.
- * - Aluno Premium: plano pago com prazo ainda ativo.
+ * - Aluno Plus: plano trimestral ainda ativo.
+ * - Aluno Premium: plano mensal pago ainda ativo.
  * - Testes gratuitos e acessos vencidos não recebem insígnia de plano.
  */
 export function accountBadges(entry = {}) {
     const profile = String(entry?.perfil || 'aluno').toLowerCase();
     const vip = Boolean(entry?.vip);
     const premium = Boolean(entry?.premium);
+    const plus = premium && String(entry?.plano_atual || '').toLowerCase() === 'trimestral';
 
     if (profile === 'supremo') {
         return '<span class="account-insignia supreme-insignia" title="Desenvolvedor" aria-label="Desenvolvedor">♛ DESENVOLVEDOR</span>';
@@ -25,8 +27,10 @@ export function accountBadges(entry = {}) {
 
     if (vip) {
         badges.push('<span class="account-insignia vip-insignia" title="Usuário VIP · acesso vitalício" aria-label="VIP">✦ VIP</span>');
+    } else if (plus) {
+        badges.push('<span class="account-insignia plus-insignia" title="Usuário Plus · plano trimestral" aria-label="Plus">✚ PLUS</span>');
     } else if (premium) {
-        badges.push('<span class="account-insignia premium-insignia" title="Insígnia Premium · identificação visual, sem privilégios adicionais" aria-label="Premium">◇ PREMIUM</span>');
+        badges.push('<span class="account-insignia premium-insignia" title="Usuário Premium · plano mensal" aria-label="Premium">◇ PREMIUM</span>');
     }
 
     return badges.join(' ');

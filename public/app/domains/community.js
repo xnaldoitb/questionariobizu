@@ -3,6 +3,7 @@ import { accountBadges } from '../foundation/badges.js';
 import { appState } from '../foundation/model.js';
 import { one, safeText, notify } from '../foundation/selectors.js';
 import { bindEmojiPicker, countGraphemes } from './emoji-picker.js';
+import { DEVELOPER_PATENT, PATENTS, patentInsigniaMarkup } from '../foundation/patents.js';
 
 const GENERAL_ROOM_ID = '00000000-0000-4000-8000-000000000001';
 const HEARTBEAT_MS = 90_000;
@@ -10,6 +11,7 @@ const PRESENCE_REFRESH_MS = 60_000;
 const CHAT_REFRESH_MS = 10_000;
 const SUPPORT_REFRESH_MS = 12_000;
 const ACTIVITY_PING_THROTTLE_MS = 30_000;
+const PATENT_GUIDE_TOPIC_ID = 'guia-patentes';
 
 let initialized = false;
 let onlineUsers = [];
@@ -67,10 +69,10 @@ function rotateSpotlight() {
         target.textContent = 'Comunidade disponível';
         return;
     }
-    const pool = onlineUsers.filter((user) => user.id !== appState.user?.id);
+    const pool = onlineUsers.filter((user) => !user.proprio);
     const candidates = pool.length ? pool : onlineUsers;
     const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-    const own = chosen?.id === appState.user?.id;
+    const own = Boolean(chosen?.proprio);
     target.innerHTML = chosen ? `${own ? 'Você' : safeText(chosen.nome)} está online ${accountBadges(chosen)}` : 'Comunidade disponível';
 }
 
@@ -100,9 +102,8 @@ function renderMessages(target, messages, { support = false } = {}) {
         return;
     }
     list.innerHTML = messages.map((item) => {
-        const authorId = support ? item.autor_id : item.usuario_id;
         const author = support ? (item.usuarios || {}) : (item.usuario || {});
-        const own = authorId === appState.user?.id;
+        const own = Boolean(item.propria);
         return `<article class="chat-message ${own ? 'is-own' : ''}">
             <div class="chat-message-head"><strong>${safeText(own ? 'Você' : (author.nome || 'Usuário'))}</strong>${accountBadges(author)}<time>${safeText(formatTime(item.criado_em))}</time></div>
             <p>${safeText(item.mensagem).replace(/\n/g, '<br>')}</p>
@@ -227,11 +228,17 @@ const categoryNames = { duvida: 'Dúvida', discussao: 'Discussão', estudo: 'Est
 function renderTopics(items) {
     const list = one('#topicList');
     list.classList.remove('hidden');
-    list.innerHTML = items.map((topic) => `<button class="topic-card" type="button" data-topic-id="${topic.id}">
+    const patentGuide = `<button class="topic-card system-topic-card" type="button" data-topic-id="${PATENT_GUIDE_TOPIC_ID}">
+        <span class="topic-category category-aviso">Guia oficial</span>
+        <strong>Patentes do Ranking</strong><p>Conheça todas as insígnias, faixas de acertos e o significado de cada patente.</p>
+        <small>Questionário Bizu · tópico fixo</small>
+    </button>`;
+    const userTopics = items.map((topic) => `<button class="topic-card" type="button" data-topic-id="${topic.id}">
         <span class="topic-category category-${topic.categoria}">${categoryNames[topic.categoria] || 'Tópico'}</span>
         <strong>${safeText(topic.titulo)}</strong><p>${safeText(topic.conteudo)}</p>
         <small>${safeText(topic.usuarios?.nome || 'Usuário')} · ${safeText(formatTime(topic.atualizado_em, true))}${topic.fechado ? ' · Encerrado' : ''}</small>
-    </button>`).join('') || '<div class="chat-empty">Nenhum tópico ainda. Crie o primeiro.</div>';
+    </button>`).join('');
+    list.innerHTML = patentGuide + (userTopics || '<div class="chat-empty">Nenhum outro tópico ainda.</div>');
 }
 
 async function loadTopics() {
@@ -240,6 +247,50 @@ async function loadTopics() {
 }
 
 async function openTopic(id) {
+    if (String(id) === PATENT_GUIDE_TOPIC_ID) {
+        activeTopicId = PATENT_GUIDE_TOPIC_ID;
+        one('#topicList').classList.add('hidden');
+        one('#topicForm').classList.add('hidden');
+        const developerRow = `<tr class="patent-guide-special">
+            <td>${patentInsigniaMarkup(0, { compact: true, decorative: true, developer: true })}</td>
+            <td><strong>${DEVELOPER_PATENT.name}</strong><small>${DEVELOPER_PATENT.symbol}</small></td>
+            <td>Exclusiva</td>
+            <td>${DEVELOPER_PATENT.meaning}</td>
+        </tr>`;
+        const papiraoRow = `<tr class="patent-guide-papirao">
+            <td><span class="patent-guide-crown"><img src="/assets/icons/coroa-papirao.svg" alt="" aria-hidden="true"></span></td>
+            <td><strong>PAPIRÃO</strong><small>Coroa dourada do líder</small></td>
+            <td>1º lugar</td>
+            <td>Conquista especial e temporária de quem ocupa a primeira colocação no Top 3.</td>
+        </tr>`;
+        const rows = developerRow + papiraoRow + PATENTS.map((patent, index) => {
+            const next = PATENTS[index + 1];
+            const range = next
+                ? `${patent.min.toLocaleString('pt-BR')}–${(next.min - 1).toLocaleString('pt-BR')}`
+                : `${patent.min.toLocaleString('pt-BR')}+`;
+            return `<tr>
+                <td>${patentInsigniaMarkup(patent.min, { compact: true, decorative: true })}</td>
+                <td><strong>${safeText(patent.name)}</strong><small>${safeText(patent.symbol)}</small></td>
+                <td>${range}</td>
+                <td>${safeText(patent.meaning)}</td>
+            </tr>`;
+        }).join('');
+        one('#topicDetailContent').innerHTML = `<header class="topic-detail-head">
+            <span class="topic-category category-aviso">Guia oficial</span>
+            <h3>Patentes do Ranking</h3>
+            <small>Questionário Bizu · tópico fixo</small>
+        </header>
+        <p class="topic-main-content">As 52 patentes representam sua evolução pelos acertos acumulados. Elas não alteram sua colocação, plano ou permissões. A coroa <strong>PAPIRÃO</strong> aparece também neste guia e é uma conquista especial e temporária, exclusiva do primeiro colocado no Top 3.</p>
+        <div class="patent-guide-table-wrap">
+            <table class="patent-guide-table">
+                <thead><tr><th>Insígnia</th><th>Patente e símbolo</th><th>Acertos</th><th>Significado</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+        one('#topicReplyForm').classList.add('hidden');
+        one('#topicDetail').classList.remove('hidden');
+        return;
+    }
     const payload = await requestJson(`topicos?id=${encodeURIComponent(id)}`);
     const topic = payload.topico;
     if (!topic) return notify('Tópico não encontrado.');

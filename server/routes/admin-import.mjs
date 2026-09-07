@@ -90,7 +90,8 @@ function replaceMigrationMissing(error) {
   const message = String(error?.message || '').toLowerCase();
   return message.includes('substituir_disciplina_completa') ||
     message.includes('function public.substituir_disciplina_completa') ||
-    message.includes('could not find the function');
+    message.includes('could not find the function') ||
+    message.includes('migration v4.3');
 }
 
 async function replaceDisciplineAtomically(banco, dados) {
@@ -165,10 +166,16 @@ export const handler = async (event) => {
   if (!(await requireUser(event, 'supremo'))) return json(403, { erro: 'Acesso restrito.' });
   if (event.httpMethod !== 'POST') return json(405, { erro: 'Método não permitido.' });
 
+  const body = parseBody(event);
+  const modo = body.modo === 'replace' ? 'replace' : 'merge';
+  let dados;
   try {
-    const body = parseBody(event);
-    const modo = body.modo === 'replace' ? 'replace' : 'merge';
-    const dados = validarArquivo(body.arquivo);
+    dados = validarArquivo(body.arquivo);
+  } catch (erro) {
+    return json(400, { erro: erro.message || 'Arquivo de importação inválido.' });
+  }
+
+  try {
     const banco = db();
 
     const result = modo === 'replace'
@@ -185,7 +192,13 @@ export const handler = async (event) => {
       historico_preservado: modo === 'replace',
     });
   } catch (erro) {
-    console.error('ERRO NA IMPORTAÇÃO:', erro);
-    return json(400, { erro: erro?.message || 'Não foi possível importar o arquivo.' });
+    console.error('Erro interno na importação:', erro?.message || erro);
+    if (replaceMigrationMissing(erro)) {
+      return json(503, {
+        erro: 'A substituição definitiva requer a migration v4.3 no Supabase.',
+        codigo: 'MIGRATION_V43_REQUIRED',
+      });
+    }
+    return json(500, { erro: 'Não foi possível importar o arquivo.' });
   }
 };

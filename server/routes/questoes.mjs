@@ -83,6 +83,7 @@ async function filterUnansweredOrWrong(userId, questions) {
 }
 
 export const handler = async (event) => {
+    if (event.httpMethod !== 'GET') return json(405, { erro: 'Método não permitido.' });
     const user = await requireUser(event);
     if (!user) {
         return json(401, { erro: 'Não autenticado.' });

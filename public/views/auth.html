@@ -72,12 +72,12 @@
                 >
             </label>
             <label>
-                Senha (mínimo 6 dígitos)
-                <input autocomplete="new-password" id="signupPass" minlength="6" required type="password">
+                Senha (mínimo 8 caracteres)
+                <input autocomplete="new-password" id="signupPass" minlength="8" maxlength="72" required type="password">
             </label>
             <label>
                 Confirmar senha
-                <input autocomplete="new-password" id="signupConfirm" minlength="6" required type="password">
+                <input autocomplete="new-password" id="signupConfirm" minlength="8" maxlength="72" required type="password">
             </label>
             <button class="ui-button main-action full">Criar minha conta</button>
             <p class="error" id="signupError"></p>

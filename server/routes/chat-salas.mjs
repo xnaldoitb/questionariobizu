@@ -4,13 +4,13 @@ import { json, parseBody } from '../platform/http.mjs';
 import { consumeRateLimit } from '../platform/rate-limit.mjs';
 import { cleanText, GENERAL_ROOM_ID } from '../platform/community-access.mjs';
 
-function publicRoom(room, member = false) {
+function publicRoom(room, userId, member = false) {
     return {
         id: room.id,
         nome: room.nome,
         tipo: room.tipo,
         sistema: Boolean(room.sistema),
-        criador_id: room.criador_id || null,
+        criador: Boolean(room.criador_id && room.criador_id === userId),
         membro: member || room.tipo === 'publica',
         criado_em: room.criado_em,
     };
@@ -37,7 +37,7 @@ async function listRooms(user) {
 
     const memberSet = new Set(memberIds);
     const rooms = [...(publicRooms || []), ...privateRooms]
-        .map((room) => publicRoom(room, memberSet.has(room.id)));
+        .map((room) => publicRoom(room, user.id, memberSet.has(room.id)));
     rooms.sort((a, b) => Number(b.id === GENERAL_ROOM_ID) - Number(a.id === GENERAL_ROOM_ID));
     return rooms;
 }
@@ -54,16 +54,23 @@ async function resolvePrivateMembers(logins) {
     const found = data || [];
     const foundLogins = new Set(found.map((user) => user.usuario));
     const missing = values.filter((value) => !foundLogins.has(value));
-    if (missing.length) throw new Error(`Participante não encontrado: ${missing.join(', ')}.`);
+    if (missing.length) throw new Error('PARTICIPANTES_INVALIDOS');
     return found;
 }
 
 export const handler = async (event) => {
+    if (!['GET', 'POST'].includes(event.httpMethod)) return json(405, { erro: 'Método não permitido.' });
     const user = await requireUser(event);
     if (!user) return json(401, { erro: 'Não autenticado.' });
 
     try {
         if (event.httpMethod === 'GET') {
+            const rate = await consumeRateLimit(event, 'chat-salas-leitura', {
+                limit: 20, windowSeconds: 60, includeIp: false, failClosed: true,
+            }, user.id);
+            if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
+                erro: 'Muitas atualizações das salas. Aguarde um minuto.',
+            }, { 'retry-after': '60' });
             return json(200, { salas: await listRooms(user) });
         }
 
@@ -75,7 +82,19 @@ export const handler = async (event) => {
             const nome = cleanText(body.nome, 50);
             const tipo = body.tipo === 'privada' ? 'privada' : 'publica';
             if (nome.length < 3 || nome.length > 50) return json(400, { erro: 'O nome da sala deve ter entre 3 e 50 caracteres.' });
-            const members = tipo === 'privada' ? await resolvePrivateMembers(body.participantes) : [];
+            let members = [];
+            if (tipo === 'privada') {
+                try {
+                    members = await resolvePrivateMembers(body.participantes);
+                } catch (error) {
+                    if (error.message === 'PARTICIPANTES_INVALIDOS') {
+                        return json(400, {
+                            erro: 'Não foi possível adicionar um ou mais participantes. Confira os números informados.',
+                        });
+                    }
+                    throw error;
+                }
+            }
 
             const { data: room, error } = await db().from('chat_salas')
                 .insert({ nome, tipo, criador_id: user.id }).select('id,nome,tipo,criador_id,sistema,ativa,criado_em').single();
@@ -92,12 +111,12 @@ export const handler = async (event) => {
                 throw membershipError;
             }
 
-            return json(201, { sala: publicRoom(room, true) });
+            return json(201, { sala: publicRoom(room, user.id, true) });
         }
 
         return json(405, { erro: 'Método não permitido.' });
     } catch (error) {
         console.error('Falha nas salas do chat:', error.message);
-        return json(400, { erro: error.message || 'Não foi possível concluir a operação.' });
+        return json(400, { erro: 'Não foi possível concluir a operação nas salas.' });
     }
 };

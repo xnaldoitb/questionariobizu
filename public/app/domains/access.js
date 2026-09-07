@@ -10,16 +10,38 @@ let paymentCheckRunning = false;
 let paymentCreating = false;
 let accessReceivedAt = Date.now();
 let lastPaymentCheck = 0;
+let paymentEntryShownForUser = null;
+let paymentPlansCache = null;
+let paymentPlansPromise = null;
 
-function canShowStudentPlans() {
-    const user = appState.user;
-    return user?.perfil === 'aluno' && !user.vip && user.acesso_tipo !== 'vitalicio' && user.acesso_codigo !== 'ACESSO_VITALICIO';
+export function hasPaidAccess(user) {
+    return Boolean(
+        user?.vip
+        || user?.premium
+        || user?.acesso_tipo === 'vitalicio'
+        || user?.acesso_codigo === 'ACESSO_ATIVO'
+        || user?.acesso_codigo === 'ACESSO_VITALICIO'
+    );
+}
+
+export function canShowStudentPlans(user = appState.user) {
+    return user?.perfil === 'aluno' && !hasPaidAccess(user);
+}
+
+function hidePaymentMessages() {
+    const banner = one('#automaticPaymentNotice');
+    if (banner) {
+        banner.classList.add('hidden');
+        banner.textContent = '';
+    }
+    one('#paymentStatus')?.classList.add('hidden');
 }
 
 function acceptUser(user) {
     if (!user) return;
     appState.user = user;
     accessReceivedAt = Date.now();
+    if (!canShowStudentPlans(user)) hidePaymentMessages();
     renderAccessNotice();
     if (user.acesso_questoes && !one('#accessBlockedCard')?.classList.contains('hidden') && !one('#quizView')?.classList.contains('hidden')) {
         one('#accessBlockedCard')?.classList.add('hidden');
@@ -31,9 +53,10 @@ function acceptUser(user) {
 function startPaymentPolling() {
     if (paymentPollingTimer) clearInterval(paymentPollingTimer);
     paymentPollingTimer = window.setInterval(() => {
-        if (appState.user && document.visibilityState === 'visible') checkPaymentStatus();
+        if (canShowStudentPlans() && document.visibilityState === 'visible') checkPaymentStatus();
     }, 30000);
-    checkPaymentStatus();
+    if (canShowStudentPlans()) checkPaymentStatus();
+    else hidePaymentMessages();
 }
 
 function formatRemaining(milliseconds) {
@@ -61,21 +84,59 @@ function money(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value || 0));
 }
 
+export function paymentPlanTier(plan = {}) {
+    const id = String(plan.id || '').toLowerCase();
+    const name = String(plan.nome || '').toLowerCase();
+    if (plan.acesso_permanente || id === 'vitalicio' || name.includes('vital')) {
+        return { key: 'vip', label: 'VIP' };
+    }
+    if (id === 'trimestral' || name.includes('trimestral')) {
+        return { key: 'plus', label: 'PLUS' };
+    }
+    return { key: 'premium', label: 'PREMIUM' };
+}
+
+function renderPaymentPlans(container, plans) {
+    container.innerHTML = plans.length ? plans.map((plan) => {
+        const tier = paymentPlanTier(plan);
+        return `
+            <article class="payment-plan payment-plan-${tier.key}">
+                <div class="payment-plan-head">
+                    <strong>${safeText(plan.nome)}</strong>
+                    <span class="payment-plan-tier tier-${tier.key}">${tier.label}</span>
+                </div>
+                <div class="payment-plan-value">
+                    <span class="payment-plan-price">${safeText(money(plan.preco))}</span>
+                    <small>${plan.acesso_permanente ? 'Acesso permanente' : `${Number(plan.duracao_dias)} dias`}</small>
+                </div>
+                <button class="ui-button main-action payment-plan-button" data-plan="${safeText(plan.id)}" type="button">Escolher</button>
+            </article>
+        `;
+    }).join('') : '<div class="admin-empty-state">Nenhum plano disponível no momento.</div>';
+}
+
+export function preloadPaymentPlans() {
+    if (!canShowStudentPlans()) return Promise.resolve([]);
+    if (paymentPlansCache) return Promise.resolve(paymentPlansCache);
+    if (!paymentPlansPromise) {
+        paymentPlansPromise = requestJson('planos')
+            .then((data) => {
+                paymentPlansCache = data.planos || [];
+                return paymentPlansCache;
+            })
+            .finally(() => { paymentPlansPromise = null; });
+    }
+    return paymentPlansPromise;
+}
+
 async function loadPaymentPlans() {
     const container = one('#paymentPlans');
     if (!container) return;
-    container.innerHTML = '<div class="admin-empty-state">Carregando planos…</div>';
+    if (paymentPlansCache) renderPaymentPlans(container, paymentPlansCache);
+    else container.innerHTML = '<div class="payment-plans-loading"><i></i><span>Carregando planos…</span></div>';
     try {
-        const data = await requestJson('planos');
-        const plans = data.planos || [];
-        container.innerHTML = plans.length ? plans.map((plan) => `
-            <article class="payment-plan">
-                <strong>${safeText(plan.nome)}</strong>
-                <span class="payment-plan-price">${safeText(money(plan.preco))}</span>
-                <small>${plan.acesso_permanente ? 'Acesso permanente às questões.' : `${Number(plan.duracao_dias)} dias de acesso às questões.`}</small>
-                <button class="ui-button main-action payment-plan-button" data-plan="${safeText(plan.id)}" type="button">Comprar plano</button>
-            </article>
-        `).join('') : '<div class="admin-empty-state">Nenhum plano disponível no momento.</div>';
+        const plans = await preloadPaymentPlans();
+        renderPaymentPlans(container, plans);
     } catch (error) {
         container.innerHTML = `<div class="admin-empty-state">${safeText(error.message)}</div>`;
     }
@@ -85,12 +146,15 @@ export function openPaymentPlans() {
     if (!canShowStudentPlans()) return;
     one('#paymentStatus')?.classList.add('hidden');
     one('#paymentModal')?.classList.remove('hidden');
+    document.body?.classList.add('modal-open');
     loadPaymentPlans();
-    startPaymentPolling();
+    if (!paymentPollingTimer) startPaymentPolling();
 }
 
 function closePaymentPlans() {
     one('#paymentModal')?.classList.add('hidden');
+    if (one('#rewardModal')?.classList.contains('hidden') !== false) document.body?.classList.remove('modal-open');
+    if (typeof CustomEvent === 'function') document.dispatchEvent(new CustomEvent('quiz:payment-closed'));
 }
 
 function setPaymentStatus(message, success = false) {
@@ -102,13 +166,20 @@ function setPaymentStatus(message, success = false) {
 }
 
 async function checkPaymentStatus() {
-    if (!appState.user || paymentCheckRunning || Date.now() - lastPaymentCheck < 5000) return;
+    if (!canShowStudentPlans() || paymentCheckRunning || Date.now() - lastPaymentCheck < 5000) {
+        if (appState.user && !canShowStudentPlans()) hidePaymentMessages();
+        return;
+    }
     lastPaymentCheck = Date.now();
     paymentCheckRunning = true;
     try {
         const data = await requestJson('pagamento-status');
         acceptUser(data.usuario);
         const banner = one('#automaticPaymentNotice');
+        if (!canShowStudentPlans()) {
+            hidePaymentMessages();
+            return;
+        }
         if (banner) {
             banner.classList.toggle('hidden', !data.pendencias && !data.consulta?.falhas);
             banner.textContent = data.consulta?.falhas
@@ -128,6 +199,10 @@ async function checkPaymentStatus() {
             setPaymentStatus(confirmed ? 'Último pagamento confirmado. Você pode escolher um plano para uma nova compra.' : 'Nenhuma cobrança pendente. Escolha um plano somente se desejar fazer uma nova compra.', Boolean(confirmed));
         }
     } catch {
+        if (!canShowStudentPlans()) {
+            hidePaymentMessages();
+            return;
+        }
         setPaymentStatus('Ainda não foi possível confirmar. Continuaremos verificando automaticamente.');
         const banner = one('#automaticPaymentNotice');
         if (banner) { banner.classList.remove('hidden'); banner.textContent = 'Consulta de pagamentos indisponível no momento. Tentaremos automaticamente; seu acesso atual não será removido por esta falha.'; }
@@ -187,6 +262,12 @@ export function renderAccessNotice() {
     const notice = one('#accessNotice');
     if (!notice || !appState.user) return;
 
+    if (hasPaidAccess(appState.user)) {
+        notice.classList.add('hidden');
+        hidePaymentMessages();
+        return;
+    }
+
     const title = one('#accessNoticeTitle');
     const text = one('#accessNoticeText');
     notice.classList.remove('hidden', 'is-trial', 'is-blocked', 'is-active');
@@ -227,6 +308,9 @@ export function startAccessIndicator() {
     if (new URLSearchParams(window.location.search).has('pagamento')) {
         openPaymentPlans();
         window.history.replaceState({}, '', window.location.pathname);
+    } else if (canShowStudentPlans() && paymentEntryShownForUser !== appState.user?.id) {
+        paymentEntryShownForUser = appState.user?.id || null;
+        openPaymentPlans();
     }
     countdownTimer = window.setInterval(() => {
         if (!appState.user) return;
@@ -250,6 +334,14 @@ export function renderAccessBlocked(source = {}) {
     const access = source?.payload?.acesso || source?.acesso || source;
     const code = source?.code || source?.payload?.codigo || access?.codigo || appState.user?.acesso_codigo;
     const message = source?.message || source?.payload?.erro || access?.mensagem || appState.user?.acesso_mensagem;
+
+    // Uma resposta atrasada ou uma cobrança antiga nunca deve substituir o estado
+    // atual de quem já possui Premium ou VIP.
+    if (hasPaidAccess(appState.user)) {
+        prepareQuestionView();
+        renderAccessNotice();
+        return;
+    }
 
     if (appState.user) {
         appState.user.acesso_questoes = false;

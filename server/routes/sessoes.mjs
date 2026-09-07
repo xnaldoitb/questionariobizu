@@ -190,7 +190,15 @@ export const handler = async (event) => {
 
     if (event.httpMethod === 'DELETE') {
         const { error } = await db().from('sessoes').delete().eq('usuario_id', user.id);
-        return error ? json(500, { erro: 'Não foi possível apagar o histórico.' }) : json(200, { ok: true });
+        if (error) return json(500, { erro: 'Não foi possível apagar o histórico.' });
+        const { error: notificationError } = await db().from('usuarios').update({
+            patente_notificada_nivel: 0,
+            papirao_notificado: false,
+        }).eq('id', user.id);
+        if (notificationError) {
+            console.error('Histórico apagado, mas falhou ao reiniciar avisos de patente:', notificationError.message);
+        }
+        return json(200, { ok: true });
     }
 
     const body = parseBody(event);
@@ -216,7 +224,14 @@ export const handler = async (event) => {
                 questionIds,
             );
         } catch (error) {
-            return json(400, { erro: error.message });
+            const knownValidation = new Set([
+                'Seleção de questões inválida.',
+                'A seleção contém questões repetidas.',
+                'Uma ou mais questões não pertencem à disciplina selecionada.',
+            ]);
+            if (knownValidation.has(error.message)) return json(400, { erro: error.message });
+            console.error('Falha ao validar questões do simulado:', error.message);
+            return json(500, { erro: 'Não foi possível validar as questões selecionadas.' });
         }
 
         const { data, error } = await db()

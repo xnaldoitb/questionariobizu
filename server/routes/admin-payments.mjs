@@ -1,7 +1,10 @@
 import { requireUser } from '../platform/auth.mjs';
 import { db } from '../platform/db.mjs';
 import { json, parseBody } from '../platform/http.mjs';
-import { createCheckoutPreference, loadPlan, loadPlans } from '../platform/payments.mjs';
+import {
+    createCheckoutPreference, expireCheckoutPreference, loadPlan, loadPlans,
+    paymentCanBeRemoved, reconcilePayment,
+} from '../platform/payments.mjs';
 import { auditAdmin } from '../platform/admin-audit.mjs';
 
 const ROLES = ['admin', 'supremo'];
@@ -51,6 +54,7 @@ async function loadPaymentHistory(actor) {
     }
     let paymentQuery = db().from('pagamentos')
         .select('id,usuario_id,plano,plano_nome,valor,duracao_dias,acesso_permanente,status,origem,mercado_pago_preference_id,mercado_pago_payment_id,criado_em,atualizado_em,aprovado_em,aplicado_em,criado_por_admin_id');
+    paymentQuery = paymentQuery.is('excluido_em', null);
     if (allowedUserIds) paymentQuery = paymentQuery.in('usuario_id', allowedUserIds);
     const { data: payments, error } = await paymentQuery.order('criado_em', { ascending: false }).limit(500);
     if (error) throw error;
@@ -114,6 +118,55 @@ export const handler = async (event) => {
         return json(200, { ok: true });
     }
 
+    if (action === 'delete_payment') {
+        const paymentId = String(body.pagamento_id || '');
+        const { data: original, error: paymentError } = await db().from('pagamentos')
+            .select('*').eq('id', paymentId).maybeSingle();
+        if (paymentError) throw paymentError;
+        if (!original || original.excluido_em) return json(404, { erro: 'Pagamento não encontrado.' });
+
+        const paymentUser = await targetUser(original.usuario_id);
+        if (!paymentUser) return json(404, { erro: 'Usuário do pagamento não encontrado.' });
+        if (!canManage(actor, paymentUser)) return json(403, { erro: 'Você não pode excluir este pagamento.' });
+        if (!paymentCanBeRemoved(original)) {
+            return json(409, { erro: 'Somente cobranças pendentes, canceladas, recusadas ou com erro podem ser excluídas.' });
+        }
+
+        let checked = original;
+        try {
+            checked = await reconcilePayment(original);
+        } catch {
+            return json(503, { erro: 'Não foi possível conferir esta cobrança no Mercado Pago. Tente novamente mais tarde.' });
+        }
+        if (!paymentCanBeRemoved(checked)) {
+            return json(409, { erro: 'A cobrança foi atualizada e não pode mais ser excluída.' });
+        }
+        try {
+            await expireCheckoutPreference(checked);
+        } catch {
+            return json(503, { erro: 'Não foi possível encerrar o link de pagamento. O registro foi preservado.' });
+        }
+
+        const now = new Date().toISOString();
+        const nextStatus = ['pendente', 'pending', 'in_process'].includes(String(checked.status).toLowerCase())
+            ? 'cancelled'
+            : checked.status;
+        const { data: excluded, error: excludeError } = await db().from('pagamentos').update({
+            status: nextStatus,
+            excluido_em: now,
+            excluido_por_admin_id: actor.id,
+            atualizado_em: now,
+        }).eq('id', checked.id).is('aplicado_em', null).is('excluido_em', null)
+            .select('id').maybeSingle();
+        if (excludeError) throw excludeError;
+        if (!excluded) return json(409, { erro: 'A cobrança mudou enquanto era conferida e foi preservada.' });
+        await auditAdmin(actor, 'pagamento_excluido', 'pagamento', checked.id, {
+            usuario_id: checked.usuario_id,
+            status_anterior: checked.status,
+        });
+        return json(200, { ok: true });
+    }
+
     const target = await targetUser(body.usuario_id);
     if (!target) return json(404, { erro: 'Usuário não encontrado.' });
     if (!canManage(actor, target)) return json(403, { erro: 'Você não pode alterar o acesso deste usuário.' });
@@ -132,6 +185,23 @@ export const handler = async (event) => {
         });
         if (error) return json(400, { erro: 'Não foi possível conceder o plano.' });
         await auditAdmin(actor, 'acesso_manual_concedido', 'pagamento', null, {
+            usuario_id: target.id,
+            plano_id: plan.id,
+        });
+        return json(200, { resultado: data });
+    }
+
+    if (action === 'award_plan') {
+        const message = String(body.mensagem || '').trim();
+        if (message.length > 180) return json(400, { erro: 'A mensagem do prêmio deve ter no máximo 180 caracteres.' });
+        const { data, error } = await db().rpc('premiar_usuario_plano', {
+            p_usuario_id: target.id,
+            p_plano_id: plan.id,
+            p_admin_id: actor.id,
+            p_mensagem: message || null,
+        });
+        if (error) return json(400, { erro: 'Não foi possível registrar o prêmio. Verifique se a migration v4.37 foi executada.' });
+        await auditAdmin(actor, 'usuario_premiado', 'premio', data?.premio_id || null, {
             usuario_id: target.id,
             plano_id: plan.id,
         });

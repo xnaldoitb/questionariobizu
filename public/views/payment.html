@@ -1,10 +1,10 @@
 <div class="modal-overlay hidden" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
     <section class="report-modal payment-modal">
-        <header class="report-modal-header">
+        <header class="report-modal-header payment-modal-header">
             <div>
-                <p class="section-kicker"><span class="kicker-mark"></span> acesso às questões</p>
+                <p class="section-kicker"><span class="kicker-mark"></span> acesso</p>
                 <h2 id="paymentTitle">Escolha seu plano</h2>
-                <p>Pix ou saldo Mercado Pago. A confirmação é automática, sem precisar abrir esta tela. Nova compra antes do vencimento acumula o período.</p>
+                <p>Pix · liberação automática</p>
             </div>
             <button class="modal-close" id="paymentClose" type="button" aria-label="Fechar">×</button>
         </header>
@@ -12,5 +12,18 @@
             <div class="admin-empty-state">Carregando planos…</div>
         </div>
         <p class="payment-status hidden" id="paymentStatus" role="status" aria-live="polite"></p>
+    </section>
+</div>
+
+<div class="modal-overlay hidden reward-overlay" id="rewardModal" role="dialog" aria-modal="true" aria-labelledby="rewardTitle">
+    <section class="report-modal reward-modal">
+        <button class="modal-close reward-close" id="rewardClose" type="button" aria-label="Fechar">×</button>
+        <div class="reward-confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="reward-medal" aria-hidden="true"><span>★</span></div>
+        <p class="section-kicker reward-kicker"><span class="kicker-mark"></span> conquista</p>
+        <h2 id="rewardTitle">Parabéns!</h2>
+        <p class="reward-message" id="rewardMessage"></p>
+        <div class="reward-plan"><span>Você recebeu</span><strong id="rewardPlan"></strong></div>
+        <button class="ui-button main-action reward-continue" id="rewardContinue" type="button">Continuar</button>
     </section>
 </div>

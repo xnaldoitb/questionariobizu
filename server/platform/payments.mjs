@@ -11,6 +11,9 @@ export function mercadoPagoToken() {
 export function applicationUrl(event) {
     const configured = String(process.env.APP_URL || '').trim().replace(/\/$/, '');
     if (configured) return configured;
+    if (process.env.VERCEL_ENV === 'production') {
+        throw new Error('APP_URL não configurada para o ambiente de produção.');
+    }
     const host = event.headers['x-forwarded-host'] || event.headers.host;
     const protocol = event.headers['x-forwarded-proto'] || 'https';
     if (!host) throw new Error('APP_URL não configurada.');
@@ -139,6 +142,7 @@ export async function latestPaymentForUser(userId) {
         .select('id,plano,valor,status,mercado_pago_preference_id,mercado_pago_payment_id,criado_em,aprovado_em,aplicado_em,compensacao_manual_id')
         .eq('usuario_id', userId)
         .eq('origem', 'mercado_pago')
+        .is('excluido_em', null)
         .order('criado_em', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -179,9 +183,37 @@ export async function reconcilePayment(paymentRecord) {
     return data;
 }
 
+export const REMOVABLE_PAYMENT_STATUSES = new Set([
+    'pendente', 'pending', 'in_process', 'cancelled', 'canceled', 'rejected', 'erro', 'failure',
+]);
+
+export function paymentCanBeRemoved(payment) {
+    return Boolean(
+        payment
+        && payment.origem === 'mercado_pago'
+        && !payment.aplicado_em
+        && REMOVABLE_PAYMENT_STATUSES.has(String(payment.status || '').toLowerCase())
+    );
+}
+
+export async function expireCheckoutPreference(payment) {
+    if (!payment?.mercado_pago_preference_id) return;
+    const now = Date.now();
+    const createdAt = new Date(payment.criado_em || now).getTime();
+    await mercadoPagoRequest(`/checkout/preferences/${encodeURIComponent(payment.mercado_pago_preference_id)}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            expires: true,
+            expiration_date_from: new Date(Math.min(createdAt, now - 1000)).toISOString(),
+            expiration_date_to: new Date(now + 60000).toISOString(),
+        }),
+    });
+}
+
 export async function reconcilePaymentsForUser(userId) {
     const { data, error } = await db().from('pagamentos').select('*')
         .eq('usuario_id', userId).eq('origem', 'mercado_pago').is('aplicado_em', null)
+        .is('excluido_em', null)
         .or(`ultima_consulta_em.is.null,ultima_consulta_em.lt.${new Date(Date.now() - 25000).toISOString()}`)
         .order('ultima_consulta_em', { ascending: true, nullsFirst: true })
         .order('criado_em', { ascending: true }).limit(5);

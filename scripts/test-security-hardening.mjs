@@ -54,6 +54,11 @@ const accepted=await call({sessao_id:'session',questao_id:10,resposta_marcada:1}
 assert.equal(accepted.statusCode,200);
 assert.equal(accepted.body.correta,1);
 assert.equal(inserted,1);
+const skipped=await call({sessao_id:'session',questao_id:11,pulada:true});
+assert.equal(skipped.statusCode,200);
+assert.equal(skipped.body.pulada,true);
+assert.equal('correta' in skipped.body,false);
+assert.equal('resolucao' in skipped.body,false);
 session={...session,finalizada_em:new Date().toISOString()};
 assert.equal((await call({sessao_id:'session',questao_id:10,resposta_marcada:1})).statusCode,403);
 session={id:'session',questoes_ids:[10],finalizada_em:null};

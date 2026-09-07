@@ -86,7 +86,7 @@ mock('db.mjs', { db:()=>({ from:(table)=>{
 const route = new vm.SourceTextModule(await readFile(new URL('../server/routes/questoes.mjs', import.meta.url),'utf8'), { context });
 await route.link(spec=>modules.get(spec.split('/').at(-1)));
 await route.evaluate();
-const call = (params={}) => route.namespace.handler({ queryStringParameters:{ disciplina:'a',...params } });
+const call = (params={}) => route.namespace.handler({ httpMethod:'GET', queryStringParameters:{ disciplina:'a',...params } });
 for (const params of [{ limite:'10' }, { limite:'all',por_pagina:'1' }, { revisao:'pendentes_erros',limite:'all' }]) {
     const result = await call({ capitulos:'2,3',...params });
     assert.equal(result.statusCode, 200);

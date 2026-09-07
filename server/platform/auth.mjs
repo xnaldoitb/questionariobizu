@@ -92,6 +92,7 @@ export async function getUser(event) {
             perfil: registro.perfil,
             vip: Boolean(registro.vip),
             premium: premiumAtivo,
+            plano_atual: registro.plano_atual || null,
             sessao_id: payload.sessao_id || null,
             acesso_teste: !['ACESSO_ATIVO', 'ACESSO_VITALICIO'].includes(acesso.codigo),
             teste_ativo_ate: acesso.teste_ativo_ate || null,

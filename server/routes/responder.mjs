@@ -57,6 +57,7 @@ export const handler = async (event) => {
     if (!sameSubmission) {
       return json(409, { erro: 'Esta questão já foi respondida neste simulado.' });
     }
+    if (pulada) return json(200, { ok: true, pulada: true, repetida: true });
     return json(200, {
       correta: q.resposta_correta,
       acertou: Boolean(existing.data.acertou),
@@ -71,5 +72,6 @@ export const handler = async (event) => {
       ? 'Esta questão já foi respondida neste simulado.'
       : 'Não foi possível registrar a resposta.',
   });
+  if (pulada) return json(200, { ok: true, pulada: true });
   return json(200, { correta: q.resposta_correta, acertou, resolucao: q.resolucao });
 };

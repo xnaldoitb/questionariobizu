@@ -4,6 +4,10 @@ import { json } from '../platform/http.mjs';
 import { cleanupCommunity, removePresence } from '../platform/community.mjs';
 
 export const handler = async (event) => {
+    if (event.httpMethod !== 'POST') {
+        return json(405, { erro: 'Método não permitido.' });
+    }
+
     try {
         const user = await getUser(event);
 

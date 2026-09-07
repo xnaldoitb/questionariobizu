@@ -17,12 +17,15 @@ create table if not exists public.usuarios (
   responsavel_admin_id uuid references public.usuarios(id) on delete set null,
   vip boolean not null default false,
   premium boolean not null default false,
+  plano_atual text,
   vip_desde timestamptz,
   acesso_teste boolean not null default false,
   teste_expira_em timestamptz
   ,whatsapp text check (whatsapp is null or whatsapp ~ '^55[0-9]{10,11}$')
   ,cadastro_device_hash text check (cadastro_device_hash is null or cadastro_device_hash ~ '^[a-f0-9]{64}$')
   ,sessao_ativa_device_hash text check (sessao_ativa_device_hash is null or sessao_ativa_device_hash ~ '^[a-f0-9]{64}$')
+  ,patente_notificada_nivel smallint not null default 0 check (patente_notificada_nivel between 0 and 51)
+  ,papirao_notificado boolean not null default false
 );
 
 create table if not exists public.disciplinas (
@@ -109,6 +112,14 @@ alter table public.questoes enable row level security;
 alter table public.sessoes enable row level security;
 alter table public.respostas enable row level security;
 
+revoke all on table public.usuarios, public.disciplinas, public.capitulos,
+  public.questoes, public.sessoes, public.respostas
+from public, anon, authenticated;
+
+grant select, insert, update, delete on table public.usuarios, public.disciplinas,
+  public.capitulos, public.questoes, public.sessoes, public.respostas
+to service_role;
+
 create table if not exists public.auditoria_admin (
   id bigint generated always as identity primary key,
   ator_id uuid references public.usuarios(id) on delete set null,
@@ -166,6 +177,7 @@ select
   u.perfil,
   u.vip,
   u.premium,
+  u.plano_atual,
   count(distinct r.sessao_id)::bigint as sessoes,
   count(r.id)::bigint as respondidas,
   count(r.id) filter (where r.acertou)::bigint as acertos,
@@ -175,7 +187,7 @@ select
 from public.usuarios u
 join public.respostas r on r.usuario_id = u.id
 where r.pulada = false and r.resposta_marcada is not null
-group by u.id, u.nome, u.usuario, u.perfil, u.vip, u.premium;
+group by u.id, u.nome, u.usuario, u.perfil, u.vip, u.premium, u.plano_atual;
 
 -- v4.3: substituição transacional de disciplina.
 create or replace function public.substituir_disciplina_completa(
@@ -290,14 +302,31 @@ create table if not exists public.pagamentos (
   criado_em timestamptz not null default now(),
   atualizado_em timestamptz not null default now(),
   aprovado_em timestamptz,
-  aplicado_em timestamptz
+  aplicado_em timestamptz,
+  excluido_em timestamptz,
+  excluido_por_admin_id uuid references public.usuarios(id) on delete set null
 );
 
 create index if not exists idx_pagamentos_usuario_criado on public.pagamentos(usuario_id, criado_em desc);
 create index if not exists idx_pagamentos_status on public.pagamentos(status, atualizado_em desc);
 alter table public.pagamentos enable row level security;
 revoke all on public.pagamentos from anon, authenticated;
-grant select, insert, update on public.pagamentos to service_role;
+grant select, insert, update, delete on public.pagamentos to service_role;
+
+create table if not exists public.premios_usuario (
+  id uuid primary key default gen_random_uuid(),
+  usuario_id uuid not null references public.usuarios(id) on delete cascade,
+  plano text not null,
+  plano_nome text not null,
+  mensagem text not null,
+  criado_por_admin_id uuid references public.usuarios(id) on delete set null,
+  criado_em timestamptz not null default now(),
+  visualizado_em timestamptz
+);
+create index if not exists premios_usuario_pendentes_idx on public.premios_usuario(usuario_id, criado_em) where visualizado_em is null;
+alter table public.premios_usuario enable row level security;
+revoke all on public.premios_usuario from public, anon, authenticated;
+grant select, insert, update on public.premios_usuario to service_role;
 
 create or replace function public.confirmar_pagamento_pix(
   p_pagamento_id uuid, p_mercado_pago_payment_id text, p_status text,

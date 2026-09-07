@@ -27,7 +27,10 @@ export const handler = async (event) => {
         const rates = await Promise.all([
             consumeRateLimit(event, 'login-ip', { limit: 30, windowSeconds: 15 * 60, failClosed: true }),
             consumeRateLimit(event, 'login-conta', {
-                limit: 10,
+                // O limite por IP já bloqueia força bruta concentrada. Um limite
+                // global maior evita que poucas tentativas externas travem a conta
+                // legítima de outro usuário.
+                limit: 50,
                 windowSeconds: 15 * 60,
                 failClosed: true,
                 includeIp: false,
@@ -122,6 +125,7 @@ export const handler = async (event) => {
                     status_aprovacao: user.status_aprovacao,
                     vip: Boolean(user.vip),
                     premium: acesso.codigo === 'ACESSO_ATIVO',
+                    plano_atual: user.plano_atual || null,
                     acesso_teste: !['ACESSO_ATIVO', 'ACESSO_VITALICIO'].includes(acesso.codigo),
                     teste_ativo_ate: acesso.teste_ativo_ate || null,
                     teste_proximo_em: acesso.teste_proximo_em || null,

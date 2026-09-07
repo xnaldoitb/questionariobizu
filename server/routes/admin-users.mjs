@@ -28,6 +28,7 @@ const V43_COLUMNS = [
     'vip',
     'vip_desde',
     'premium',
+    'plano_atual',
     'acesso_teste',
     'teste_expira_em',
 ];
@@ -49,8 +50,8 @@ function migrationMissing(error) {
 
 function migrationResponse() {
     return json(503, {
-        erro: 'Esta versão requer as migrations até a v4.7. Execute supabase/migration-v4.7-teste-30min-acesso-vencido.sql no Supabase antes de publicar.',
-        codigo: 'MIGRATION_V47_REQUIRED',
+        erro: 'Esta versão requer a migration v4.36. Execute supabase/migration-v4.36-plus-pagamentos.sql no Supabase antes de publicar.',
+        codigo: 'MIGRATION_V436_REQUIRED',
     });
 }
 
@@ -175,7 +176,7 @@ export const handler = async (event) => {
 
             let usersQuery = db()
                     .from('usuarios')
-                    .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,criado_em,ultimo_acesso,validade_ate,desativado_por_validade,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,vip_desde,acesso_teste,teste_expira_em,teste_ciclo_em,teste_saldo_segundos,teste_ativo_ate');
+                    .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,criado_em,ultimo_acesso,validade_ate,desativado_por_validade,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,plano_atual,vip_desde,acesso_teste,teste_expira_em,teste_ciclo_em,teste_saldo_segundos,teste_ativo_ate');
             if (!isSupreme) {
                 usersQuery = usersQuery.or(
                     `responsavel_admin_id.eq.${actor.id},and(responsavel_admin_id.is.null,perfil.eq.aluno,vip.eq.false)`,
@@ -230,8 +231,8 @@ export const handler = async (event) => {
         if (!body.usuario || !body.senha || !body.nome) {
             return json(400, { erro: 'Preencha AL SD PM Nº, senha e Nome de Guerra.' });
         }
-        if (String(body.senha).length < 6 || String(body.senha).length > 72) {
-            return json(400, { erro: 'A senha deve ter entre 6 e 72 caracteres.' });
+        if (String(body.senha).length < 8 || String(body.senha).length > 72) {
+            return json(400, { erro: 'A senha deve ter entre 8 e 72 caracteres.' });
         }
 
         const requestedRole = normalizedRole(body);
@@ -271,6 +272,7 @@ export const handler = async (event) => {
             responsavel_admin_id: actor.id,
             vip: false,
             premium: Boolean(validade_ate) && !requestedVip,
+            plano_atual: requestedVip ? 'vitalicio' : null,
             vip_desde: null,
             acesso_teste: false,
             teste_expira_em: null,
@@ -295,7 +297,7 @@ export const handler = async (event) => {
         const { data, error } = await db()
             .from('usuarios')
             .insert(payload)
-            .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,validade_ate,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,vip_desde,acesso_teste,teste_expira_em')
+            .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,validade_ate,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,plano_atual,vip_desde,acesso_teste,teste_expira_em')
             .single();
 
         if (error) {
@@ -438,6 +440,7 @@ export const handler = async (event) => {
                 vip: vitalicio,
                 vip_desde: vitalicio ? (target.vip_desde || new Date().toISOString()) : null,
                 premium: Boolean(validade_ate) && !vitalicio,
+                plano_atual: vitalicio ? 'vitalicio' : null,
                 ativo: shouldReactivate,
                 desativado_por_validade: false,
                 acesso_teste: !validade_ate && !vitalicio,
@@ -515,8 +518,8 @@ export const handler = async (event) => {
                 if (!isSupreme) {
                     return json(403, { erro: 'Somente o Desenvolvedor pode redefinir senhas.' });
                 }
-                if (String(body.senha).length < 6 || String(body.senha).length > 72) {
-                    return json(400, { erro: 'A senha deve ter entre 6 e 72 caracteres.' });
+                if (String(body.senha).length < 8 || String(body.senha).length > 72) {
+                    return json(400, { erro: 'A senha deve ter entre 8 e 72 caracteres.' });
                 }
                 payload.senha_hash = await bcrypt.hash(String(body.senha), 12);
                 Object.assign(payload, clearSessionFields({}));
@@ -545,6 +548,7 @@ export const handler = async (event) => {
                     payload.status_aprovacao = 'aprovado';
                     payload.ativo = true;
                     payload.acesso_teste = false;
+                    payload.plano_atual = 'vitalicio';
                     if (target.acesso_teste) {
                         payload.aprovado_por_admin_id = actor.id;
                         payload.responsavel_admin_id = target.responsavel_admin_id || actor.id;
@@ -557,6 +561,7 @@ export const handler = async (event) => {
                     payload.teste_ativo_ate = null;
                     payload.teste_ciclo_em = new Date().toISOString();
                     payload.teste_saldo_segundos = 0;
+                    payload.plano_atual = null;
                 }
             }
 
@@ -568,7 +573,7 @@ export const handler = async (event) => {
             return error
                 ? (migrationMissing(error)
                     ? migrationResponse()
-                    : json(400, { erro: error.code === '23505' ? 'Esse AL SD PM Nº já existe.' : error.message }))
+                    : json(400, { erro: error.code === '23505' ? 'Esse AL SD PM Nº já existe.' : 'Não foi possível atualizar o usuário.' }))
                 : audited(actor, body.senha ? 'senha_redefinida' : 'usuario_editado', id, json(200, { ok: true }));
         }
 
@@ -612,7 +617,10 @@ export const handler = async (event) => {
                 .from('usuarios')
                 .update({ responsavel_admin_id: null })
                 .eq('responsavel_admin_id', id);
-            if (clearResponsibilityError) return json(400, { erro: clearResponsibilityError.message });
+            if (clearResponsibilityError) {
+                console.error('Falha ao liberar usuários do administrador:', clearResponsibilityError.message);
+                return json(400, { erro: 'Não foi possível liberar os usuários vinculados ao administrador.' });
+            }
 
             const { error } = await db()
                 .from('usuarios')

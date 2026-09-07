@@ -2,6 +2,7 @@ import { requestJson } from '../foundation/request.js';
 import { one, all, safeText, notify } from '../foundation/selectors.js';
 import { appState } from '../foundation/model.js';
 import { accountBadges } from '../foundation/badges.js';
+import { DEVELOPER_PATENT, patentButtonMarkup, patentForHits } from '../foundation/patents.js';
 
 let historyResponses = [];
 let activeHistoryFilter = 'all';
@@ -40,6 +41,14 @@ function rankBadge(index) {
     const badge = badges[index];
     if (!badge) return '';
     return `<span class="ranking-medal ranking-medal-${index + 1}" title="${badge[1]}" aria-label="${badge[1]}">${badge[0]}</span>`;
+}
+
+function developerEntry(entry) {
+    return entry?.perfil === 'supremo';
+}
+
+function rankingPatentName(entry) {
+    return developerEntry(entry) ? DEVELOPER_PATENT.name : patentForHits(entry?.acertos).name;
 }
 
 export function bindPerformanceEvents() {
@@ -220,18 +229,27 @@ async function refreshRanking() {
         const mine = myIndex >= 0 ? ranking[myIndex] : null;
 
         one('#myRankingCard').innerHTML = mine
-            ? `<span>Sua colocação</span><strong>${myIndex + 1}º</strong><div><b>${safeText(mine.nome)} ${accountBadges(mine)} ${rankBadge(myIndex)}</b><small>${mine.acertos} acertos · ${mine.respondidas} respondidas · ${mine.percentual}%</small></div>`
-            : '<span>Sua colocação</span><strong>—</strong><div><b>Sem pontuação</b><small>Responda uma questão para entrar no ranking.</small></div>';
+            ? `<div class="my-rank-position"><span>Sua colocação</span><strong>${myIndex + 1}º</strong></div>
+                ${patentButtonMarkup(mine.acertos, { compact: true, developer: developerEntry(mine) })}
+                <div class="my-rank-identity"><b>${safeText(mine.nome)} ${accountBadges(mine)} ${rankBadge(myIndex)}</b><small>${safeText(rankingPatentName(mine))}</small></div>
+                <div class="my-rank-stats"><span><strong>${mine.acertos}</strong> acertos</span><small>${mine.percentual}% · ${mine.respondidas} respondidas</small></div>`
+            : '<div class="my-rank-position"><span>Sua colocação</span><strong>—</strong></div><div class="my-rank-identity"><b>Sem pontuação</b><small>Responda uma questão para entrar no ranking.</small></div>';
 
         one('#rankingPodium').innerHTML = podium.length
             ? podium.map((entry, index) => `
                 <article class="podium-card podium-${index + 1}">
-                    <span class="podium-position">${rankBadge(index)} ${index + 1}º</span>
-                    <div class="ranking-avatar">${initials(entry.nome)}</div>
-                    <strong>${safeText(entry.nome)} ${accountBadges(entry)}</strong>
-                    <small>AL SD PM Nº: ${safeText(entry.usuario)}</small>
-                    <b>${entry.acertos} acertos</b>
-                    <span>${entry.percentual}% de aproveitamento</span>
+                    <div class="podium-emblem-row">${index === 0
+                        ? patentButtonMarkup(entry.acertos, { papirao: true })
+                        : `<span class="podium-position">${rankBadge(index)} ${index + 1}º</span>${patentButtonMarkup(entry.acertos, { developer: developerEntry(entry) })}`}</div>
+                    <div class="podium-identity">
+                        <strong>${safeText(entry.nome)} ${accountBadges(entry)}</strong>
+                        <em class="podium-patent-name">${safeText(rankingPatentName(entry))}</em>
+                        <small>AL SD PM Nº: ${safeText(entry.usuario)}</small>
+                    </div>
+                    <div class="podium-results">
+                        <span><b>${entry.acertos}</b><small>acertos</small></span>
+                        <span><b>${entry.percentual}%</b><small>aproveitamento</small></span>
+                    </div>
                 </article>
             `).join('')
             : '';
@@ -239,18 +257,16 @@ async function refreshRanking() {
         one('#rankingList').innerHTML = ranking.length
             ? ranking.map((entry, index) => `
                 <article class="ranking-card ${index < 3 ? 'is-top' : ''} ${entry.usuario === appState.user.usuario ? 'is-me' : ''}">
-                    <div class="ranking-card-main">
-                        <span class="ranking-position">${index + 1}</span>
-                        <div class="ranking-avatar small">${initials(entry.nome)}</div>
-                        <div>
-                            <strong>${rankBadge(index)} ${safeText(entry.nome)} ${accountBadges(entry)}</strong>
-                            <p>AL SD PM Nº: ${safeText(entry.usuario)} · ${entry.sessoes} sessões com respostas</p>
-                        </div>
+                    <span class="ranking-position">${index + 1}º</span>
+                    <div class="ranking-card-emblem">${patentButtonMarkup(entry.acertos, { developer: developerEntry(entry) })}</div>
+                    <div class="ranking-person">
+                        <div class="ranking-name-line"><strong>${safeText(entry.nome)} ${accountBadges(entry)}</strong></div>
+                        <span class="ranking-patent-name">${safeText(rankingPatentName(entry))}</span>
+                        <small>AL SD PM Nº: ${safeText(entry.usuario)} · ${entry.sessoes} sessões</small>
                     </div>
                     <div class="ranking-card-score">
-                        <strong>${entry.acertos}</strong>
-                        <span>acertos</span>
-                        <small>${entry.percentual}% · ${entry.respondidas} questões</small>
+                        <span class="ranking-primary-score"><strong>${entry.acertos}</strong><small>acertos</small></span>
+                        <span class="ranking-secondary-score"><strong>${entry.percentual}%</strong><small>${entry.respondidas} questões</small></span>
                     </div>
                 </article>
             `).join('')
@@ -261,10 +277,6 @@ async function refreshRanking() {
     }
 }
 
-function initials(name = '') {
-    return name.trim().split(/\s+/).slice(0, 2).map((part) => part[0] || '').join('').toUpperCase() || 'AL';
-}
-
 async function resetOwnResults(label) {
     if (!confirm(`Resetar seu ${label}? Esta ação apagará os resultados utilizados no histórico e no ranking.`)) return;
 
@@ -272,6 +284,7 @@ async function resetOwnResults(label) {
         await requestJson('sessoes', { method: 'DELETE' });
         notify('Resultados resetados.');
         await Promise.all([refreshHistory(), refreshRanking()]);
+        document.dispatchEvent(new CustomEvent('quiz:progress-changed'));
     } catch (error) {
         notify(error.message);
     }

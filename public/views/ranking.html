@@ -1,11 +1,7 @@
 <div class="modal-overlay hidden" id="rankingModal" role="dialog" aria-modal="true" aria-labelledby="rankingTitle">
     <section class="report-modal report-modal-ranking ranking-v5-modal">
         <header class="report-modal-header">
-            <div>
-                <p class="section-kicker"><span class="kicker-mark"></span> classificação geral</p>
-                <h2 id="rankingTitle">Ranking de estudos</h2>
-                <p>Classificação por acertos, aproveitamento e questões respondidas.</p>
-            </div>
+            <p class="section-kicker report-title-minimal" id="rankingTitle"><span class="kicker-mark"></span> Ranking de estudos</p>
             <button class="modal-close" id="rankingClose" type="button" aria-label="Fechar ranking">×</button>
         </header>
         <div class="report-modal-body-scroll">
@@ -25,5 +21,24 @@
 
         <div class="report-list ranking-list" id="rankingList"></div>
         </div>
+    </section>
+</div>
+
+<div class="modal-overlay hidden patent-overlay" id="patentModal" role="dialog" aria-modal="true" aria-labelledby="patentModalTitle">
+    <section class="report-modal patent-modal-card">
+        <button class="modal-close patent-modal-close" id="patentClose" type="button" aria-label="Fechar patente">×</button>
+        <div class="patent-modal-icon" id="patentModalIcon" aria-hidden="true"></div>
+        <p class="section-kicker patent-modal-kicker"><span class="kicker-mark"></span><span id="patentModalKicker">SUA EVOLUÇÃO</span></p>
+        <h2 id="patentModalTitle">Patente</h2>
+        <p class="patent-modal-description" id="patentModalDescription"></p>
+        <div class="patent-modal-stats">
+            <span><small>Acertos</small><strong id="patentModalHits">0</strong></span>
+            <span><small>Patente atual</small><strong id="patentModalCurrent">—</strong></span>
+        </div>
+        <div class="patent-progress" role="progressbar" aria-label="Progresso para a próxima patente" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <i id="patentProgressBar"></i>
+        </div>
+        <p class="patent-modal-next" id="patentModalNext"></p>
+        <button class="ui-button main-action patent-continue" id="patentContinue" type="button">Fechar</button>
     </section>
 </div>

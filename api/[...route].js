@@ -15,6 +15,8 @@ import { handler as chat } from '../server/routes/chat.mjs';
 import { handler as chatSalas } from '../server/routes/chat-salas.mjs';
 import { handler as suporte } from '../server/routes/suporte.mjs';
 import { handler as topicos } from '../server/routes/topicos.mjs';
+import { handler as premio } from '../server/routes/premio.mjs';
+import { handler as patente } from '../server/routes/patente.mjs';
 import { handler as pagamentoCriar } from '../server/routes/pagamento-criar.mjs';
 import { handler as pagamentoStatus } from '../server/routes/pagamento-status.mjs';
 import { handler as pagamentoWebhook } from '../server/routes/pagamento-webhook.mjs';
@@ -49,6 +51,8 @@ const routes = new Map([
     ['chat-salas', chatSalas],
     ['suporte', suporte],
     ['topicos', topicos],
+    ['premio', premio],
+    ['patente', patente],
     ['pagamento-criar', pagamentoCriar],
     ['pagamento-status', pagamentoStatus],
     ['pagamento-webhook', pagamentoWebhook],
@@ -64,15 +68,31 @@ const routes = new Map([
     ['admin-payments', adminPayments],
 ]);
 
-function crossOriginMutation(req, routeName) {
+export function crossOriginMutation(req, routeName) {
     if (routeName === 'pagamento-webhook') return false;
     if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(String(req.method || '').toUpperCase())) return false;
-    const origin = String(req.headers?.origin || '').trim();
-    if (!origin) return false;
-    const configured = String(process.env.APP_URL || '').trim().replace(/\/$/, '');
+    const originHeader = String(req.headers?.origin || '').trim();
+    const refererHeader = String(req.headers?.referer || '').trim();
+    let requestOrigin = originHeader;
+    if (!requestOrigin && refererHeader) {
+        try { requestOrigin = new URL(refererHeader).origin; } catch { return true; }
+    }
+    if (!requestOrigin || requestOrigin === 'null') return true;
+
+    let normalizedOrigin;
+    try { normalizedOrigin = new URL(requestOrigin).origin; } catch { return true; }
+
+    const configured = String(process.env.APP_URL || '').trim();
     const host = String(req.headers?.['x-forwarded-host'] || req.headers?.host || '').trim();
-    const expected = configured || (host ? `https://${host}` : '');
-    return !expected || origin !== expected;
+    const protocol = String(req.headers?.['x-forwarded-proto'] || 'https').split(',')[0].trim();
+    const allowed = new Set();
+    if (configured) {
+        try { allowed.add(new URL(configured).origin); } catch { return true; }
+    }
+    if (host) {
+        try { allowed.add(new URL(`${protocol}://${host}`).origin); } catch { return true; }
+    }
+    return !allowed.size || !allowed.has(normalizedOrigin);
 }
 
 export default async function apiRouter(req, res) {

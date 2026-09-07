@@ -6,28 +6,66 @@ import { cleanText, graphemeLength } from '../platform/community-access.mjs';
 
 const CATEGORIES = new Set(['duvida', 'discussao', 'estudo', 'aviso']);
 
-async function topicDetail(id) {
+function publicTopic(topic, currentUserId) {
+    if (!topic) return null;
+    return {
+        id: topic.id,
+        titulo: topic.titulo,
+        conteudo: topic.conteudo,
+        categoria: topic.categoria,
+        fechado: Boolean(topic.fechado),
+        criado_em: topic.criado_em,
+        atualizado_em: topic.atualizado_em,
+        proprio: topic.autor_id === currentUserId,
+        usuarios: topic.usuarios || null,
+    };
+}
+
+function publicReply(reply, currentUserId) {
+    return {
+        id: reply.id,
+        topico_id: reply.topico_id,
+        conteudo: reply.conteudo,
+        criado_em: reply.criado_em,
+        propria: reply.autor_id === currentUserId,
+        usuarios: reply.usuarios || null,
+    };
+}
+
+async function topicDetail(id, currentUserId) {
     const [{ data: topic, error }, { data: replies, error: repliesError }] = await Promise.all([
         db().from('topicos_comunidade').select('id,autor_id,titulo,conteudo,categoria,fechado,criado_em,atualizado_em,usuarios:autor_id(nome,perfil)').eq('id', id).maybeSingle(),
         db().from('topico_respostas').select('id,topico_id,autor_id,conteudo,criado_em,usuarios:autor_id(nome,perfil)').eq('topico_id', id).order('criado_em').limit(300),
     ]);
     if (error || repliesError) throw error || repliesError;
-    return { topico: topic, respostas: replies || [] };
+    return {
+        topico: publicTopic(topic, currentUserId),
+        respostas: (replies || []).map((reply) => publicReply(reply, currentUserId)),
+    };
 }
 
 export const handler = async (event) => {
+    if (!['GET', 'POST', 'PUT'].includes(event.httpMethod)) return json(405, { erro: 'Método não permitido.' });
     const user = await requireUser(event);
     if (!user) return json(401, { erro: 'Não autenticado.' });
     const params = event.queryStringParameters || {};
 
     try {
         if (event.httpMethod === 'GET') {
-            if (params.id) return json(200, await topicDetail(params.id));
+            const rate = await consumeRateLimit(event, 'topicos-leitura', {
+                limit: 30, windowSeconds: 60, includeIp: false, failClosed: true,
+            }, user.id);
+            if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
+                erro: 'Muitas atualizações dos tópicos. Aguarde um minuto.',
+            }, { 'retry-after': '60' });
+            if (params.id) return json(200, await topicDetail(params.id, user.id));
             const { data, error } = await db().from('topicos_comunidade')
                 .select('id,autor_id,titulo,conteudo,categoria,fechado,criado_em,atualizado_em,usuarios:autor_id(nome,perfil)')
                 .order('atualizado_em', { ascending: false }).limit(80);
             if (error) throw error;
-            return json(200, { topicos: data || [] });
+            return json(200, {
+                topicos: (data || []).map((topic) => publicTopic(topic, user.id)),
+            });
         }
 
         if (event.httpMethod === 'POST') {

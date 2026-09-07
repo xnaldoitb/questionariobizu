@@ -28,21 +28,35 @@ async function publicConversation(record) {
     return { ...record, usuario: owner || null };
 }
 
-async function messages(conversationId) {
+async function messages(conversationId, currentUserId) {
     const { data, error } = await db().from('suporte_mensagens')
         .select('id,conversa_id,autor_id,mensagem,criado_em,usuarios:autor_id(nome,perfil)')
         .eq('conversa_id', conversationId).order('criado_em', { ascending: true }).limit(300);
     if (error) throw error;
-    return data || [];
+    return (data || []).map((message) => ({
+        id: message.id,
+        conversa_id: message.conversa_id,
+        mensagem: message.mensagem,
+        criado_em: message.criado_em,
+        propria: message.autor_id === currentUserId,
+        usuarios: message.usuarios || null,
+    }));
 }
 
 export const handler = async (event) => {
+    if (!['GET', 'POST', 'PUT'].includes(event.httpMethod)) return json(405, { erro: 'Método não permitido.' });
     const user = await requireUser(event);
     if (!user) return json(401, { erro: 'Não autenticado.' });
     const params = event.queryStringParameters || {};
 
     try {
         if (event.httpMethod === 'GET') {
+            const rate = await consumeRateLimit(event, 'suporte-leitura', {
+                limit: 15, windowSeconds: 60, includeIp: false, failClosed: true,
+            }, user.id);
+            if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
+                erro: 'Muitas atualizações do suporte. Aguarde um minuto.',
+            }, { 'retry-after': '60' });
             if (user.perfil === 'supremo' && params.listar === '1') {
                 const { data, error } = await db().from('suporte_conversas')
                     .select('id,usuario_id,status,atualizado_em,criado_em,usuarios:usuario_id(nome,usuario)')
@@ -54,7 +68,7 @@ export const handler = async (event) => {
             if (!conversation) return json(200, { conversa: null, mensagens: [] });
             return json(200, {
                 conversa: await publicConversation(conversation),
-                mensagens: await messages(conversation.id),
+                mensagens: await messages(conversation.id, user.id),
             });
         }
 

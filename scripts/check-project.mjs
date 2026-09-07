@@ -16,6 +16,9 @@ const requiredFiles = [
     'public/app/domains/management.js',
     'public/app/domains/community.js',
     'public/app/domains/access.js',
+    'public/app/domains/rewards.js',
+    'public/app/domains/patents.js',
+    'public/app/foundation/patents.js',
     'public/app/domains/admin/common.js',
     'public/app/domains/admin/users.js',
     'public/app/domains/admin/content.js',
@@ -30,10 +33,12 @@ const requiredFiles = [
     'public/assets/icons/icon-512-v435.png',
     'public/assets/icons/icon-maskable-512-v435.png',
     'public/assets/icons/questionario-bizu-icon.svg',
+    'public/assets/icons/coroa-papirao.svg',
     'public/assets/logo-questionario-bizu.svg',
     'public/styles/10-pwa-brand.css',
     'public/styles/12-community-hub.css',
     'public/styles/13-visual-refinement.css',
+    'public/styles/14-ranking-patents.css',
     'api/[...route].js',
     'server/platform/auth.mjs',
     'server/platform/access-validity.mjs',
@@ -41,12 +46,15 @@ const requiredFiles = [
     'server/platform/question-access.mjs',
     'server/platform/admin-audit.mjs',
     'server/platform/payments.mjs',
+    'server/platform/patents.mjs',
     'server/routes/login.mjs',
     'server/routes/presenca.mjs',
     'server/routes/chat.mjs',
     'server/routes/chat-salas.mjs',
     'server/routes/suporte.mjs',
     'server/routes/topicos.mjs',
+    'server/routes/premio.mjs',
+    'server/routes/patente.mjs',
     'server/routes/admin-users.mjs',
     'server/routes/admin-catalogo.mjs',
     'server/routes/admin-questions.mjs',
@@ -72,6 +80,11 @@ const requiredFiles = [
     'supabase/migration-v4.17-protecao-cadastros.sql',
     'supabase/migration-v4.18-sessao-mesmo-dispositivo.sql',
     'supabase/migration-v4.35-comunidade-suporte-topicos.sql',
+    'supabase/migration-v4.35.4-endpoints-seguranca.sql',
+    'supabase/migration-v4.36-plus-pagamentos.sql',
+    'supabase/migration-v4.37-premiacao.sql',
+    'supabase/migration-v4.39-patentes-ranking.sql',
+    'supabase/migration-v4.41-52-patentes-ranking.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -94,6 +107,11 @@ const identityModule = await readFile('public/app/domains/identity.js', 'utf8');
 const migration = await readFile('supabase/migration-admin-2.0-validade-usuarios.sql', 'utf8');
 const migration43 = await readFile('supabase/migration-v4.3-vip-auditoria-ranking.sql', 'utf8');
 const migration44 = await readFile('supabase/migration-v4.4-insignias-ranking.sql', 'utf8');
+const migration4354 = await readFile('supabase/migration-v4.35.4-endpoints-seguranca.sql', 'utf8');
+const migration436 = await readFile('supabase/migration-v4.36-plus-pagamentos.sql', 'utf8');
+const migration437 = await readFile('supabase/migration-v4.37-premiacao.sql', 'utf8');
+const migration439 = await readFile('supabase/migration-v4.39-patentes-ranking.sql', 'utf8');
+const migration441 = await readFile('supabase/migration-v4.41-52-patentes-ranking.sql', 'utf8');
 const badges = await readFile('public/app/foundation/badges.js', 'utf8');
 const dashboardView = await readFile('public/views/dashboard.html', 'utf8');
 const quizView = await readFile('public/views/quiz.html', 'utf8');
@@ -449,12 +467,32 @@ const rateLimitModule = await readFile('server/platform/rate-limit.mjs', 'utf8')
 for (const marker of ['cadastro_device_hash', 'proteger_whatsapp_usuario', 'pg_advisory_xact_lock']) {
     if (!migration417.includes(marker)) throw new Error(`Proteção de cadastros v4.17 incompleta: ${marker}`);
 }
-for (const marker of ['cadastro-ip-dia', 'cadastro-dispositivo', 'cadastro-whatsapp', 'form_started_at']) {
+for (const marker of ['cadastro-ip-dia', 'cadastro-dispositivo', 'form_started_at']) {
     if (!cadastroRoute.includes(marker)) throw new Error(`Defesa da rota de cadastro v4.17 incompleta: ${marker}`);
+}
+if (cadastroRoute.includes("consumeRateLimit(event, 'cadastro-whatsapp'")) {
+    throw new Error('O WhatsApp não deve ser usado como chave de bloqueio de cadastro.');
 }
 if (!rateLimitModule.includes('failClosed') || !rateLimitModule.includes("createHash('sha256')")) {
     throw new Error('Rate limit seguro v4.17 incompleto.');
 }
+for (const marker of ['public.usuarios', 'public.questoes', 'from public, anon, authenticated', 'to service_role']) {
+    if (!migration4354.includes(marker)) throw new Error(`Defesa em profundidade v4.35.4 incompleta: ${marker}`);
+}
+for (const marker of ['plano_atual', 'excluido_em', 'confirmar_pagamento_pix', 'conceder_acesso_plano']) {
+    if (!migration436.includes(marker)) throw new Error(`Planos e pagamentos v4.36 incompletos: ${marker}`);
+}
+for (const marker of ['premios_usuario', 'premiar_usuario_plano', 'visualizado_em']) {
+    if (!migration437.includes(marker)) throw new Error(`Premiação v4.37 incompleta: ${marker}`);
+}
+if (!routeNames.has('premio')) throw new Error('Rota individual de premiação v4.37 ausente.');
+for (const marker of ['patente_notificada_nivel', 'papirao_notificado']) {
+    if (!migration439.includes(marker)) throw new Error(`Patentes v4.39 incompletas: ${marker}`);
+}
+for (const marker of ['between 0 and 51', 'usuarios_patente_notificada_nivel_check']) {
+    if (!migration441.includes(marker)) throw new Error(`Expansão de patentes v4.41 incompleta: ${marker}`);
+}
+if (!routeNames.has('patente')) throw new Error('Rota individual de patente v4.39 ausente.');
 
 const migration418 = await readFile('supabase/migration-v4.18-sessao-mesmo-dispositivo.sql', 'utf8');
 for (const marker of ['sessao_ativa_device_hash', 'p_device_hash text', 'sessao_ativa_device_hash = p_device_hash']) {
@@ -464,4 +502,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.35.3: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.41.0: verificações estruturais concluídas.');

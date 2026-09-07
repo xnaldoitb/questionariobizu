@@ -8,9 +8,9 @@ import { cleanText, graphemeLength, roomForUser } from '../platform/community-ac
 const MAX_MESSAGE_LENGTH = 400;
 const MESSAGE_LIMIT = 80;
 
-async function loadMessages(roomId) {
+async function loadMessages(roomId, currentUserId) {
     const { data, error } = await db().from('chat_mensagens')
-        .select('id,mensagem,criado_em,usuario_id,usuarios(nome,perfil,vip,premium)')
+        .select('id,mensagem,criado_em,usuario_id,usuarios(nome,perfil,vip,premium,plano_atual)')
         .eq('sala_id', roomId).order('id', { ascending: false }).limit(MESSAGE_LIMIT);
     if (error) throw error;
 
@@ -18,17 +18,19 @@ async function loadMessages(roomId) {
         id: row.id,
         mensagem: row.mensagem,
         criado_em: row.criado_em,
-        usuario_id: row.usuario_id,
+        propria: row.usuario_id === currentUserId,
         usuario: {
             nome: row.usuarios?.nome || 'Usuário',
             perfil: row.usuarios?.perfil || 'aluno',
             vip: Boolean(row.usuarios?.vip),
             premium: Boolean(row.usuarios?.premium),
+            plano_atual: row.usuarios?.plano_atual || null,
         },
     }));
 }
 
 export const handler = async (event) => {
+    if (!['GET', 'POST'].includes(event.httpMethod)) return json(405, { erro: 'Método não permitido.' });
     const user = await requireUser(event);
     if (!user) return json(401, { erro: 'Não autenticado.' });
 
@@ -39,8 +41,14 @@ export const handler = async (event) => {
         if (!room) return json(403, { erro: 'Sala indisponível ou sem permissão de acesso.' });
 
         if (event.httpMethod === 'GET') {
+            const rate = await consumeRateLimit(event, 'chat-leitura', {
+                limit: 15, windowSeconds: 60, includeIp: false, failClosed: true,
+            }, user.id);
+            if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
+                erro: 'Muitas atualizações do chat. Aguarde alguns segundos.',
+            }, { 'retry-after': '60' });
             await cleanupCommunity();
-            const [messages, active] = await Promise.all([loadMessages(room.id), listActiveUsers()]);
+            const [messages, active] = await Promise.all([loadMessages(room.id, user.id), listActiveUsers()]);
             return json(200, { sala: room, mensagens: messages, online: active.count });
         }
 
@@ -58,10 +66,24 @@ export const handler = async (event) => {
             await touchPresence(user.id, { activity: true });
             const { data, error } = await db().from('chat_mensagens')
                 .insert({ sala_id: room.id, usuario_id: user.id, mensagem: message })
-                .select('id,mensagem,criado_em,usuario_id,sala_id').single();
+                .select('id,mensagem,criado_em').single();
             if (error) throw error;
 
-            return json(201, { mensagem: { ...data, usuario: user } });
+            return json(201, {
+                mensagem: {
+                    id: data.id,
+                    mensagem: data.mensagem,
+                    criado_em: data.criado_em,
+                    propria: true,
+                    usuario: {
+                        nome: user.nome,
+                        perfil: user.perfil,
+                        vip: Boolean(user.vip),
+                        premium: Boolean(user.premium),
+                        plano_atual: user.plano_atual || null,
+                    },
+                },
+            });
         }
 
         return json(405, { erro: 'Método não permitido.' });

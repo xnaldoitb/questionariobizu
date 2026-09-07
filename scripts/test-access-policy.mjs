@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { resolveQuestionAccess } from '../server/platform/access-policy.mjs';
+import { hasPaidQuestionAccess, resolveQuestionAccess } from '../server/platform/access-policy.mjs';
+import { canShowStudentPlans, hasPaidAccess } from '../public/app/domains/access.js';
 
 const now = Date.parse('2026-08-28T12:00:00Z');
 const user = { perfil: 'aluno', vip: false, validade_ate: null, teste_saldo_segundos: 1800, teste_ciclo_em: null };
@@ -20,6 +21,18 @@ assert.equal(resolveQuestionAccess({ ...exhausted, validade_ate: new Date(now - 
 assert.equal(resolveQuestionAccess({ ...active, validade_ate: new Date(now + 86400000).toISOString() }, now).codigo, 'ACESSO_ATIVO');
 assert.equal(resolveQuestionAccess({ ...exhausted, vip: true }, now).codigo, 'ACESSO_VITALICIO');
 assert.equal(resolveQuestionAccess({ ...exhausted, perfil: 'supremo' }, now).permitido, true);
+assert.equal(hasPaidQuestionAccess({ ...exhausted, vip: true }, now), true);
+assert.equal(hasPaidQuestionAccess({ ...exhausted, validade_ate: new Date(now + 86400000).toISOString() }, now), true);
+assert.equal(hasPaidQuestionAccess(exhausted, now), false);
+
+const freeStudent = { perfil: 'aluno', vip: false, premium: false, acesso_codigo: 'TESTE_EXPIRADO', acesso_tipo: 'teste_expirado' };
+const premiumStudent = { ...freeStudent, premium: true, acesso_codigo: 'ACESSO_ATIVO', acesso_tipo: 'regular' };
+const vipStudent = { ...freeStudent, vip: true, acesso_codigo: 'ACESSO_VITALICIO', acesso_tipo: 'vitalicio' };
+assert.equal(canShowStudentPlans(freeStudent), true);
+assert.equal(canShowStudentPlans(premiumStudent), false);
+assert.equal(canShowStudentPlans(vipStudent), false);
+assert.equal(hasPaidAccess(premiumStudent), true);
+assert.equal(hasPaidAccess(vipStudent), true);
 
 const sql = await readFile(new URL('../supabase/migration-v4.21-acesso-ativo-recorrente.sql', import.meta.url), 'utf8');
 assert.match(sql, /FOR UPDATE/);
@@ -30,7 +43,11 @@ assert.match(sql, /REVOKE ALL ON FUNCTION public.atualizar_teste_ativo/);
 assert.doesNotMatch(sql, /UPDATE public.pagamentos|DELETE FROM|TRUNCATE/i);
 const access = await readFile(new URL('../public/app/domains/access.js', import.meta.url), 'utf8');
 assert.match(access, /export function startAccessIndicator\(\)[\s\S]*?startPaymentPolling\(\)/);
+assert.match(access, /hasPaidAccess\(appState\.user\)[\s\S]*?hidePaymentMessages\(\)/);
 const close = access.match(/function closePaymentPlans\(\) \{([^}]+)\}/)[1];
 assert.doesNotMatch(close, /clearInterval/);
 assert.doesNotMatch(access, /paymentModal'\)\?\.classList\.contains\('hidden'\)\) return/);
-console.log('Acesso: 13 cenários de política e verificações estruturais passaram (SQL não executado).');
+const paymentCreate = await readFile(new URL('../server/routes/pagamento-criar.mjs', import.meta.url), 'utf8');
+assert.match(paymentCreate, /hasPaidQuestionAccess\(user\)/);
+assert.match(paymentCreate, /Nenhuma nova cobrança foi criada/);
+console.log('Acesso: política, Premium/VIP e verificações estruturais passaram (SQL não executado).');

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img" aria-labelledby="title desc">
+  <title id="title">Coroa dourada Papirão</title>
+  <desc id="desc">Coroa de mérito dourada com detalhes metálicos e pedras coloridas.</desc>
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffbd2"/>
+      <stop offset=".16" stop-color="#fff09a"/>
+      <stop offset=".34" stop-color="#efbd37"/>
+      <stop offset=".58" stop-color="#a9630b"/>
+      <stop offset=".78" stop-color="#ffe782"/>
+      <stop offset=".9" stop-color="#fff8c5"/>
+      <stop offset="1" stop-color="#8e5510"/>
+    </linearGradient>
+    <linearGradient id="band" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe98c"/>
+      <stop offset=".48" stop-color="#d99924"/>
+      <stop offset="1" stop-color="#8d520d"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="155%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#5a3509" flood-opacity=".38"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)" stroke="#70420d" stroke-linejoin="round">
+    <path d="M20 43 45 60 54 28 72 56 80 10 88 56 106 28 115 60 140 43 130 88H30Z" fill="url(#gold)" stroke-width="4"/>
+    <path d="M31 77c24 6 74 6 98 0l-3 15c-28 7-64 7-92 0Z" fill="url(#band)" stroke-width="3"/>
+    <path d="M36 93c25 5 63 5 88 0l3 10c-29 8-65 8-94 0Z" fill="url(#gold)" stroke-width="3"/>
+  </g>
+  <path d="M31 48 45 58 53 34M109 34l7 24 13-9M75 54l5-34 5 34" fill="none" stroke="#fff3ae" stroke-width="3" stroke-linecap="round" opacity=".72"/>
+  <path d="M39 69c21-7 61-7 82 0M44 91c19 3 53 3 72 0" fill="none" stroke="#fffbd0" stroke-width="3" stroke-linecap="round" opacity=".82"/>
+  <g fill="#fff" opacity=".92">
+    <circle cx="57" cy="42" r="2.4"/>
+    <circle cx="81" cy="28" r="2.8"/>
+    <circle cx="104" cy="43" r="2.2"/>
+  </g>
+  <g stroke="#fff4bd" stroke-width="2">
+    <circle cx="52" cy="79" r="5" fill="#b7283c"/>
+    <path d="m80 73 7 7-7 7-7-7Z" fill="#255f9f"/>
+    <circle cx="108" cy="79" r="5" fill="#29835f"/>
+  </g>
+  <path d="M43 98c23 4 51 4 74 0" fill="none" stroke="#fff0a0" stroke-width="2.5" stroke-linecap="round" opacity=".78"/>
+  <g filter="url(#shadow)" stroke="#70420d" stroke-linejoin="round">
+    <path d="M18 96 36 92v21l-18 3 6-10Z" fill="#8f1f31" stroke-width="2.5"/>
+    <path d="m142 96-18-4v21l18 3-6-10Z" fill="#8f1f31" stroke-width="2.5"/>
+    <path d="M32 92c29 5 67 5 96 0v23c-31 6-65 6-96 0Z" fill="#a52835" stroke-width="3"/>
+  </g>
+  <path d="M39 98c25 4 57 4 82 0" fill="none" stroke="#e9bd4c" stroke-width="1.8" opacity=".9"/>
+  <text x="80" y="111" fill="#fff6cf" stroke="#6d3510" stroke-width=".55" paint-order="stroke" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="900" letter-spacing="1.15">PAPIRÃO</text>
+</svg>

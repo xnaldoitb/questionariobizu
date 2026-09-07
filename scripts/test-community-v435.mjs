@@ -23,6 +23,12 @@ const authView = await readFile(new URL('public/views/auth.html', root), 'utf8')
 const fragments = await readFile(new URL('public/app/foundation/fragments.js', root), 'utf8');
 const pwaBrand = await readFile(new URL('public/styles/10-pwa-brand.css', root), 'utf8');
 const communityCss = await readFile(new URL('public/styles/12-community-hub.css', root), 'utf8');
+const ranking = await readFile(new URL('server/routes/ranking.mjs', root), 'utf8');
+const presence = await readFile(new URL('server/platform/community.mjs', root), 'utf8');
+const chat = await readFile(new URL('server/routes/chat.mjs', root), 'utf8');
+const rooms = await readFile(new URL('server/routes/chat-salas.mjs', root), 'utf8');
+const topics = await readFile(new URL('server/routes/topicos.mjs', root), 'utf8');
+const support = await readFile(new URL('server/routes/suporte.mjs', root), 'utf8');
 
 for (const id of ['openSupportBtn','openTopicsBtn','chatRoomForm','supportModal','topicsModal']) assert(view.includes(`id="${id}"`));
 for (const route of ['chat-salas','suporte','topicos']) assert(router.includes(`['${route}',`));
@@ -46,5 +52,17 @@ assert(pwa.includes("'Preparando instalação…'"));
 assert(pwaBrand.includes('.install-app-compact'));
 assert(!pwaBrand.includes('width: min(100%, 320px)'));
 assert(communityCss.includes('.community-modal-header .modal-close'));
+assert(ranking.includes('publicRankingEntry'));
+assert(!ranking.match(/publicRankingEntry\([\s\S]{0,500}usuario_id:/));
+assert(presence.includes('proprio: Boolean'));
+assert(!presence.includes("usuario: row.usuarios?.usuario"));
+assert(chat.includes('propria: row.usuario_id === currentUserId'));
+assert(rooms.includes("throw new Error('PARTICIPANTES_INVALIDOS')"));
+assert(!rooms.includes('Participante não encontrado:'));
+assert(topics.includes('function publicTopic'));
+assert(topics.includes('function publicReply'));
+assert(!topics.includes('return { topico: topic, respostas:'));
+assert(support.includes('propria: message.autor_id === currentUserId'));
+assert(community.includes('const own = Boolean(item.propria)'));
 
-console.log('v4.35: comunidade, suporte, tópicos, recuperação de login e atualização PWA validados.');
+console.log('v4.35.4: comunidade, minimização de dados, suporte, tópicos e PWA validados.');

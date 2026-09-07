@@ -14,6 +14,7 @@ export const handler = async (event) => {
     const pagamento = await latestPaymentForUser(user.id);
     const { count, error } = await db().from('pagamentos').select('id', { count: 'exact', head: true })
         .eq('usuario_id', user.id).eq('origem', 'mercado_pago').is('aplicado_em', null)
+        .is('excluido_em', null)
         .in('status', ['pendente', 'pending', 'in_process', 'revisao', 'approved', 'authorized']);
     if (error) throw error;
     const refreshed = await getUser(event);

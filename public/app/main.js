@@ -13,7 +13,10 @@ import { bindStudyEvents } from './domains/study.js';
 import { bindStudyFilterModals } from './domains/study-filter-modals.js';
 import { bindPerformanceEvents } from './domains/performance.js';
 import { startCommunity } from './domains/community.js';
-import { bindPaymentEvents, startAccessIndicator } from './domains/access.js';
+import { bindPaymentEvents, preloadPaymentPlans, startAccessIndicator } from './domains/access.js';
+import { bindRewardEvents, checkRewardNotification } from './domains/rewards.js';
+import { bindPatentEvents, checkPatentNotification } from './domains/patents.js';
+import { DEVELOPER_PATENT, patentButtonMarkup, patentForHits } from './foundation/patents.js';
 import { bindPwaInstall } from './foundation/pwa.js';
 import {
     bindManagementEvents,
@@ -24,6 +27,7 @@ import {
 
 const PROFILE_REFRESH_MS = 15_000;
 let lastProfileRefresh = 0;
+let lastProfilePatentLevel = null;
 
 function refreshThemeControl() {
     const dark = document.documentElement.dataset.theme === 'dark';
@@ -53,21 +57,32 @@ function alternateTheme() {
     refreshThemeControl();
 }
 
-function initials(name = '') {
-    return name
-        .trim()
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part[0] || '')
-        .join('')
-        .toUpperCase() || 'AL';
+function renderProfilePatent(hits = 0) {
+    const developer = appState.user?.perfil === 'supremo';
+    const patent = developer ? DEVELOPER_PATENT : patentForHits(hits);
+    const advanced = !developer && lastProfilePatentLevel !== null && patent.level > lastProfilePatentLevel;
+    lastProfilePatentLevel = developer ? -1 : patent.level;
+    const icon = one('#profileAvatar');
+    const name = one('#profilePatentName');
+    if (icon) {
+        icon.innerHTML = patentButtonMarkup(hits, { developer }).replace(/^<button[^>]*>|<\/button>$/g, '');
+        icon.dataset.patentHits = String(hits);
+        icon.dataset.developer = developer ? 'true' : 'false';
+        icon.setAttribute('aria-label', `Ver patente ${patent.name}`);
+    }
+    if (name) {
+        name.textContent = patent.name;
+        name.dataset.patentHits = String(hits);
+        name.dataset.developer = developer ? 'true' : 'false';
+    }
+    return advanced;
 }
 
 async function refreshProfileSummary({ force = false } = {}) {
     one('#profileWarName').innerHTML = `${safeText(appState.user.nome)} ${accountBadges(appState.user)}`;
     one('#profileKicker').textContent = roleConnectedLabel(appState.user.perfil);
     one('#profileRegistration').textContent = `AL SD PM Nº: ${appState.user.usuario}`;
-    one('#profileAvatar').textContent = initials(appState.user.nome);
+    renderProfilePatent(Number(one('#profileCorrect')?.textContent || 0));
 
     if (!force && Date.now() - lastProfileRefresh < PROFILE_REFRESH_MS) return;
 
@@ -85,7 +100,9 @@ async function refreshProfileSummary({ force = false } = {}) {
         one('#profileRanking').textContent = index >= 0 ? `${index + 1}º` : '—';
         one('#profileAnswered').textContent = current?.respondidas || 0;
         one('#profileCorrect').textContent = current?.acertos || 0;
+        const patentAdvanced = renderProfilePatent(current?.acertos || 0);
         lastProfileRefresh = Date.now();
+        return { patentAdvanced };
     } catch {
         one('#profileRanking').textContent = '—';
     }
@@ -95,12 +112,16 @@ async function enterWorkspace() {
     one('#loginView').classList.add('hidden');
     one('#appView').classList.remove('hidden');
 
+    preloadPaymentPlans().catch(() => {});
     await refreshProfileSummary();
     startAccessIndicator();
     startCommunity();
     applyManagementAccess();
     await refreshCatalog();
     openScreen('dashboard');
+    checkRewardNotification().then((shown) => {
+        if (!shown) checkPatentNotification();
+    });
 }
 
 function bindPrimaryNavigation() {
@@ -126,8 +147,9 @@ function bindPrimaryNavigation() {
 
     one('#themeBtn').addEventListener('click', alternateTheme);
 
-    document.addEventListener('quiz:progress-changed', () => {
-        refreshProfileSummary({ force: true });
+    document.addEventListener('quiz:progress-changed', async () => {
+        const update = await refreshProfileSummary({ force: true });
+        if (update?.patentAdvanced) checkPatentNotification();
     });
     document.addEventListener('quiz:access-changed', () => {
         one('#profileWarName').innerHTML = `${safeText(appState.user.nome)} ${accountBadges(appState.user)}`;
@@ -153,6 +175,8 @@ async function bootstrap() {
     bindStudyEvents();
     bindPerformanceEvents();
     bindPaymentEvents();
+    bindRewardEvents();
+    bindPatentEvents();
     bindPwaInstall();
     bindManagementEvents();
 

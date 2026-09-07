@@ -1,8 +1,24 @@
 import { db } from '../platform/db.mjs';
 import { requireUser } from '../platform/auth.mjs';
 import { json } from '../platform/http.mjs';
+import { consumeRateLimit } from '../platform/rate-limit.mjs';
 
 const PAGE_SIZE = 500;
+
+function publicRankingEntry(entry) {
+    return {
+        nome: entry.nome,
+        usuario: entry.usuario,
+        perfil: entry.perfil || 'aluno',
+        vip: Boolean(entry.vip),
+        premium: Boolean(entry.premium),
+        plano_atual: entry.plano_atual || null,
+        sessoes: Number(entry.sessoes || 0),
+        respondidas: Number(entry.respondidas || 0),
+        acertos: Number(entry.acertos || 0),
+        percentual: Number(entry.percentual || 0),
+    };
+}
 
 function sortRanking(entries) {
     return entries.sort(
@@ -17,19 +33,11 @@ function sortRanking(entries) {
 async function loadFromView() {
     const { data, error } = await db()
         .from('ranking_usuarios')
-        .select('usuario_id,nome,usuario,perfil,vip,premium,sessoes,respondidas,acertos,percentual');
+        .select('usuario_id,nome,usuario,perfil,vip,premium,plano_atual,sessoes,respondidas,acertos,percentual');
 
     if (error) throw error;
 
-    return sortRanking((data || []).map((entry) => ({
-        ...entry,
-        vip: Boolean(entry.vip),
-        premium: Boolean(entry.premium),
-        sessoes: Number(entry.sessoes || 0),
-        respondidas: Number(entry.respondidas || 0),
-        acertos: Number(entry.acertos || 0),
-        percentual: Number(entry.percentual || 0),
-    })));
+    return sortRanking((data || []).map(publicRankingEntry));
 }
 
 async function loadFallback() {
@@ -39,7 +47,7 @@ async function loadFallback() {
     while (true) {
         const { data, error } = await db()
             .from('respostas')
-            .select('id,usuario_id,sessao_id,acertou,usuarios(nome,usuario,perfil,vip,premium)')
+            .select('id,usuario_id,sessao_id,acertou,usuarios(nome,usuario,perfil,vip,premium,plano_atual)')
             .eq('pulada', false)
             .not('resposta_marcada', 'is', null)
             .order('id', { ascending: true })
@@ -60,6 +68,7 @@ async function loadFallback() {
             perfil: response.usuarios?.perfil || 'aluno',
             vip: Boolean(response.usuarios?.vip),
             premium: Boolean(response.usuarios?.premium),
+            plano_atual: response.usuarios?.plano_atual || null,
             sessionIds: new Set(),
             respondidas: 0,
             acertos: 0,
@@ -71,13 +80,13 @@ async function loadFallback() {
         map.set(response.usuario_id, entry);
     }
 
-    return sortRanking([...map.values()].map((entry) => ({
-        usuario_id: entry.usuario_id,
+    return sortRanking([...map.values()].map((entry) => publicRankingEntry({
         nome: entry.nome,
         usuario: entry.usuario,
         perfil: entry.perfil || 'aluno',
         vip: entry.vip,
         premium: entry.premium,
+        plano_atual: entry.plano_atual,
         sessoes: entry.sessionIds.size,
         respondidas: entry.respondidas,
         acertos: entry.acertos,
@@ -88,9 +97,18 @@ async function loadFallback() {
 }
 
 export const handler = async (event) => {
-    if (!(await requireUser(event))) {
+    if (event.httpMethod !== 'GET') return json(405, { erro: 'Método não permitido.' });
+    const user = await requireUser(event);
+    if (!user) {
         return json(401, { erro: 'Não autenticado.' });
     }
+
+    const rate = await consumeRateLimit(event, 'ranking-leitura', {
+        limit: 20, windowSeconds: 60, includeIp: false, failClosed: true,
+    }, user.id);
+    if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
+        erro: 'Muitas atualizações do ranking. Aguarde um minuto.',
+    }, { 'retry-after': '60' });
 
     try {
         let ranking;

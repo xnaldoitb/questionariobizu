@@ -17,6 +17,10 @@ export function sendNetlifyResult(res, result) {
     const statusCode = result?.statusCode ?? 200;
     const headers = result?.headers ?? {};
 
+    if (!Object.keys(headers).some((name) => name.toLowerCase() === 'cache-control')) {
+        res.setHeader('cache-control', 'no-store');
+    }
+
     for (const [name, value] of Object.entries(headers)) {
         if (value !== undefined && value !== null) {
             res.setHeader(name, value);
@@ -34,7 +38,7 @@ export function vercelHandler(handler) {
         } catch (error) {
             console.error('Erro não tratado na API:', error);
             res.status(500).json({
-                erro: error?.message || 'Erro interno do servidor.',
+                erro: 'Erro interno do servidor.',
             });
         }
     };
