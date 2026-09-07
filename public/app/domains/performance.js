@@ -245,7 +245,8 @@ async function refreshRanking() {
                     <span class="ranking-position">${index + 1}º</span>
                     <div class="ranking-card-emblem">${patentButtonMarkup(entry.acertos, { developer: developerEntry(entry) })}</div>
                     <div class="ranking-person">
-                        <div class="ranking-name-line"><strong>${safeText(entry.nome)} ${accountBadges(entry)}</strong></div>
+                        <div class="ranking-name-line"><strong>${safeText(entry.nome)}</strong></div>
+                        <div class="ranking-account-badges">${accountBadges(entry)}</div>
                         <small>AL SD PM Nº: ${safeText(entry.usuario)}</small>
                     </div>
                     <div class="ranking-card-score">

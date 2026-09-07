@@ -286,7 +286,7 @@ if (!rankingRoute.includes("from('respostas')") || !rankingRoute.includes('ranki
     throw new Error('Ranking imediato v4.3 não está configurado.');
 }
 
-for (const marker of ['PREMIUM', 'VIP', 'ADM', 'DESENVOLVEDOR']) {
+for (const marker of ['PREMIUM', 'VIP', 'ADM', 'DEV']) {
     if (!badges.includes(marker)) {
         throw new Error(`Insígnia v4.4 ausente: ${marker}`);
     }
@@ -507,4 +507,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.42.2: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.42.4: verificações estruturais concluídas.');

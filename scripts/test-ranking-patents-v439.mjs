@@ -20,13 +20,14 @@ assert.equal(DEVELOPER_PATENT.name, 'Comandante do Código');
 assert(patentInsigniaMarkup(0, { developer: true }).includes('patent-developer-marks'));
 assert(patentButtonMarkup(0, { developer: true }).includes('data-developer="true"'));
 
-const [dashboard, performance, main, topic, modal, css, route, router, migration, sessions, rankingRoute, rankingMigration] = await Promise.all([
+const [dashboard, performance, main, topic, modal, css, badges, route, router, migration, sessions, rankingRoute, rankingMigration] = await Promise.all([
     readFile('public/views/dashboard.html', 'utf8'),
     readFile('public/app/domains/performance.js', 'utf8'),
     readFile('public/app/main.js', 'utf8'),
     readFile('public/app/domains/community.js', 'utf8'),
     readFile('public/views/ranking.html', 'utf8'),
     readFile('public/styles/14-ranking-patents.css', 'utf8'),
+    readFile('public/app/foundation/badges.js', 'utf8'),
     readFile('server/routes/patente.mjs', 'utf8'),
     readFile('api/[...route].js', 'utf8'),
     readFile('supabase/migration-v4.41-52-patentes-ranking.sql', 'utf8'),
@@ -52,7 +53,15 @@ assert(modal.includes('id="patentModal"') && modal.includes('id="patentProgressB
 assert(css.includes('.patent-insignia') && css.includes('.patent-guide-table'));
 assert(css.includes('@keyframes patent-hero-glow') && css.includes('.patent-hero-cluster'));
 assert(css.includes('.ranking-list { display:grid; grid-template-columns:1fr;'));
-assert(css.includes('.ranking-card { grid-template-columns:32px 40px minmax(58px,1fr) minmax(88px,100px);'));
+assert(css.includes('.ranking-card { grid-template-columns:30px 38px minmax(88px,1fr) minmax(82px,92px);'));
+assert(css.includes(':root[data-theme="light"] .ranking-card .ranking-position'));
+assert(performance.includes('class="ranking-account-badges"'));
+assert(css.includes('.ranking-account-badges .account-insignia'));
+assert(!css.includes('.ranking-card .premium-insignia::after'));
+assert(badges.includes('>♛ DEV</span>'));
+assert(badges.includes('>✚ PLUS</span>'));
+assert(badges.includes('>◇ PREMIUM</span>'));
+assert(css.includes('.ranking-person { grid-template-columns:minmax(0,1fr);'));
 assert(patentInsigniaMarkup(0).includes('patent-trainee-mark'));
 assert(patentInsigniaMarkup(20).includes('patent-enlisted-bars'));
 assert(patentInsigniaMarkup(175).includes('patent-sergeant-chevrons'));
@@ -95,4 +104,4 @@ assert(sessions.includes('patente_notificada_nivel: 0') && sessions.includes('pa
 assert(rankingRoute.includes(".from('usuarios')") && rankingRoute.includes('users.map'));
 assert(rankingMigration.includes('left join public.respostas') && !rankingMigration.includes('status_aprovacao'));
 
-console.log('Ranking v4.42.2: card pessoal removido e classificação geral em faixas validada.');
+console.log('Ranking v4.42.4: planos completos, ADM/DEV abreviados e resultados isolados validados.');

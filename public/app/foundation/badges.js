@@ -16,7 +16,7 @@ export function accountBadges(entry = {}) {
     const plus = premium && String(entry?.plano_atual || '').toLowerCase() === 'trimestral';
 
     if (profile === 'supremo') {
-        return '<span class="account-insignia supreme-insignia" title="Desenvolvedor" aria-label="Desenvolvedor">♛ DESENVOLVEDOR</span>';
+        return '<span class="account-insignia supreme-insignia" title="Desenvolvedor" aria-label="Desenvolvedor">♛ DEV</span>';
     }
 
     const badges = [];
