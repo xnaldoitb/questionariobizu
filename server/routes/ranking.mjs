@@ -41,13 +41,27 @@ async function loadFromView() {
 }
 
 async function loadFallback() {
+    const users = [];
+    let userFrom = 0;
+    while (true) {
+        const { data, error } = await db()
+            .from('usuarios')
+            .select('id,nome,usuario,perfil,vip,premium,plano_atual')
+            .order('id', { ascending: true })
+            .range(userFrom, userFrom + PAGE_SIZE - 1);
+        if (error) throw error;
+        users.push(...(data || []));
+        if (!data || data.length < PAGE_SIZE) break;
+        userFrom += PAGE_SIZE;
+    }
+
     const rows = [];
     let from = 0;
 
     while (true) {
         const { data, error } = await db()
             .from('respostas')
-            .select('id,usuario_id,sessao_id,acertou,usuarios(nome,usuario,perfil,vip,premium,plano_atual)')
+            .select('id,usuario_id,sessao_id,acertou')
             .eq('pulada', false)
             .not('resposta_marcada', 'is', null)
             .order('id', { ascending: true })
@@ -59,25 +73,25 @@ async function loadFallback() {
         from += PAGE_SIZE;
     }
 
-    const map = new Map();
+    const map = new Map(users.map((registeredUser) => [registeredUser.id, {
+        usuario_id: registeredUser.id,
+        nome: registeredUser.nome,
+        usuario: registeredUser.usuario,
+        perfil: registeredUser.perfil || 'aluno',
+        vip: Boolean(registeredUser.vip),
+        premium: Boolean(registeredUser.premium),
+        plano_atual: registeredUser.plano_atual || null,
+        sessionIds: new Set(),
+        respondidas: 0,
+        acertos: 0,
+    }]));
     for (const response of rows) {
-        const entry = map.get(response.usuario_id) || {
-            usuario_id: response.usuario_id,
-            nome: response.usuarios?.nome,
-            usuario: response.usuarios?.usuario,
-            perfil: response.usuarios?.perfil || 'aluno',
-            vip: Boolean(response.usuarios?.vip),
-            premium: Boolean(response.usuarios?.premium),
-            plano_atual: response.usuarios?.plano_atual || null,
-            sessionIds: new Set(),
-            respondidas: 0,
-            acertos: 0,
-        };
+        const entry = map.get(response.usuario_id);
+        if (!entry) continue;
 
         if (response.sessao_id) entry.sessionIds.add(response.sessao_id);
         entry.respondidas += 1;
         if (response.acertou) entry.acertos += 1;
-        map.set(response.usuario_id, entry);
     }
 
     return sortRanking([...map.values()].map((entry) => publicRankingEntry({

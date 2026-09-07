@@ -1,6 +1,6 @@
 import { one, notify } from './selectors.js';
 
-const APP_VERSION = '4.41.7';
+const APP_VERSION = '4.42.0';
 const UPDATE_INTERVAL_MS = 15 * 60 * 1000;
 const INSTALL_DISMISSED_KEY = 'bizu-install-dismissed-session';
 let installPrompt = null;

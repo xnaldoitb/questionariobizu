@@ -2,7 +2,7 @@ import { requestJson } from '../foundation/request.js';
 import { one, all, safeText, notify } from '../foundation/selectors.js';
 import { appState } from '../foundation/model.js';
 import { accountBadges } from '../foundation/badges.js';
-import { DEVELOPER_PATENT, patentButtonMarkup, patentForHits } from '../foundation/patents.js';
+import { patentButtonMarkup } from '../foundation/patents.js';
 
 let historyResponses = [];
 let activeHistoryFilter = 'all';
@@ -45,10 +45,6 @@ function rankBadge(index) {
 
 function developerEntry(entry) {
     return entry?.perfil === 'supremo';
-}
-
-function rankingPatentName(entry) {
-    return developerEntry(entry) ? DEVELOPER_PATENT.name : patentForHits(entry?.acertos).name;
 }
 
 export function bindPerformanceEvents() {
@@ -231,7 +227,7 @@ async function refreshRanking() {
         one('#myRankingCard').innerHTML = mine
             ? `<div class="my-rank-position"><span>Sua colocação</span><strong>${myIndex + 1}º</strong></div>
                 ${patentButtonMarkup(mine.acertos, { compact: true, developer: developerEntry(mine) })}
-                <div class="my-rank-identity"><b>${safeText(mine.nome)} ${accountBadges(mine)} ${rankBadge(myIndex)}</b><small>${safeText(rankingPatentName(mine))}</small></div>
+                <div class="my-rank-identity"><b>${safeText(mine.nome)} ${accountBadges(mine)} ${rankBadge(myIndex)}</b></div>
                 <div class="my-rank-stats"><span><strong>${mine.acertos}</strong> acertos</span><small>${mine.percentual}% · ${mine.respondidas} respondidas</small></div>`
             : '<div class="my-rank-position"><span>Sua colocação</span><strong>—</strong></div><div class="my-rank-identity"><b>Sem pontuação</b><small>Responda uma questão para entrar no ranking.</small></div>';
 
@@ -243,7 +239,6 @@ async function refreshRanking() {
                         : `<span class="podium-position">${rankBadge(index)} ${index + 1}º</span>${patentButtonMarkup(entry.acertos, { developer: developerEntry(entry) })}`}</div>
                     <div class="podium-identity">
                         <strong>${safeText(entry.nome)} ${accountBadges(entry)}</strong>
-                        <em class="podium-patent-name">${safeText(rankingPatentName(entry))}</em>
                         <small>AL SD PM Nº: ${safeText(entry.usuario)}</small>
                     </div>
                     <div class="podium-results">
@@ -261,7 +256,6 @@ async function refreshRanking() {
                     <div class="ranking-card-emblem">${patentButtonMarkup(entry.acertos, { developer: developerEntry(entry) })}</div>
                     <div class="ranking-person">
                         <div class="ranking-name-line"><strong>${safeText(entry.nome)} ${accountBadges(entry)}</strong></div>
-                        <span class="ranking-patent-name">${safeText(rankingPatentName(entry))}</span>
                         <small>AL SD PM Nº: ${safeText(entry.usuario)} · ${entry.sessoes} sessões</small>
                     </div>
                     <div class="ranking-card-score">

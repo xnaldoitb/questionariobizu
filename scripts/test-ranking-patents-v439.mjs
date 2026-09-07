@@ -20,7 +20,7 @@ assert.equal(DEVELOPER_PATENT.name, 'Comandante do Código');
 assert(patentInsigniaMarkup(0, { developer: true }).includes('patent-developer-marks'));
 assert(patentButtonMarkup(0, { developer: true }).includes('data-developer="true"'));
 
-const [dashboard, performance, main, topic, modal, css, route, router, migration, sessions] = await Promise.all([
+const [dashboard, performance, main, topic, modal, css, route, router, migration, sessions, rankingRoute, rankingMigration] = await Promise.all([
     readFile('public/views/dashboard.html', 'utf8'),
     readFile('public/app/domains/performance.js', 'utf8'),
     readFile('public/app/main.js', 'utf8'),
@@ -31,10 +31,14 @@ const [dashboard, performance, main, topic, modal, css, route, router, migration
     readFile('api/[...route].js', 'utf8'),
     readFile('supabase/migration-v4.41-52-patentes-ranking.sql', 'utf8'),
     readFile('server/routes/sessoes.mjs', 'utf8'),
+    readFile('server/routes/ranking.mjs', 'utf8'),
+    readFile('supabase/migration-v4.42-ranking-todos-usuarios.sql', 'utf8'),
 ]);
 
 assert(dashboard.includes('profile-patent-button') && !dashboard.includes('class="profile-avatar"'));
+assert(!dashboard.includes('profilePatentName'));
 assert(performance.includes('patentButtonMarkup') && !performance.includes('ranking-avatar'));
+for (const hiddenName of ['rankingPatentName', 'podium-patent-name', 'ranking-patent-name']) assert(!performance.includes(hiddenName));
 for (const marker of ['my-rank-position', 'podium-results', 'ranking-person', 'ranking-primary-score']) assert(performance.includes(marker));
 assert(main.includes('checkPatentNotification') && main.includes('renderProfilePatent'));
 assert(main.includes("appState.user?.perfil === 'supremo'"));
@@ -45,6 +49,7 @@ assert(topic.includes('papiraoRow') && topic.includes('patent-guide-papirao'));
 assert(modal.includes('id="patentModal"') && modal.includes('id="patentProgressBar"'));
 assert(css.includes('.patent-insignia') && css.includes('.patent-guide-table'));
 assert(css.includes('@keyframes patent-hero-glow') && css.includes('.patent-hero-cluster'));
+assert(css.includes('.my-ranking-card { grid-template-columns:36px 40px minmax(0,1fr) auto;'));
 assert(patentInsigniaMarkup(0).includes('patent-trainee-mark'));
 assert(patentInsigniaMarkup(20).includes('patent-enlisted-bars'));
 assert(patentInsigniaMarkup(175).includes('patent-sergeant-chevrons'));
@@ -84,5 +89,7 @@ assert(route.includes("user.perfil === 'supremo'") && route.includes('!developer
 assert(router.includes("['patente', patente]"));
 assert(migration.includes('between 0 and 51') && migration.includes('patente_notificada_nivel'));
 assert(sessions.includes('patente_notificada_nivel: 0') && sessions.includes('papirao_notificado: false'));
+assert(rankingRoute.includes(".from('usuarios')") && rankingRoute.includes('users.map'));
+assert(rankingMigration.includes('left join public.respostas') && !rankingMigration.includes('status_aprovacao'));
 
-console.log('Ranking v4.41.7: Subtenente com triângulo e estrela, sem divisas, validado.');
+console.log('Ranking v4.42: nomes somente no detalhe, todos os cadastros e card móvel compacto validados.');

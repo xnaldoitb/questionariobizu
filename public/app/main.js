@@ -63,17 +63,11 @@ function renderProfilePatent(hits = 0) {
     const advanced = !developer && lastProfilePatentLevel !== null && patent.level > lastProfilePatentLevel;
     lastProfilePatentLevel = developer ? -1 : patent.level;
     const icon = one('#profileAvatar');
-    const name = one('#profilePatentName');
     if (icon) {
         icon.innerHTML = patentButtonMarkup(hits, { developer }).replace(/^<button[^>]*>|<\/button>$/g, '');
         icon.dataset.patentHits = String(hits);
         icon.dataset.developer = developer ? 'true' : 'false';
         icon.setAttribute('aria-label', `Ver patente ${patent.name}`);
-    }
-    if (name) {
-        name.textContent = patent.name;
-        name.dataset.patentHits = String(hits);
-        name.dataset.developer = developer ? 'true' : 'false';
     }
     return advanced;
 }

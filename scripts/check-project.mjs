@@ -85,6 +85,7 @@ const requiredFiles = [
     'supabase/migration-v4.37-premiacao.sql',
     'supabase/migration-v4.39-patentes-ranking.sql',
     'supabase/migration-v4.41-52-patentes-ranking.sql',
+    'supabase/migration-v4.42-ranking-todos-usuarios.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -112,6 +113,7 @@ const migration436 = await readFile('supabase/migration-v4.36-plus-pagamentos.sq
 const migration437 = await readFile('supabase/migration-v4.37-premiacao.sql', 'utf8');
 const migration439 = await readFile('supabase/migration-v4.39-patentes-ranking.sql', 'utf8');
 const migration441 = await readFile('supabase/migration-v4.41-52-patentes-ranking.sql', 'utf8');
+const migration442 = await readFile('supabase/migration-v4.42-ranking-todos-usuarios.sql', 'utf8');
 const badges = await readFile('public/app/foundation/badges.js', 'utf8');
 const dashboardView = await readFile('public/views/dashboard.html', 'utf8');
 const quizView = await readFile('public/views/quiz.html', 'utf8');
@@ -492,6 +494,9 @@ for (const marker of ['patente_notificada_nivel', 'papirao_notificado']) {
 for (const marker of ['between 0 and 51', 'usuarios_patente_notificada_nivel_check']) {
     if (!migration441.includes(marker)) throw new Error(`Expansão de patentes v4.41 incompleta: ${marker}`);
 }
+for (const marker of ['left join public.respostas', 'inclusive pendentes']) {
+    if (!migration442.includes(marker)) throw new Error(`Ranking completo v4.42 incompleto: ${marker}`);
+}
 if (!routeNames.has('patente')) throw new Error('Rota individual de patente v4.39 ausente.');
 
 const migration418 = await readFile('supabase/migration-v4.18-sessao-mesmo-dispositivo.sql', 'utf8');
@@ -502,4 +507,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.41.7: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.42.0: verificações estruturais concluídas.');

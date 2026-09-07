@@ -185,8 +185,10 @@ select
     then round((count(r.id) filter (where r.acertou))::numeric / count(r.id)::numeric * 100)::integer
     else 0 end as percentual
 from public.usuarios u
-join public.respostas r on r.usuario_id = u.id
-where r.pulada = false and r.resposta_marcada is not null
+left join public.respostas r
+  on r.usuario_id = u.id
+ and r.pulada = false
+ and r.resposta_marcada is not null
 group by u.id, u.nome, u.usuario, u.perfil, u.vip, u.premium, u.plano_atual;
 
 -- v4.3: substituição transacional de disciplina.
