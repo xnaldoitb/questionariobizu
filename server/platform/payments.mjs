@@ -65,6 +65,35 @@ export async function loadPlan(planId) {
     return data || null;
 }
 
+function pixPayerEmail(event, user) {
+    const configured = String(process.env.MERCADO_PAGO_PAYER_EMAIL || '').trim().toLowerCase();
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(configured)) return configured;
+
+    const host = new URL(applicationUrl(event)).hostname.toLowerCase();
+    const domain = /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(host) ? host : 'example.com';
+    const account = String(user?.usuario || user?.id || 'usuario')
+        .normalize('NFKD')
+        .replace(/[^a-z0-9]/gi, '')
+        .toLowerCase()
+        .slice(0, 36) || 'usuario';
+    return `pix.${account}@${domain}`;
+}
+
+function mercadoPagoTicketUrl(value) {
+    try {
+        const url = new URL(String(value || ''));
+        const trusted = url.protocol === 'https:' && (
+            url.hostname === 'mercadopago.com.br'
+            || url.hostname.endsWith('.mercadopago.com.br')
+            || url.hostname === 'mercadopago.com'
+            || url.hostname.endsWith('.mercadopago.com')
+        );
+        return trusted ? url.toString() : null;
+    } catch {
+        return null;
+    }
+}
+
 export async function createCheckoutPreference({ event, user, plan }) {
     const paymentId = newPaymentId();
     const value = Number(plan.preco);
@@ -83,33 +112,52 @@ export async function createCheckoutPreference({ event, user, plan }) {
 
     try {
         const baseUrl = applicationUrl(event);
-        const preference = await mercadoPagoRequest('/checkout/preferences', {
+        const expiration = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+        const names = String(user.nome || 'Aluno Bizu').trim().split(/\s+/);
+        const payment = await mercadoPagoRequest('/v1/payments', {
             method: 'POST',
             headers: { 'x-idempotency-key': paymentId },
             body: JSON.stringify({
-                items: [{ id: plan.id, title: `Questionário Bizu — ${plan.nome}`, quantity: 1, currency_id: 'BRL', unit_price: value }],
+                transaction_amount: value,
+                description: `Questionário Bizu — ${plan.nome}`,
+                payment_method_id: 'pix',
                 external_reference: paymentId,
                 notification_url: `${baseUrl}/api/pagamento-webhook`,
-                back_urls: { success: `${baseUrl}/?pagamento=sucesso`, pending: `${baseUrl}/?pagamento=pendente`, failure: `${baseUrl}/?pagamento=falha` },
-                auto_return: 'approved',
-                payment_methods: {
-                    excluded_payment_types: [
-                        { id: 'credit_card' }, { id: 'debit_card' }, { id: 'ticket' },
-                        { id: 'atm' }, { id: 'prepaid_card' },
-                    ],
-                    installments: 1,
+                date_of_expiration: expiration,
+                payer: {
+                    email: pixPayerEmail(event, user),
+                    first_name: names[0].slice(0, 60),
+                    last_name: names.slice(1).join(' ').slice(0, 60) || names[0].slice(0, 60),
                 },
-                statement_descriptor: 'QUESTIONARIO BIZU',
                 metadata: { pagamento_id: paymentId, usuario_id: user.id, plano: plan.id },
             }),
         });
 
+        const transaction = payment?.point_of_interaction?.transaction_data || {};
+        const qrCode = String(transaction.qr_code || '').trim().slice(0, 4096);
+        const qrBase64 = String(transaction.qr_code_base64 || '').replace(/\s/g, '');
+        if (!qrCode || !qrBase64 || !/^[a-z0-9+/]+=*$/i.test(qrBase64)) {
+            throw new Error('O Mercado Pago não retornou o QR Code Pix. Tente novamente.');
+        }
+
         const { error: updateError } = await db().from('pagamentos').update({
-            mercado_pago_preference_id: preference.id,
+            mercado_pago_payment_id: String(payment.id),
+            status: String(payment.status || 'pending'),
             atualizado_em: new Date().toISOString(),
         }).eq('id', paymentId);
         if (updateError) throw updateError;
-        return { pagamento_id: paymentId, plano: plan.id, valor: value, checkout_url: preference.init_point };
+        return {
+            pagamento_id: paymentId,
+            mercado_pago_payment_id: String(payment.id),
+            plano: plan.id,
+            plano_nome: plan.nome,
+            valor: value,
+            status: String(payment.status || 'pending'),
+            qr_code: qrCode,
+            qr_code_base64: qrBase64,
+            checkout_url: mercadoPagoTicketUrl(transaction.ticket_url),
+            expira_em: payment.date_of_expiration || expiration,
+        };
     } catch (error) {
         await db().from('pagamentos').update({ status: 'erro', atualizado_em: new Date().toISOString() }).eq('id', paymentId);
         throw error;
@@ -197,6 +245,15 @@ export function paymentCanBeRemoved(payment) {
 }
 
 export async function expireCheckoutPreference(payment) {
+    if (payment?.mercado_pago_payment_id) {
+        if (['pendente', 'pending', 'in_process', 'authorized'].includes(String(payment.status || '').toLowerCase())) {
+            await mercadoPagoRequest(`/v1/payments/${encodeURIComponent(payment.mercado_pago_payment_id)}`, {
+                method: 'PUT',
+                body: JSON.stringify({ status: 'cancelled' }),
+            });
+        }
+        return;
+    }
     if (!payment?.mercado_pago_preference_id) return;
     const now = Date.now();
     const createdAt = new Date(payment.criado_em || now).getTime();

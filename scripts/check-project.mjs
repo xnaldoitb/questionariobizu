@@ -420,7 +420,7 @@ for (const marker of ['whatsapp', 'pagamentos', 'confirmar_pagamento_pix']) {
     if (!migration48.includes(marker)) throw new Error(`Migration v4.8 incompleta: ${marker}`);
 }
 
-if (!paymentPlatform.includes('excluded_payment_types') || !paymentWebhook.includes('validateWebhookSignature')) {
+if (!paymentPlatform.includes("payment_method_id: 'pix'") || !paymentPlatform.includes('qr_code_base64') || !paymentWebhook.includes('validateWebhookSignature')) {
     throw new Error('Proteções da integração Pix v4.8 estão incompletas.');
 }
 
@@ -507,4 +507,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.42.4: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.43.0: verificações estruturais concluídas.');

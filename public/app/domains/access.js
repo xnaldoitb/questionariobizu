@@ -13,6 +13,7 @@ let lastPaymentCheck = 0;
 let paymentEntryShownForUser = null;
 let paymentPlansCache = null;
 let paymentPlansPromise = null;
+let activePixPayment = null;
 
 export function hasPaidAccess(user) {
     return Boolean(
@@ -142,12 +143,48 @@ async function loadPaymentPlans() {
     }
 }
 
+function activePixIsValid() {
+    if (!activePixPayment?.qr_code || !activePixPayment?.qr_code_base64) return false;
+    const expiration = new Date(activePixPayment.expira_em || 0).getTime();
+    return !expiration || expiration > Date.now();
+}
+
+function showPaymentPlanSelection() {
+    activePixPayment = null;
+    one('#paymentPlans')?.classList.remove('hidden');
+    one('#paymentPixPanel')?.classList.add('hidden');
+    if (one('#paymentTitle')) one('#paymentTitle').textContent = 'Escolha seu plano';
+    if (one('#paymentSubtitle')) one('#paymentSubtitle').textContent = 'Pix · liberação automática';
+}
+
+function showPixPayment(payment) {
+    activePixPayment = payment;
+    one('#paymentPlans')?.classList.add('hidden');
+    one('#paymentPixPanel')?.classList.remove('hidden');
+    if (one('#paymentTitle')) one('#paymentTitle').textContent = 'Pague com Pix';
+    if (one('#paymentSubtitle')) one('#paymentSubtitle').textContent = 'Escaneie ou copie o código';
+    if (one('#paymentPixPlan')) one('#paymentPixPlan').textContent = payment.plano_nome || 'Plano selecionado';
+    if (one('#paymentPixValue')) one('#paymentPixValue').textContent = money(payment.valor);
+    if (one('#paymentPixCode')) one('#paymentPixCode').value = payment.qr_code;
+    if (one('#paymentPixQr')) one('#paymentPixQr').src = `data:image/png;base64,${payment.qr_code_base64}`;
+    const link = one('#paymentPixOpen');
+    if (link) {
+        link.classList.toggle('hidden', !payment.checkout_url);
+        if (payment.checkout_url) link.href = payment.checkout_url;
+        else link.removeAttribute('href');
+    }
+}
+
 export function openPaymentPlans() {
     if (!canShowStudentPlans()) return;
     one('#paymentStatus')?.classList.add('hidden');
     one('#paymentModal')?.classList.remove('hidden');
     document.body?.classList.add('modal-open');
-    loadPaymentPlans();
+    if (activePixIsValid()) showPixPayment(activePixPayment);
+    else {
+        showPaymentPlanSelection();
+        loadPaymentPlans();
+    }
     if (!paymentPollingTimer) startPaymentPolling();
 }
 
@@ -214,8 +251,6 @@ async function checkPaymentStatus() {
 async function beginPayment(plan, button) {
     if (paymentCreating || !canShowStudentPlans()) return;
     paymentCreating = true;
-    const checkoutWindow = window.open('', '_blank');
-    if (checkoutWindow) checkoutWindow.opener = null;
     button.disabled = true;
     setPaymentStatus('Preparando o pagamento Pix…');
     try {
@@ -223,12 +258,10 @@ async function beginPayment(plan, button) {
             method: 'POST',
             body: JSON.stringify({ plano: plan }),
         });
-        if (checkoutWindow) checkoutWindow.location.href = data.checkout_url;
-        else window.location.href = data.checkout_url;
-        setPaymentStatus('Pagamento aberto. Após pagar o Pix, a liberação ocorrerá automaticamente.');
+        showPixPayment(data);
+        setPaymentStatus('Aguardando o pagamento. A liberação será automática após a confirmação.');
         startPaymentPolling();
     } catch (error) {
-        checkoutWindow?.close();
         setPaymentStatus(error.message);
     } finally {
         paymentCreating = false;
@@ -236,11 +269,39 @@ async function beginPayment(plan, button) {
     }
 }
 
+async function copyPixCode() {
+    const code = one('#paymentPixCode')?.value || '';
+    if (!code) return;
+    try {
+        await navigator.clipboard.writeText(code);
+    } catch {
+        const field = one('#paymentPixCode');
+        field?.focus();
+        field?.select();
+        if (!document.execCommand?.('copy')) {
+            setPaymentStatus('Não foi possível copiar automaticamente. Selecione o código e copie manualmente.');
+            return;
+        }
+    }
+    const button = one('#paymentPixCopy');
+    if (button) {
+        button.textContent = 'Código copiado!';
+        window.setTimeout(() => { button.textContent = 'Copiar código Pix'; }, 1800);
+    }
+    setPaymentStatus('Código Pix copiado. Abra o aplicativo do seu banco para pagar.', true);
+}
+
 export function bindPaymentEvents() {
     one('#accountPlansBtn')?.addEventListener('click', openPaymentPlans);
     one('#accessNoticePlans')?.addEventListener('click', openPaymentPlans);
     one('#blockedPlansBtn')?.addEventListener('click', openPaymentPlans);
     one('#paymentClose')?.addEventListener('click', closePaymentPlans);
+    one('#paymentPixCopy')?.addEventListener('click', copyPixCode);
+    one('#paymentPixBack')?.addEventListener('click', () => {
+        showPaymentPlanSelection();
+        one('#paymentStatus')?.classList.add('hidden');
+        loadPaymentPlans();
+    });
     one('#paymentModal')?.addEventListener('click', (event) => {
         if (event.target.id === 'paymentModal') closePaymentPlans();
     });

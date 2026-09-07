@@ -190,15 +190,18 @@ async function adminPaymentAction(action, userId = one('#paymentUserSelect')?.va
             if (one('#paymentAwardMessage')) one('#paymentAwardMessage').value = '';
             notify('Usuário premiado com sucesso.');
         } else {
-            await navigator.clipboard?.writeText(result.checkout_url).catch(() => {});
-            status.innerHTML = `Cobrança criada. <a href="${safeText(result.checkout_url)}" target="_blank" rel="noopener noreferrer">Abrir pagamento</a>`;
+            await navigator.clipboard?.writeText(result.qr_code).catch(() => {});
+            status.innerHTML = result.checkout_url
+                ? `Cobrança Pix criada. <a href="${safeText(result.checkout_url)}" target="_blank" rel="noopener noreferrer">Abrir QR Code</a>`
+                : 'Cobrança Pix criada. O código copia e cola foi copiado.';
             if (result.whatsapp) {
-                const message = encodeURIComponent(`Olá, ${result.usuario_nome}. Sua cobrança do Questionário Bizu está disponível aqui: ${result.checkout_url}`);
+                const paymentAccess = result.checkout_url || result.qr_code;
+                const message = encodeURIComponent(`Olá, ${result.usuario_nome}. Sua cobrança Pix do Questionário Bizu está disponível aqui: ${paymentAccess}`);
                 window.open(`https://wa.me/${result.whatsapp}?text=${message}`, '_blank', 'noopener,noreferrer');
-            } else {
+            } else if (result.checkout_url) {
                 window.open(result.checkout_url, '_blank', 'noopener,noreferrer');
             }
-            notify('Nova cobrança gerada. O link também foi copiado.');
+            notify('Nova cobrança Pix gerada. O código também foi copiado.');
         }
         await refreshManagedUsers({ quiet: true });
         await refreshAdminPayments({ quiet: true });

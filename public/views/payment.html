@@ -4,12 +4,28 @@
             <div>
                 <p class="section-kicker"><span class="kicker-mark"></span> acesso</p>
                 <h2 id="paymentTitle">Escolha seu plano</h2>
-                <p>Pix · liberação automática</p>
+                <p id="paymentSubtitle">Pix · liberação automática</p>
             </div>
             <button class="modal-close" id="paymentClose" type="button" aria-label="Fechar">×</button>
         </header>
         <div class="payment-plans" id="paymentPlans">
             <div class="admin-empty-state">Carregando planos…</div>
+        </div>
+        <div class="payment-pix hidden" id="paymentPixPanel">
+            <div class="payment-pix-summary">
+                <span id="paymentPixPlan">Plano selecionado</span>
+                <strong id="paymentPixValue">R$ 0,00</strong>
+            </div>
+            <div class="payment-pix-qr-frame">
+                <img id="paymentPixQr" alt="QR Code para pagamento via Pix" width="220" height="220"/>
+            </div>
+            <label class="payment-pix-code-label" for="paymentPixCode">Pix copia e cola</label>
+            <textarea id="paymentPixCode" class="payment-pix-code" rows="3" readonly></textarea>
+            <div class="payment-pix-actions">
+                <button class="ui-button main-action" id="paymentPixCopy" type="button">Copiar código Pix</button>
+                <a class="ui-button quiet-action hidden" id="paymentPixOpen" target="_blank" rel="noopener noreferrer">Abrir no Mercado Pago</a>
+            </div>
+            <button class="payment-pix-back" id="paymentPixBack" type="button">Escolher outro plano</button>
         </div>
         <p class="payment-status hidden" id="paymentStatus" role="status" aria-live="polite"></p>
     </section>
