@@ -117,7 +117,7 @@ function renderMissions(payload) {
         return `<article class="mission-item ${mission.concluida ? 'is-complete' : ''}">
             <span class="mission-check" aria-hidden="true">${mission.concluida ? '✓' : ''}</span>
             <div class="mission-copy"><div><strong>${safeText(mission.titulo)}</strong><b>+${mission.pontos} XP</b></div><span>${safeText(mission.descricao)}</span>
-                <div class="mission-progress"><i style="width:${progress}%"></i></div><small>${mission.atual}/${mission.meta}</small>
+                <div class="mission-progress"><i style="width:${progress}%"></i></div><small>${mission.atual}/${mission.meta} ${safeText(mission.unidade || '')}</small>
             </div>
         </article>`;
     }).join('') || '<div class="progression-empty">Nenhuma missão disponível.</div>';

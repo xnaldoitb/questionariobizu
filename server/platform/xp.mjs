@@ -4,20 +4,20 @@ import { createNotification } from './notifications.mjs';
 
 const DAY_MS = 86_400_000;
 
-function localDay(value = new Date()) {
-    return new Intl.DateTimeFormat('en-CA', {
+export function localDay(value = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/Belem', year: 'numeric', month: '2-digit', day: '2-digit',
-    }).format(new Date(value));
+    }).formatToParts(new Date(value)).reduce((result, part) => {
+        if (['year', 'month', 'day'].includes(part.type)) result[part.type] = part.value;
+        return result;
+    }, {});
+    return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
-function startOfLocalDay() {
-    const now = new Date();
-    const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'America/Belem', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23',
-    }).formatToParts(now).reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
-    const localAsUtc = Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day), Number(parts.hour));
-    const offset = localAsUtc - now.getTime();
-    return new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day)) - offset).toISOString();
+export function startOfLocalDay(value = new Date()) {
+    // Belém usa UTC−03:00 durante todo o ano. Construir o marco diretamente
+    // evita que os minutos atuais contaminem o cálculo do início do dia.
+    return new Date(`${localDay(value)}T03:00:00.000Z`).toISOString();
 }
 
 export async function awardXp(userId, key, type, points, details = {}) {
@@ -91,9 +91,9 @@ export async function missionStatus(userId, { award = false } = {}) {
     const sequence = correctStreak(rows);
     const day = localDay();
     const missions = [
-        { id: 'sequencia-10', titulo: 'Sequência certeira', descricao: 'Acerte 10 questões seguidas.', atual: Math.min(sequence, 10), meta: 10, pontos: 25, concluida: sequence >= 10 },
-        { id: 'disciplinas-3', titulo: 'Ronda de disciplinas', descricao: 'Estude 3 disciplinas no mesmo dia.', atual: Math.min(disciplines, 3), meta: 3, pontos: 40, concluida: disciplines >= 3 },
-        { id: 'constancia-7', titulo: 'Constância semanal', descricao: 'Responda questões por 7 dias seguidos.', atual: Math.min(streakDays, 7), meta: 7, pontos: 200, concluida: streakDays >= 7 },
+        { id: 'sequencia-10', titulo: 'Sequência certeira', descricao: 'Acerte 10 questões seguidas. Um erro reinicia esta contagem.', atual: Math.min(sequence, 10), meta: 10, unidade: 'acertos seguidos', pontos: 25, concluida: sequence >= 10 },
+        { id: 'disciplinas-3', titulo: 'Ronda de disciplinas', descricao: 'Responda em 3 disciplinas diferentes no mesmo dia.', atual: Math.min(disciplines, 3), meta: 3, unidade: 'disciplinas hoje', pontos: 40, concluida: disciplines >= 3 },
+        { id: 'constancia-7', titulo: 'Constância semanal', descricao: 'Estude em 7 dias consecutivos. Conta apenas 1 avanço por dia.', atual: Math.min(streakDays, 7), meta: 7, unidade: 'dias seguidos', pontos: 200, concluida: streakDays >= 7 },
     ];
 
     if (award) {
