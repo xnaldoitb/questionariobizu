@@ -201,7 +201,7 @@ export async function missionStatus(userId, { award = false, institutional = fal
         const applied = await grantMission({
             id: 'ronda-progressiva', key: `${roundPrefix}${roundTarget}`,
             title: `Ronda de ${roundTarget} disciplinas`, points,
-            details: { meta: roundTarget, disciplinas },
+            details: { meta: roundTarget, disciplinas: disciplines },
         });
         if (applied) roundAwardedPoints = points;
         roundStages = [...awardedKeys].filter((key) => key.startsWith(roundPrefix)).length;

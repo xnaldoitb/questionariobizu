@@ -43,6 +43,8 @@ assert(migration.includes('set xp_total = u.xp_total + p_pontos'));
 for (const marker of ["'primeiro_acerto', 10", "'correcao', 4", "'revisao', 3", "'dominio', 150", "'sessao', 20", "'precisao', 60", "'precisao', 30"]) assert(xp.includes(marker));
 for (const marker of ['sequencia-progressiva', 'ronda-progressiva', 'ritmo-diario', 'precisao-diaria', 'excelencia-diaria', 'constancia-7', 'centena-semanal', 'explorador-semanal']) assert(xp.includes(marker));
 for (const marker of ['roundTargets = [3, 6, 9, 12, 15, 18]', 'sequenceMissionTarget', 'roundMissionTarget', 'progressiveMissionReward', 'pontos_premiados', 'startOfLocalWeek']) assert(xp.includes(marker));
+assert(xp.includes('details: { meta: roundTarget, disciplinas: disciplines }'));
+assert(!xp.includes('details: { meta: roundTarget, disciplinas }'));
 assert(responder.includes('awardAnswerXp') && responder.includes('chapterId: q.capitulo_id'));
 assert(sessions.includes('awardSessionXp'));
 assert(notifications.includes(".eq('usuario_id', user.id)") && notifications.includes('marcar_todas'));
@@ -63,7 +65,7 @@ assert(community.includes("XP_RULES_TOPIC_ID = 'regras-xp'") && community.includ
 assert(community.includes('Premium concede <strong>500 XP</strong>'));
 assert(community.includes('10, 20, 30…') && community.includes('3, 6, 9, 12, 15 e 18'));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.45.4'));
-assert(worker.includes('v4.45.4-xp-todos-perfis') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.45.5'));
+assert(worker.includes('v4.45.5-missoes-institucionais') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, notificações e tópico oficial v4.45 validados.');

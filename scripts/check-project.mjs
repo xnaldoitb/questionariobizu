@@ -530,4 +530,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.45.4: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.45.5: verificações estruturais concluídas.');
