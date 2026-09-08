@@ -4,17 +4,6 @@ import { json } from '../platform/http.mjs';
 import { consumeRateLimit } from '../platform/rate-limit.mjs';
 import { patentStatus } from '../platform/patents.mjs';
 
-async function correctHits(userId) {
-    const { count, error } = await db().from('respostas')
-        .select('id', { count: 'exact', head: true })
-        .eq('usuario_id', userId)
-        .eq('pulada', false)
-        .eq('acertou', true)
-        .not('resposta_marcada', 'is', null);
-    if (error) throw error;
-    return Number(count || 0);
-}
-
 async function rankingLeaderId() {
     const { data, error } = await db().from('ranking_usuarios')
         .select('usuario_id,nome,acertos,percentual,respondidas')
@@ -30,17 +19,17 @@ async function rankingLeaderId() {
 }
 
 async function currentState(user) {
-    const [{ data: notification, error }, hits, leaderId] = await Promise.all([
+    const [{ data: notification, error }, leaderId] = await Promise.all([
         db().from('usuarios')
-            .select('patente_notificada_nivel,papirao_notificado')
+            .select('patente_notificada_nivel,papirao_notificado,xp_total')
             .eq('id', user.id)
             .single(),
-        correctHits(user.id),
         rankingLeaderId(),
     ]);
     if (error) throw error;
-    const patente = patentStatus(hits);
-    const lider = leaderId === user.id && hits > 0;
+    const xp = Number(notification?.xp_total || 0);
+    const patente = patentStatus(xp);
+    const lider = leaderId === user.id && xp > 0;
     const notifiedLevel = Math.max(0, Number(notification?.patente_notificada_nivel || 0));
     const institutional = ['admin', 'supremo'].includes(user.perfil);
     return {

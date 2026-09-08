@@ -3,6 +3,7 @@ import { requireUser } from '../platform/auth.mjs';
 import { json, parseBody } from '../platform/http.mjs';
 import { consumeRateLimit } from '../platform/rate-limit.mjs';
 import { cleanText, GENERAL_ROOM_ID } from '../platform/community-access.mjs';
+import { createNotifications } from '../platform/notifications.mjs';
 
 function publicRoom(room, userId, member = false) {
     return {
@@ -109,6 +110,18 @@ export const handler = async (event) => {
             if (membershipError) {
                 await db().from('chat_salas').delete().eq('id', room.id).eq('criador_id', user.id);
                 throw membershipError;
+            }
+
+            if (tipo === 'privada') {
+                await createNotifications(members.filter((member) => member.id !== user.id).map((member) => ({
+                    usuario_id: member.id,
+                    tipo: 'chat_privado',
+                    titulo: 'Convite para sala privada',
+                    mensagem: `${user.nome} adicionou você à sala ${nome}.`,
+                    acao: 'chat',
+                    referencia_id: room.id,
+                    chave: `sala-convite:${room.id}:${member.id}`,
+                }))).catch((notificationError) => console.error('Falha ao notificar convite:', notificationError.message));
             }
 
             return json(201, { sala: publicRoom(room, user.id, true) });

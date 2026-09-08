@@ -3,6 +3,7 @@ import { requireUser } from '../platform/auth.mjs';
 import { json, parseBody } from '../platform/http.mjs';
 import { questionAccessDeniedResponse } from '../platform/question-access.mjs';
 import { consumeRateLimit } from '../platform/rate-limit.mjs';
+import { awardAnswerXp } from '../platform/xp.mjs';
 export const handler = async (event) => {
   const user = await requireUser(event);
   if (!user) return json(401, { erro: 'Não autenticado.' });
@@ -45,7 +46,7 @@ export const handler = async (event) => {
     .eq('sessao_id', sessao_id).eq('questao_id', Number(questao_id)).maybeSingle();
   if (existing.error) return json(500, { erro: 'Não foi possível validar a resposta.' });
 
-  const { data: q, error } = await db().from('questoes').select('resposta_correta,resolucao,alternativas,ativo').eq('id', questao_id).eq('ativo', true).single();
+  const { data: q, error } = await db().from('questoes').select('resposta_correta,resolucao,alternativas,ativo,capitulo_id').eq('id', questao_id).eq('ativo', true).single();
   if (error || !q) return json(404, { erro: 'Questão não encontrada.' });
   const answer = Number(resposta_marcada);
   if (!pulada && (!Number.isInteger(answer) || answer < 0 || answer >= q.alternativas.length)) {
@@ -65,6 +66,13 @@ export const handler = async (event) => {
       repetida: true,
     });
   }
+  const { data: previous, error: previousError } = await db().from('respostas')
+    .select('acertou,pulada,respondida_em')
+    .eq('usuario_id', user.id)
+    .eq('questao_id', Number(questao_id))
+    .order('respondida_em', { ascending: false })
+    .limit(100);
+  if (previousError) return json(500, { erro: 'Não foi possível calcular o progresso de XP.' });
   const acertou = !pulada && Number(resposta_marcada) === q.resposta_correta;
   const saved = await db().from('respostas').insert({ sessao_id, usuario_id: user.id, questao_id, resposta_marcada: pulada ? null : answer, acertou, pulada });
   if (saved.error) return json(saved.error.code === '23505' ? 409 : 500, {
@@ -72,6 +80,19 @@ export const handler = async (event) => {
       ? 'Esta questão já foi respondida neste simulado.'
       : 'Não foi possível registrar a resposta.',
   });
-  if (pulada) return json(200, { ok: true, pulada: true });
-  return json(200, { correta: q.resposta_correta, acertou, resolucao: q.resolucao });
+  let progression = { xp_ganho: 0 };
+  try {
+    progression = await awardAnswerXp({
+      userId: user.id,
+      questionId: Number(questao_id),
+      chapterId: q.capitulo_id,
+      correct: acertou,
+      previous: previous || [],
+    });
+  } catch (xpError) {
+    // A resposta nunca é perdida se o serviço de progressão ficar indisponível.
+    console.error('Resposta salva, mas falhou ao conceder XP:', xpError.message);
+  }
+  if (pulada) return json(200, { ok: true, pulada: true, ...progression });
+  return json(200, { correta: q.resposta_correta, acertou, resolucao: q.resolucao, ...progression });
 };

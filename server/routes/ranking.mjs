@@ -13,6 +13,7 @@ function publicRankingEntry(entry) {
         vip: Boolean(entry.vip),
         premium: Boolean(entry.premium),
         plano_atual: entry.plano_atual || null,
+        xp_total: Number(entry.xp_total || 0),
         respondidas: Number(entry.respondidas || 0),
         acertos: Number(entry.acertos || 0),
         percentual: Number(entry.percentual || 0),
@@ -32,7 +33,7 @@ function sortRanking(entries) {
 async function loadFromView() {
     const { data, error } = await db()
         .from('ranking_usuarios')
-        .select('usuario_id,nome,usuario,perfil,vip,premium,plano_atual,respondidas,acertos,percentual');
+        .select('usuario_id,nome,usuario,perfil,vip,premium,plano_atual,xp_total,respondidas,acertos,percentual');
 
     if (error) throw error;
 
@@ -45,7 +46,7 @@ async function loadFallback() {
     while (true) {
         const { data, error } = await db()
             .from('usuarios')
-            .select('id,nome,usuario,perfil,vip,premium,plano_atual')
+            .select('id,nome,usuario,perfil,vip,premium,plano_atual,xp_total')
             .order('id', { ascending: true })
             .range(userFrom, userFrom + PAGE_SIZE - 1);
         if (error) throw error;
@@ -80,6 +81,7 @@ async function loadFallback() {
         vip: Boolean(registeredUser.vip),
         premium: Boolean(registeredUser.premium),
         plano_atual: registeredUser.plano_atual || null,
+        xp_total: Number(registeredUser.xp_total || 0),
         respondidas: 0,
         acertos: 0,
     }]));
@@ -98,6 +100,7 @@ async function loadFallback() {
         vip: entry.vip,
         premium: entry.premium,
         plano_atual: entry.plano_atual,
+        xp_total: entry.xp_total,
         respondidas: entry.respondidas,
         acertos: entry.acertos,
         percentual: entry.respondidas

@@ -18,6 +18,7 @@ const requiredFiles = [
     'public/app/domains/access.js',
     'public/app/domains/rewards.js',
     'public/app/domains/patents.js',
+    'public/app/domains/progression.js',
     'public/app/foundation/patents.js',
     'public/app/domains/admin/common.js',
     'public/app/domains/admin/users.js',
@@ -39,6 +40,7 @@ const requiredFiles = [
     'public/styles/12-community-hub.css',
     'public/styles/13-visual-refinement.css',
     'public/styles/14-ranking-patents.css',
+    'public/styles/15-progression-notifications.css',
     'api/[...route].js',
     'server/platform/auth.mjs',
     'server/platform/access-validity.mjs',
@@ -47,6 +49,8 @@ const requiredFiles = [
     'server/platform/admin-audit.mjs',
     'server/platform/payments.mjs',
     'server/platform/patents.mjs',
+    'server/platform/xp.mjs',
+    'server/platform/notifications.mjs',
     'server/routes/login.mjs',
     'server/routes/presenca.mjs',
     'server/routes/chat.mjs',
@@ -55,6 +59,8 @@ const requiredFiles = [
     'server/routes/topicos.mjs',
     'server/routes/premio.mjs',
     'server/routes/patente.mjs',
+    'server/routes/missoes.mjs',
+    'server/routes/notificacoes.mjs',
     'server/routes/admin-users.mjs',
     'server/routes/admin-catalogo.mjs',
     'server/routes/admin-questions.mjs',
@@ -87,6 +93,7 @@ const requiredFiles = [
     'supabase/migration-v4.41-52-patentes-ranking.sql',
     'supabase/migration-v4.42-ranking-todos-usuarios.sql',
     'supabase/migration-v4.43.2-adm-vitalicio.sql',
+    'supabase/migration-v4.44.1-xp-missoes-notificacoes.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -116,6 +123,7 @@ const migration439 = await readFile('supabase/migration-v4.39-patentes-ranking.s
 const migration441 = await readFile('supabase/migration-v4.41-52-patentes-ranking.sql', 'utf8');
 const migration442 = await readFile('supabase/migration-v4.42-ranking-todos-usuarios.sql', 'utf8');
 const migration4432 = await readFile('supabase/migration-v4.43.2-adm-vitalicio.sql', 'utf8');
+const migration444 = await readFile('supabase/migration-v4.44.1-xp-missoes-notificacoes.sql', 'utf8');
 const badges = await readFile('public/app/foundation/badges.js', 'utf8');
 const dashboardView = await readFile('public/views/dashboard.html', 'utf8');
 const quizView = await readFile('public/views/quiz.html', 'utf8');
@@ -507,6 +515,12 @@ for (const marker of ['left join public.respostas', 'inclusive pendentes']) {
     if (!migration442.includes(marker)) throw new Error(`Ranking completo v4.42 incompleto: ${marker}`);
 }
 if (!routeNames.has('patente')) throw new Error('Rota individual de patente v4.39 ausente.');
+for (const route of ['missoes', 'notificacoes']) {
+    if (!routeNames.has(route)) throw new Error(`Rota v4.44 ausente: ${route}`);
+}
+for (const marker of ['xp_eventos', 'notificacoes', 'conceder_xp', 'retroativo-v1', 'bonus-plano-', 'xp_total']) {
+    if (!migration444.includes(marker)) throw new Error(`Progressão v4.44 incompleta: ${marker}`);
+}
 
 const migration418 = await readFile('supabase/migration-v4.18-sessao-mesmo-dispositivo.sql', 'utf8');
 for (const marker of ['sessao_ativa_device_hash', 'p_device_hash text', 'sessao_ativa_device_hash = p_device_hash']) {
@@ -516,4 +530,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.43.3: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.44.1: verificações estruturais concluídas.');

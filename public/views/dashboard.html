@@ -249,4 +249,38 @@
             </div>
         </section>
     </div>
+
+    <div class="modal-overlay progression-overlay hidden" id="notificationsModal" role="dialog" aria-modal="true" aria-labelledby="notificationsTitle">
+        <section class="report-modal progression-modal notifications-modal">
+            <header class="progression-modal-header">
+                <span class="progression-modal-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M6.7 10.2c0-3.3 2.1-5.8 5.3-5.8s5.3 2.5 5.3 5.8v3.2l1.6 2.4H5.1l1.6-2.4v-3.2Z"/><path d="M9.7 18.1c.5.9 1.2 1.4 2.3 1.4s1.8-.5 2.3-1.4"/></svg>
+                </span>
+                <div><small>Central</small><h2 id="notificationsTitle">Notificações</h2></div>
+                <button class="progression-close" id="notificationsClose" type="button" aria-label="Fechar notificações">×</button>
+            </header>
+            <div class="progression-toolbar"><span id="notificationsStatus">Avisos importantes da sua conta</span><button id="markAllNotifications" type="button">Marcar todas como lidas</button></div>
+            <div class="notification-list" id="notificationsList"><div class="progression-empty">Carregando notificações…</div></div>
+        </section>
+    </div>
+
+    <div class="modal-overlay progression-overlay hidden" id="missionsModal" role="dialog" aria-modal="true" aria-labelledby="missionsTitle">
+        <section class="report-modal progression-modal missions-modal">
+            <header class="progression-modal-header">
+                <span class="progression-modal-icon mission-symbol" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M5 20V5.1M6 6h10l-2.5 3L16 12H6"/><circle cx="18.2" cy="17.2" r="2.4"/><path d="m17.1 17.2.7.7 1.5-1.6"/></svg>
+                </span>
+                <div><small>Progressão</small><h2 id="missionsTitle">Missões</h2></div>
+                <button class="progression-close" id="missionsClose" type="button" aria-label="Fechar missões">×</button>
+            </header>
+            <div class="xp-summary">
+                <div><span>XP acumulado</span><strong id="missionsXp">0 XP</strong></div>
+                <div><span>Patente atual</span><strong id="missionsPatent">—</strong></div>
+                <div class="xp-summary-progress"><i id="missionsPatentProgress"></i></div>
+                <small id="missionsNextPatent">Carregando progresso…</small>
+            </div>
+            <div class="mission-list" id="missionsList"><div class="progression-empty">Carregando missões…</div></div>
+            <button class="mission-rules-link" id="openXpRulesTopic" type="button">Ver regras de XP e tabela completa de patentes</button>
+        </section>
+    </div>
 </section>

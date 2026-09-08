@@ -3,6 +3,7 @@ import { requireUser } from '../platform/auth.mjs';
 import { json, parseBody } from '../platform/http.mjs';
 import { consumeRateLimit } from '../platform/rate-limit.mjs';
 import { cleanText, graphemeLength } from '../platform/community-access.mjs';
+import { createNotifications } from '../platform/notifications.mjs';
 
 async function ownConversation(user) {
     const { data, error } = await db().from('suporte_conversas')
@@ -81,13 +82,29 @@ export const handler = async (event) => {
             const conversation = await conversationFor(user, body.conversa_id);
             if (!conversation) return json(404, { erro: 'Conversa de suporte não encontrada.' });
 
-            const { error } = await db().from('suporte_mensagens').insert({
+            const { data: savedMessage, error } = await db().from('suporte_mensagens').insert({
                 conversa_id: conversation.id,
                 autor_id: user.id,
                 mensagem: content,
-            });
+            }).select('id').single();
             if (error) throw error;
             await db().from('suporte_conversas').update({ status: 'aberta', atualizado_em: new Date().toISOString() }).eq('id', conversation.id);
+            let recipients = [];
+            if (user.perfil === 'supremo') {
+                recipients = [conversation.usuario_id];
+            } else {
+                const { data: developers } = await db().from('usuarios').select('id').eq('perfil', 'supremo').eq('ativo', true);
+                recipients = (developers || []).map((developer) => developer.id);
+            }
+            await createNotifications(recipients.filter((id) => id !== user.id).map((id) => ({
+                usuario_id: id,
+                tipo: 'suporte',
+                titulo: 'Nova mensagem no suporte',
+                mensagem: user.perfil === 'supremo' ? 'O Desenvolvedor respondeu ao seu atendimento.' : `${user.nome} enviou uma mensagem ao suporte.`,
+                acao: 'suporte',
+                referencia_id: conversation.id,
+                chave: `suporte:${savedMessage.id}:${id}`,
+            }))).catch((notificationError) => console.error('Falha ao notificar suporte:', notificationError.message));
             return json(201, { ok: true });
         }
 

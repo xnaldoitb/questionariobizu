@@ -10,11 +10,11 @@ const [performance, patents, css, crown, worker] = await Promise.all([
 ]);
 
 assert(performance.includes("index === 0"));
-assert(performance.includes("patentButtonMarkup(entry.acertos, { papirao: true })"));
+assert(performance.includes("patentButtonMarkup(entry.xp_total, { papirao: true })"));
 assert(patents.includes('podium-champion-crown'));
 assert(patents.includes("coroa-papirao.svg"));
 assert(patents.includes('data-papirao="true"'));
-assert(performance.includes("<span class=\"podium-position\">${rankBadge(index)} ${index + 1}º</span>${patentButtonMarkup(entry.acertos, { developer: developerEntry(entry), admin: adminEntry(entry) })}"));
+assert(performance.includes("<span class=\"podium-position\">${rankBadge(index)} ${index + 1}º</span>${patentButtonMarkup(entry.xp_total, { developer: developerEntry(entry), admin: adminEntry(entry) })}"));
 assert(!performance.includes('ranking-avatar'));
 assert(performance.includes('class="podium-name-line"'));
 assert(performance.includes('class="podium-account-badges"'));

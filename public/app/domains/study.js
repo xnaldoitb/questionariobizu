@@ -261,6 +261,12 @@ async function submitAnswer(answerIndex) {
             }),
         });
 
+        if (Number(data.xp_ganho || 0) > 0) {
+            document.dispatchEvent(new CustomEvent('quiz:xp-changed', {
+                detail: { ganho: Number(data.xp_ganho), total: Number(data.xp_total || 0) },
+            }));
+        }
+
         appState.quiz.stats.answered += 1;
         if (data.acertou) appState.quiz.stats.correct += 1;
 

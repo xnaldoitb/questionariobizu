@@ -4,6 +4,7 @@ import { json, parseBody } from '../platform/http.mjs';
 import { consumeRateLimit } from '../platform/rate-limit.mjs';
 import { cleanupCommunity, listActiveUsers, touchPresence } from '../platform/community.mjs';
 import { cleanText, graphemeLength, roomForUser } from '../platform/community-access.mjs';
+import { createNotifications } from '../platform/notifications.mjs';
 
 const MAX_MESSAGE_LENGTH = 400;
 const MESSAGE_LIMIT = 80;
@@ -68,6 +69,22 @@ export const handler = async (event) => {
                 .insert({ sala_id: room.id, usuario_id: user.id, mensagem: message })
                 .select('id,mensagem,criado_em').single();
             if (error) throw error;
+
+            if (room.tipo === 'privada') {
+                const { data: members, error: memberError } = await db().from('chat_sala_membros')
+                    .select('usuario_id').eq('sala_id', room.id).neq('usuario_id', user.id);
+                if (!memberError) {
+                    await createNotifications((members || []).map((member) => ({
+                        usuario_id: member.usuario_id,
+                        tipo: 'chat_privado',
+                        titulo: `Nova mensagem em ${room.nome}`,
+                        mensagem: `${user.nome}: ${message}`,
+                        acao: 'chat',
+                        referencia_id: room.id,
+                        chave: `chat:${data.id}:${member.usuario_id}`,
+                    }))).catch((notificationError) => console.error('Falha ao notificar chat privado:', notificationError.message));
+                }
+            }
 
             return json(201, {
                 mensagem: {

@@ -229,8 +229,8 @@ async function refreshRanking() {
             ? podium.map((entry, index) => `
                 <article class="podium-card podium-${index + 1}">
                     <div class="podium-emblem-row">${index === 0
-                        ? patentButtonMarkup(entry.acertos, { papirao: true })
-                        : `<span class="podium-position">${rankBadge(index)} ${index + 1}º</span>${patentButtonMarkup(entry.acertos, { developer: developerEntry(entry), admin: adminEntry(entry) })}`}</div>
+                        ? patentButtonMarkup(entry.xp_total, { papirao: true })
+                        : `<span class="podium-position">${rankBadge(index)} ${index + 1}º</span>${patentButtonMarkup(entry.xp_total, { developer: developerEntry(entry), admin: adminEntry(entry) })}`}</div>
                     <div class="podium-identity">
                         <div class="podium-name-line"><strong>${safeText(entry.nome)}</strong></div>
                         <div class="podium-account-badges">${accountBadges(entry)}</div>
@@ -248,7 +248,7 @@ async function refreshRanking() {
             ? ranking.map((entry, index) => `
                 <article class="ranking-card ${index < 3 ? 'is-top' : ''} ${entry.usuario === appState.user.usuario ? 'is-me' : ''}">
                     <span class="ranking-position">${index + 1}º</span>
-                    <div class="ranking-card-emblem">${patentButtonMarkup(entry.acertos, { developer: developerEntry(entry), admin: adminEntry(entry) })}</div>
+                    <div class="ranking-card-emblem">${patentButtonMarkup(entry.xp_total, { developer: developerEntry(entry), admin: adminEntry(entry) })}</div>
                     <div class="ranking-person">
                         <div class="ranking-name-line"><strong>${safeText(entry.nome)}</strong></div>
                         <div class="ranking-account-badges">${accountBadges(entry)}</div>

@@ -12,6 +12,7 @@ const CHAT_REFRESH_MS = 10_000;
 const SUPPORT_REFRESH_MS = 12_000;
 const ACTIVITY_PING_THROTTLE_MS = 30_000;
 const PATENT_GUIDE_TOPIC_ID = 'guia-patentes';
+const XP_RULES_TOPIC_ID = 'regras-xp';
 
 let initialized = false;
 let onlineUsers = [];
@@ -140,7 +141,8 @@ async function refreshChat({ quiet = true } = {}) {
     } catch (error) { if (!quiet) notify(error.message); }
 }
 
-async function openChat() {
+export async function openCommunityChat(roomId = null) {
+    if (roomId) currentRoomId = String(roomId);
     openModal('chatModal');
     try { await loadRooms(); await refreshChat({ quiet: false }); }
     catch (error) { notify(error.message); }
@@ -205,7 +207,8 @@ async function loadSupport({ quiet = false } = {}) {
     } catch (error) { if (!quiet) notify(error.message); }
 }
 
-async function openSupport() {
+export async function openCommunitySupport(conversationId = null) {
+    if (conversationId) supportConversationId = String(conversationId);
     openModal('supportModal');
     await loadSupport();
     one('#supportInput')?.focus();
@@ -228,9 +231,14 @@ const categoryNames = { duvida: 'Dúvida', discussao: 'Discussão', estudo: 'Est
 function renderTopics(items) {
     const list = one('#topicList');
     list.classList.remove('hidden');
+    const xpGuide = `<button class="topic-card system-topic-card xp-system-topic" type="button" data-topic-id="${XP_RULES_TOPIC_ID}">
+        <span class="topic-category category-aviso">Guia oficial</span>
+        <strong>XP, missões e progressão</strong><p>Veja como ganhar XP, os bônus de assinatura e quanto é necessário para cada patente.</p>
+        <small>Questionário Bizu · tópico fixo</small>
+    </button>`;
     const patentGuide = `<button class="topic-card system-topic-card" type="button" data-topic-id="${PATENT_GUIDE_TOPIC_ID}">
         <span class="topic-category category-aviso">Guia oficial</span>
-        <strong>Patentes do Ranking</strong><p>Conheça todas as insígnias, faixas de acertos e o significado de cada patente.</p>
+        <strong>Patentes do Ranking</strong><p>Conheça todas as insígnias e o significado de cada patente.</p>
         <small>Questionário Bizu · tópico fixo</small>
     </button>`;
     const userTopics = items.map((topic) => `<button class="topic-card" type="button" data-topic-id="${topic.id}">
@@ -238,7 +246,7 @@ function renderTopics(items) {
         <strong>${safeText(topic.titulo)}</strong><p>${safeText(topic.conteudo)}</p>
         <small>${safeText(topic.usuarios?.nome || 'Usuário')} · ${safeText(formatTime(topic.atualizado_em, true))}${topic.fechado ? ' · Encerrado' : ''}</small>
     </button>`).join('');
-    list.innerHTML = patentGuide + (userTopics || '<div class="chat-empty">Nenhum outro tópico ainda.</div>');
+    list.innerHTML = xpGuide + patentGuide + (userTopics || '<div class="chat-empty">Nenhum outro tópico ainda.</div>');
 }
 
 async function loadTopics() {
@@ -247,6 +255,42 @@ async function loadTopics() {
 }
 
 async function openTopic(id) {
+    if (String(id) === XP_RULES_TOPIC_ID) {
+        activeTopicId = XP_RULES_TOPIC_ID;
+        one('#topicList').classList.add('hidden');
+        one('#topicForm').classList.add('hidden');
+        const rows = PATENTS.map((patent) => `<tr>
+            <td>${patentInsigniaMarkup(patent.min, { compact: true, decorative: true })}</td>
+            <td><strong>${safeText(patent.name)}</strong></td>
+            <td><strong>${patent.min.toLocaleString('pt-BR')} XP</strong></td>
+        </tr>`).join('');
+        one('#topicDetailContent').innerHTML = `<header class="topic-detail-head">
+            <span class="topic-category category-aviso">Guia oficial</span>
+            <h3>XP, missões e progressão</h3>
+            <small>Questionário Bizu · tópico fixo</small>
+        </header>
+        <p class="topic-main-content">O XP mede sua evolução de estudo e define sua patente. A colocação do ranking continua sendo determinada pelos acertos; por isso, bônus e missões ajudam na patente sem alterar artificialmente o resultado competitivo.</p>
+        <div class="xp-rules-grid">
+            <article><strong>+10 XP</strong><span>Primeiro acerto em cada questão</span></article>
+            <article><strong>+3 XP</strong><span>Revisão correta após pelo menos 24 horas</span></article>
+            <article><strong>+4 XP</strong><span>Corrigir uma questão errada pela primeira vez</span></article>
+            <article><strong>+20 XP</strong><span>Finalizar um simulado com 20 ou mais respostas</span></article>
+            <article><strong>+30 / +60 XP</strong><span>Alcançar 80% / 90% em um simulado</span></article>
+            <article><strong>+25 XP</strong><span>Acertar 10 questões seguidas</span></article>
+            <article><strong>+40 XP</strong><span>Estudar 3 disciplinas no mesmo dia</span></article>
+            <article><strong>+150 XP</strong><span>Dominar um capítulo: 30 questões e 80% de acertos</span></article>
+            <article><strong>+200 XP</strong><span>Estudar por 7 dias consecutivos</span></article>
+        </div>
+        <h4 class="xp-topic-subtitle">Bônus único por plano</h4>
+        <p class="topic-main-content">Premium concede <strong>500 XP</strong>, Plus concede <strong>1.200 XP</strong> e VIP concede <strong>2.500 XP</strong>. Em um upgrade, o usuário recebe somente a diferença; renovar o mesmo plano não repete o bônus.</p>
+        <h4 class="xp-topic-subtitle">XP necessário para cada patente</h4>
+        <div class="patent-guide-table-wrap"><table class="patent-guide-table xp-patent-table">
+            <thead><tr><th>Insígnia</th><th>Patente</th><th>XP mínimo</th></tr></thead><tbody>${rows}</tbody>
+        </table></div>`;
+        one('#topicReplyForm').classList.add('hidden');
+        one('#topicDetail').classList.remove('hidden');
+        return;
+    }
     if (String(id) === PATENT_GUIDE_TOPIC_ID) {
         activeTopicId = PATENT_GUIDE_TOPIC_ID;
         one('#topicList').classList.add('hidden');
@@ -286,10 +330,10 @@ async function openTopic(id) {
             <h3>Patentes do Ranking</h3>
             <small>Questionário Bizu · tópico fixo</small>
         </header>
-        <p class="topic-main-content">As 52 patentes representam sua evolução pelos acertos acumulados. Elas não alteram sua colocação, plano ou permissões. <strong>Oficial de Instrução</strong> e <strong>Comandante do Código</strong> são patentes institucionais. A coroa <strong>PAPIRÃO</strong> é uma conquista especial e temporária, exclusiva do primeiro colocado no Top 3.</p>
+        <p class="topic-main-content">As 52 patentes representam sua evolução pelo XP acumulado. Elas não alteram sua colocação, plano ou permissões. <strong>Oficial de Instrução</strong> e <strong>Comandante do Código</strong> são patentes institucionais. A coroa <strong>PAPIRÃO</strong> é uma conquista especial e temporária, exclusiva do primeiro colocado no Top 3.</p>
         <div class="patent-guide-table-wrap">
             <table class="patent-guide-table">
-                <thead><tr><th>Insígnia</th><th>Patente e símbolo</th><th>Acertos</th><th>Significado</th></tr></thead>
+                <thead><tr><th>Insígnia</th><th>Patente e símbolo</th><th>XP</th><th>Significado</th></tr></thead>
                 <tbody>${rows}</tbody>
             </table>
         </div>`;
@@ -317,6 +361,11 @@ async function openTopics() {
     await loadTopics().catch((error) => notify(error.message));
 }
 
+export async function openXpRulesTopic() {
+    await openTopics();
+    await openTopic(XP_RULES_TOPIC_ID);
+}
+
 async function submitTopic(event) {
     event.preventDefault();
     try {
@@ -341,8 +390,8 @@ async function submitTopicReply(event) {
 
 function bindCommunityUi() {
     bindEmojiPicker();
-    one('#openChatBtn')?.addEventListener('click', openChat);
-    one('#openSupportBtn')?.addEventListener('click', openSupport);
+    one('#openChatBtn')?.addEventListener('click', () => openCommunityChat());
+    one('#openSupportBtn')?.addEventListener('click', () => openCommunitySupport());
     one('#openTopicsBtn')?.addEventListener('click', openTopics);
     [['chatClose', 'chatModal'], ['supportClose', 'supportModal'], ['topicsClose', 'topicsModal']].forEach(([button, modal]) => one(`#${button}`)?.addEventListener('click', () => closeModal(modal)));
     ['chatModal', 'supportModal', 'topicsModal'].forEach((id) => one(`#${id}`)?.addEventListener('click', (event) => { if (event.target === event.currentTarget) closeModal(id); }));

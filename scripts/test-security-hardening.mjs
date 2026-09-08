@@ -21,10 +21,13 @@ mock('http.mjs', {
 });
 mock('question-access.mjs', { questionAccessDeniedResponse:()=>({erro:'bloqueado'}) });
 mock('rate-limit.mjs', { consumeRateLimit:async()=>({allowed:rateAllowed,unavailable:false}) });
+mock('xp.mjs', { awardAnswerXp:async()=>({xp_ganho:0,xp_total:0,missoes_concluidas:[]}) });
 mock('db.mjs', { db:()=>({ from:(table)=>{
     const query = {
         select:()=>query,
         eq:()=>query,
+        order:()=>query,
+        limit:async()=>({data:[],error:null}),
         maybeSingle:async()=>({
             data: table === 'sessoes' ? session : table === 'respostas' ? existing : null,
             error:null,

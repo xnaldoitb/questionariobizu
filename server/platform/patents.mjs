@@ -1,4 +1,4 @@
-export const PATENTS = [
+const LEGACY_PATENTS = [
     [0, 'Aspirante do Bizu'], [20, 'Recruta do Conhecimento'], [50, 'Soldado das Questões'],
     [100, 'Cabo da Estratégia'], [175, 'Sargento do Gabarito'],
     [275, 'Terceiro-Sargento do Estudo I'], [400, 'Terceiro-Sargento do Estudo II'],
@@ -25,7 +25,11 @@ export const PATENTS = [
     [26800, 'Major-General do Conhecimento'], [27950, 'Tenente-General das Questões'],
     [29100, 'General do Bizu'], [30300, 'Comandante do Saber'],
     [32000, 'Herói do Conhecimento'],
-].map(([min, name], level) => ({ min, name, level }));
+];
+
+// O novo sistema usa XP. Multiplicar os marcos antigos por 10 preserva a
+// patente conquistada por quem já estudava antes da versão 4.44.
+export const PATENTS = LEGACY_PATENTS.map(([min, name], level) => ({ min: min * 10, name, level }));
 
 export function patentForHits(value) {
     const hits = Math.max(0, Number(value) || 0);
@@ -48,6 +52,8 @@ export function patentStatus(value) {
         minimo: current.min,
         proxima: next?.name || null,
         proximo_minimo: next?.min || null,
+        xp: hits,
+        // Mantido por compatibilidade durante a atualização dos clientes.
         acertos: hits,
         faltam: next ? Math.max(next.min - hits, 0) : 0,
         progresso: progress,

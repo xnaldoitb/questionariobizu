@@ -39,7 +39,7 @@ function renderPatentModal({ hits = 0, papirao = false, developer = false, admin
         : admin
         ? 'Exclusiva dos administradores'
         : progress.next
-        ? `${progress.remaining} acertos para ${progress.next.name}`
+        ? `${progress.remaining.toLocaleString('pt-BR')} XP para ${progress.next.name}`
         : 'Patente máxima alcançada';
     const progressValue = developer || admin ? 100 : progress.progress;
     one('#patentProgressBar').style.width = `${progressValue}%`;
@@ -109,7 +109,7 @@ export async function checkPatentNotification() {
         }
         notificationOpen = true;
         renderPatentModal({
-            hits: data.patente?.acertos || 0,
+            hits: data.patente?.xp ?? data.patente?.acertos ?? 0,
             papirao: Boolean(data.notificar_papirao),
             achievement: true,
         });

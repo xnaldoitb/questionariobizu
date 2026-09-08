@@ -17,6 +17,8 @@ import { handler as suporte } from '../server/routes/suporte.mjs';
 import { handler as topicos } from '../server/routes/topicos.mjs';
 import { handler as premio } from '../server/routes/premio.mjs';
 import { handler as patente } from '../server/routes/patente.mjs';
+import { handler as missoes } from '../server/routes/missoes.mjs';
+import { handler as notificacoes } from '../server/routes/notificacoes.mjs';
 import { handler as pagamentoCriar } from '../server/routes/pagamento-criar.mjs';
 import { handler as pagamentoStatus } from '../server/routes/pagamento-status.mjs';
 import { handler as pagamentoWebhook } from '../server/routes/pagamento-webhook.mjs';
@@ -53,6 +55,8 @@ const routes = new Map([
     ['topicos', topicos],
     ['premio', premio],
     ['patente', patente],
+    ['missoes', missoes],
+    ['notificacoes', notificacoes],
     ['pagamento-criar', pagamentoCriar],
     ['pagamento-status', pagamentoStatus],
     ['pagamento-webhook', pagamentoWebhook],

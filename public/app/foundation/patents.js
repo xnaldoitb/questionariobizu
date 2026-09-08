@@ -13,7 +13,7 @@ const FAMILY_DETAILS = {
     hero: ['Estrela heroica em vermelho e dourado', 'A maior patente permanente do Questionário Bizu.'],
 };
 
-const DEFINITIONS = [
+const LEGACY_DEFINITIONS = [
     [0, 'Aspirante do Bizu', 'trainee', 1],
     [20, 'Recruta do Conhecimento', 'enlisted', 1],
     [50, 'Soldado das Questões', 'enlisted', 2],
@@ -67,6 +67,10 @@ const DEFINITIONS = [
     [30300, 'Comandante do Saber', 'general', 5],
     [32000, 'Herói do Conhecimento', 'hero', 5],
 ];
+
+// Os limites originais eram baseados em acertos. A partir da v4.44 cada marco
+// vale dez vezes mais e passa a representar XP, sem rebaixar usuários antigos.
+const DEFINITIONS = LEGACY_DEFINITIONS.map(([min, name, family, grade]) => [min * 10, name, family, grade]);
 
 export const PATENTS = DEFINITIONS.map(([min, name, family, grade], level) => ({
     min,

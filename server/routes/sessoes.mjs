@@ -2,6 +2,7 @@ import { db } from '../platform/db.mjs';
 import { requireUser } from '../platform/auth.mjs';
 import { json, parseBody } from '../platform/http.mjs';
 import { questionAccessDeniedResponse } from '../platform/question-access.mjs';
+import { awardSessionXp } from '../platform/xp.mjs';
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 50;
@@ -191,6 +192,12 @@ export const handler = async (event) => {
     if (event.httpMethod === 'DELETE') {
         const { error } = await db().from('sessoes').delete().eq('usuario_id', user.id);
         if (error) return json(500, { erro: 'Não foi possível apagar o histórico.' });
+        const { error: xpDeleteError } = await db().from('xp_eventos').delete()
+            .eq('usuario_id', user.id).neq('tipo', 'plano');
+        if (!xpDeleteError) {
+            await db().from('usuarios').update({ xp_total: Number(user.xp_bonus_plano || 0) }).eq('id', user.id);
+            await db().from('notificacoes').delete().eq('usuario_id', user.id).in('tipo', ['missao', 'patente']);
+        }
         const { error: notificationError } = await db().from('usuarios').update({
             patente_notificada_nivel: 0,
             papirao_notificado: false,
@@ -279,7 +286,11 @@ export const handler = async (event) => {
             .select()
             .single();
 
-        return error ? json(500, { erro: 'Não foi possível finalizar o simulado.' }) : json(200, { sessao: data });
+        if (error) return json(500, { erro: 'Não foi possível finalizar o simulado.' });
+        let xpGanho = 0;
+        try { xpGanho = await awardSessionXp(user.id, data); }
+        catch (xpError) { console.error('Sessão finalizada, mas falhou ao conceder XP:', xpError.message); }
+        return json(200, { sessao: data, xp_ganho: xpGanho });
     }
 
     return json(405, { erro: 'Método não permitido.' });

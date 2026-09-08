@@ -13,6 +13,7 @@ import { bindStudyEvents } from './domains/study.js';
 import { bindStudyFilterModals } from './domains/study-filter-modals.js';
 import { bindPerformanceEvents } from './domains/performance.js';
 import { startCommunity } from './domains/community.js';
+import { startProgression } from './domains/progression.js';
 import { bindPaymentEvents, preloadPaymentPlans, startAccessIndicator } from './domains/access.js';
 import { bindRewardEvents, checkRewardNotification } from './domains/rewards.js';
 import { bindPatentEvents, checkPatentNotification } from './domains/patents.js';
@@ -79,7 +80,7 @@ async function refreshProfileSummary({ force = false } = {}) {
     one('#profileWarName').innerHTML = `${safeText(appState.user.nome)} ${accountBadges(appState.user)}`;
     one('#profileKicker').textContent = roleConnectedLabel(appState.user.perfil);
     one('#profileRegistration').textContent = `AL SD PM Nº: ${appState.user.usuario}`;
-    renderProfilePatent(Number(one('#profileCorrect')?.textContent || 0));
+    renderProfilePatent(Number(appState.user.xp_total || 0));
 
     if (!force && Date.now() - lastProfileRefresh < PROFILE_REFRESH_MS) return;
 
@@ -97,7 +98,7 @@ async function refreshProfileSummary({ force = false } = {}) {
         one('#profileRanking').textContent = index >= 0 ? `${index + 1}º` : '—';
         one('#profileAnswered').textContent = current?.respondidas || 0;
         one('#profileCorrect').textContent = current?.acertos || 0;
-        const patentAdvanced = renderProfilePatent(current?.acertos || 0);
+        const patentAdvanced = renderProfilePatent(current?.xp_total || 0);
         lastProfileRefresh = Date.now();
         return { patentAdvanced };
     } catch {
@@ -113,6 +114,7 @@ async function enterWorkspace() {
     await refreshProfileSummary();
     startAccessIndicator();
     startCommunity();
+    startProgression();
     applyManagementAccess();
     await refreshCatalog();
     openScreen('dashboard');
@@ -147,6 +149,12 @@ function bindPrimaryNavigation() {
     document.addEventListener('quiz:progress-changed', async () => {
         const update = await refreshProfileSummary({ force: true });
         if (update?.patentAdvanced) checkPatentNotification();
+    });
+    document.addEventListener('quiz:xp-changed', (event) => {
+        const total = Number(event.detail?.total || 0);
+        appState.user.xp_total = total;
+        const advanced = renderProfilePatent(total);
+        if (advanced) checkPatentNotification();
     });
     document.addEventListener('quiz:access-changed', () => {
         one('#profileWarName').innerHTML = `${safeText(appState.user.nome)} ${accountBadges(appState.user)}`;
