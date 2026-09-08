@@ -18,7 +18,7 @@ assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map(roundMissionTarget), [3, 6, 9, 12, 15
 assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(25, stage)), [25, 50, 75, 100]);
 assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map((stage) => progressiveMissionReward(40, stage, 6)), [40, 80, 120, 160, 200, 240, 240]);
 
-const [migration, xp, responder, sessions, notifications, missions, router, topbar, dashboard, progression, community, ranking, patent, index, worker] = await Promise.all([
+const [migration, xp, responder, sessions, notifications, missions, router, topbar, dashboard, quiz, fragments, progression, community, ranking, patent, index, worker] = await Promise.all([
     readFile('supabase/migration-v4.44.1-xp-missoes-notificacoes.sql', 'utf8'),
     readFile('server/platform/xp.mjs', 'utf8'),
     readFile('server/routes/responder.mjs', 'utf8'),
@@ -28,6 +28,8 @@ const [migration, xp, responder, sessions, notifications, missions, router, topb
     readFile('api/[...route].js', 'utf8'),
     readFile('public/views/topbar.html', 'utf8'),
     readFile('public/views/dashboard.html', 'utf8'),
+    readFile('public/views/quiz.html', 'utf8'),
+    readFile('public/app/foundation/fragments.js', 'utf8'),
     readFile('public/app/domains/progression.js', 'utf8'),
     readFile('public/app/domains/community.js', 'utf8'),
     readFile('server/routes/ranking.mjs', 'utf8'),
@@ -49,12 +51,17 @@ assert(router.includes("['missoes', missoes]") && router.includes("['notificacoe
 for (const id of ['notificationsBtn', 'missionsBtn']) assert(topbar.includes(`id="${id}"`));
 assert(topbar.includes('<div class="action-brand action-brand-static"') && !topbar.includes('<button class="action-brand"'));
 for (const id of ['notificationsModal', 'missionsModal', 'notificationsClose', 'missionsClose']) assert(dashboard.includes(`id="${id}"`));
+for (const id of ['quizNotificationsBtn', 'quizMissionsBtn']) assert(quiz.includes(`id="${id}"`) && progression.includes(`#${id}`));
+for (const id of ['chatModal', 'supportModal', 'topicsModal', 'notificationsModal', 'missionsModal']) assert(fragments.includes(`'${id}'`));
 assert(progression.includes("requestJson('notificacoes')") && progression.includes("requestJson('missoes')") && progression.includes('mission-group-title'));
+assert(progression.includes('scheduleMissionRefresh') && progression.includes('missionsRetry'));
+assert(missions.includes('limit: 90'));
+assert(xp.includes('Promise.allSettled') && xp.includes('awardsAvailable'));
 assert(community.includes("XP_RULES_TOPIC_ID = 'regras-xp'") && community.includes('XP necessário para cada patente'));
 assert(community.includes('Premium concede <strong>500 XP</strong>'));
 assert(community.includes('10, 20, 30…') && community.includes('3, 6, 9, 12, 15 e 18'));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.45.1'));
-assert(worker.includes('v4.45.1-recompensas-progressivas') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.45.2'));
+assert(worker.includes('v4.45.2-missoes-globais') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, notificações e tópico oficial v4.45 validados.');

@@ -71,14 +71,15 @@ export async function awardXp(userId, key, type, points, details = {}) {
 }
 
 async function recentResponses(userId, since = startOfLocalDay()) {
-    const { data, error } = await db().from('respostas')
-        .select('id,acertou,pulada,respondida_em,disciplina_id_snapshot,capitulo_id_snapshot')
-        .eq('usuario_id', userId)
-        .gte('respondida_em', since)
-        .order('respondida_em', { ascending: false })
-        .limit(5000);
-    if (error) throw error;
-    return data || [];
+    async function run(select) {
+        return db().from('respostas').select(select).eq('usuario_id', userId)
+            .gte('respondida_em', since).order('respondida_em', { ascending: false }).limit(5000);
+    }
+    let result = await run('id,acertou,pulada,respondida_em,disciplina_id_snapshot,capitulo_id_snapshot');
+    if (result.error?.code === '42703') result = await run('id,acertou,pulada,respondida_em,disciplina_id_snapshot');
+    if (result.error?.code === '42703') result = await run('id,acertou,pulada,respondida_em');
+    if (result.error) throw result.error;
+    return result.data || [];
 }
 
 function correctStreak(rows) {
@@ -120,12 +121,19 @@ export async function missionStatus(userId, { award = false } = {}) {
     const weekStart = startOfLocalWeek();
     const week = weekStart.slice(0, 10);
     const missionHistoryStart = new Date(Date.now() - 120 * DAY_MS).toISOString();
-    const [dailyRows, weeklyRows, streakDays, awardedKeys] = await Promise.all([
-        recentResponses(userId),
+    const [weeklyResult, streakResult, keysResult] = await Promise.allSettled([
         recentResponses(userId, weekStart),
         studyStreak(userId),
         awardedMissionKeys(userId, missionHistoryStart),
     ]);
+    const weeklyRows = weeklyResult.status === 'fulfilled' ? weeklyResult.value : [];
+    const dailyRows = weeklyRows.filter((row) => localDay(row.respondida_em) === day);
+    const streakDays = streakResult.status === 'fulfilled' ? streakResult.value : 0;
+    const awardedKeys = keysResult.status === 'fulfilled' ? keysResult.value : new Set();
+    const awardsAvailable = keysResult.status === 'fulfilled';
+    for (const result of [weeklyResult, streakResult, keysResult]) {
+        if (result.status === 'rejected') console.warn('Métrica de missão temporariamente indisponível:', result.reason?.message || result.reason);
+    }
     const validDaily = dailyRows.filter((row) => !row.pulada);
     const validWeekly = weeklyRows.filter((row) => !row.pulada);
     const disciplines = new Set(validDaily.map((row) => row.disciplina_id_snapshot).filter(Boolean)).size;
@@ -137,8 +145,14 @@ export async function missionStatus(userId, { award = false } = {}) {
     const newlyAwarded = new Set();
 
     async function grantMission({ id, key, title, points, details = {} }) {
-        if (!award || awardedKeys.has(key)) return false;
-        const result = await awardXp(userId, key, 'missao', points, { missao: id, dia: day, ...details });
+        if (!award || !awardsAvailable || awardedKeys.has(key)) return false;
+        let result;
+        try {
+            result = await awardXp(userId, key, 'missao', points, { missao: id, dia: day, ...details });
+        } catch (error) {
+            console.warn(`Prêmio da missão ${id} não pôde ser aplicado:`, error.message);
+            return false;
+        }
         // Mesmo se uma chamada paralela tiver concedido o prêmio primeiro, a
         // chave única passa a representar uma etapa concluída nesta resposta.
         awardedKeys.add(key);
@@ -258,8 +272,16 @@ export async function missionStatus(userId, { award = false } = {}) {
         })),
     ];
 
-    const { data: user, error } = await db().from('usuarios').select('xp_total,xp_bonus_plano').eq('id', userId).single();
-    if (error) throw error;
+    let { data: user, error } = await db().from('usuarios').select('xp_total,xp_bonus_plano').eq('id', userId).single();
+    if (error?.code === '42703') {
+        const fallback = await db().from('usuarios').select('xp_total').eq('id', userId).single();
+        user = fallback.data;
+        error = fallback.error;
+    }
+    if (error) {
+        console.warn('Resumo de XP temporariamente indisponível:', error.message);
+        user = { xp_total: 0, xp_bonus_plano: 0 };
+    }
     const patent = patentStatus(user?.xp_total || 0);
     return {
         xp_total: Number(user?.xp_total || 0),

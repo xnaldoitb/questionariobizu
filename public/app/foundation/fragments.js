@@ -54,4 +54,13 @@ export async function mountInterface() {
             <button class="update-later" id="dismissAppUpdate" type="button" aria-label="Lembrar depois">Depois</button>
         </aside>
     `;
+
+    // Estas janelas precisam permanecer fora da tela inicial. Durante um
+    // simulado, #dashboard fica oculto; mantê-las dentro dele fazia o clique
+    // funcionar sem que a janela pudesse aparecer.
+    const appView = root.querySelector('#appView');
+    for (const id of ['chatModal', 'supportModal', 'topicsModal', 'notificationsModal', 'missionsModal']) {
+        const modal = root.querySelector(`#${id}`);
+        if (modal) appView?.append(modal);
+    }
 }

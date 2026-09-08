@@ -5,6 +5,8 @@ import { openCommunityChat, openCommunitySupport, openXpRulesTopic } from './com
 const REFRESH_MS = 45_000;
 let initialized = false;
 let timer = null;
+let missionRefreshTimer = null;
+let missionRequest = null;
 let notifications = [];
 
 function openModal(id) {
@@ -133,13 +135,24 @@ function renderMissions(payload) {
 }
 
 async function loadMissions({ quiet = false } = {}) {
-    try { renderMissions(await requestJson('missoes')); }
-    catch (error) {
-        if (!quiet) {
-            one('#missionsList').innerHTML = '<div class="progression-empty">Não foi possível carregar as missões.</div>';
-            notify(error.message);
+    if (missionRequest) return missionRequest;
+    missionRequest = (async () => {
+        try { renderMissions(await requestJson('missoes')); }
+        catch (error) {
+            if (!quiet) {
+                one('#missionsList').innerHTML = `<div class="progression-empty"><strong>Não foi possível carregar as missões</strong><span>${safeText(error.message)}</span><button class="mission-rules-link" id="missionsRetry" type="button">Tentar novamente</button></div>`;
+                notify(error.message);
+            }
+        } finally {
+            missionRequest = null;
         }
-    }
+    })();
+    return missionRequest;
+}
+
+function scheduleMissionRefresh() {
+    clearTimeout(missionRefreshTimer);
+    missionRefreshTimer = setTimeout(() => loadMissions({ quiet: true }), 900);
 }
 
 async function openMissions() {
@@ -151,9 +164,16 @@ async function openMissions() {
 function bindUi() {
     one('#notificationsBtn')?.addEventListener('click', openNotifications);
     one('#missionsBtn')?.addEventListener('click', openMissions);
+    one('#quizNotificationsBtn')?.addEventListener('click', openNotifications);
+    one('#quizMissionsBtn')?.addEventListener('click', openMissions);
     one('#notificationsClose')?.addEventListener('click', () => closeModal('notificationsModal'));
     one('#missionsClose')?.addEventListener('click', () => closeModal('missionsModal'));
     one('#markAllNotifications')?.addEventListener('click', () => markAll().catch((error) => notify(error.message)));
+    one('#missionsList')?.addEventListener('click', (event) => {
+        if (!event.target.closest('#missionsRetry')) return;
+        one('#missionsList').innerHTML = '<div class="progression-empty">Carregando missões…</div>';
+        loadMissions();
+    });
     one('#notificationsList')?.addEventListener('click', (event) => {
         const button = event.target.closest('[data-notification-id]');
         const item = notifications.find((entry) => String(entry.id) === button?.dataset.notificationId);
@@ -172,8 +192,8 @@ function bindUi() {
             closeModal('missionsModal');
         }
     });
-    document.addEventListener('quiz:progress-changed', () => loadMissions({ quiet: true }));
-    document.addEventListener('quiz:xp-changed', () => loadMissions({ quiet: true }));
+    document.addEventListener('quiz:progress-changed', scheduleMissionRefresh);
+    document.addEventListener('quiz:xp-changed', scheduleMissionRefresh);
 }
 
 export function startProgression() {
