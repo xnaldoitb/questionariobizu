@@ -4,15 +4,20 @@ import { readFile } from 'node:fs/promises';
 let actor = { id:'admin',perfil:'admin' };
 const target = { id:'student',perfil:'aluno',ativo:true,status_aprovacao:'aprovado',vip:false,acesso_teste:true,responsavel_admin_id:'admin' };
 let saved;
+let gifted;
+let giftNotification;
 const context = vm.createContext({Date,JSON,Boolean,String,Number,Set,Map,console});
 const modules = new Map();
 let loginLimitCleared = false;
 function mock(name,exports) { const m=new vm.SyntheticModule(Object.keys(exports),function(){for(const [k,v] of Object.entries(exports))this.setExport(k,v);},{context,identifier:name});modules.set(name,m); }
 mock('bcryptjs',{default:{hash:async()=> 'test-hash'}});
+mock('node:crypto',{randomUUID:()=> '00000000-0000-4000-8000-000000000047'});
 mock('auth.mjs',{requireUser:async()=>actor});
 mock('question-access.mjs',{resolveQuestionAccess:()=>({})});
 mock('admin-audit.mjs',{auditAdmin:async()=>true});
 mock('rate-limit.mjs',{clearRateLimit:async()=>{loginLimitCleared=true;}});
+mock('xp.mjs',{awardXp:async(id,key,type,points,details)=>{gifted={id,key,type,points,details};return {applied:true,xpTotal:points};}});
+mock('notifications.mjs',{createNotification:async(record)=>{giftNotification=record;}});
 mock('db.mjs',{db:()=>({from:()=>{
     const q = {select:()=>q,eq:()=>q,neq:()=>q,in:()=>q,delete:()=>q,maybeSingle:async()=>({data:target,error:null}),
         update:payload=>{saved=payload;return q;},insert:payload=>{saved=payload;return q;},
@@ -42,6 +47,12 @@ target.vip=true;
 assert.equal((await call('PUT',{id:target.id,action:'set_validity',validade_ate:date})).statusCode,200);
 assert.equal(saved.vip,false);
 actor.perfil='supremo';
+const giftResponse=await call('PUT',{id:target.id,action:'gift_xp',pontos:750,motivo:'Destaque nos estudos'});
+assert.equal(giftResponse.statusCode,200);
+assert.equal(gifted.points,750);
+assert.equal(gifted.type,'presente');
+assert.equal(giftNotification.usuario_id,target.id);
+assert(giftNotification.mensagem.includes('750 XP'));
 assert.equal((await call('PUT',{id:target.id,action:'set_validity',vitalicio:true})).statusCode,200);
 assert.equal(saved.vip,true);
 assert.equal(saved.premium,false);

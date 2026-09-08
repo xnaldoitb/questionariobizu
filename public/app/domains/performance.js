@@ -268,11 +268,11 @@ async function refreshRanking() {
 }
 
 async function resetOwnResults(label) {
-    if (!confirm(`Resetar seu ${label}? Esta ação apagará os resultados utilizados no histórico e no ranking.`)) return;
+    if (!confirm(`Resetar seu ${label}? Esta ação apagará somente as respostas usadas no histórico e no ranking. Seu XP, suas missões e sua patente serão mantidos.`)) return;
 
     try {
         await requestJson('sessoes', { method: 'DELETE' });
-        notify('Resultados resetados.');
+        notify('Histórico e ranking limpos. XP e patente preservados.', 4800);
         await Promise.all([refreshHistory(), refreshRanking()]);
         document.dispatchEvent(new CustomEvent('quiz:progress-changed'));
     } catch (error) {

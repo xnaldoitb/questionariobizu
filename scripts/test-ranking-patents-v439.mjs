@@ -116,7 +116,8 @@ assert(route.includes(".select('patente_notificada_nivel,papirao_notificado,xp_t
 assert(route.includes("['admin', 'supremo'].includes(user.perfil)") && route.includes('!institutional'));
 assert(router.includes("['patente', patente]"));
 assert(migration.includes('between 0 and 51') && migration.includes('patente_notificada_nivel'));
-assert(sessions.includes('patente_notificada_nivel: 0') && sessions.includes('papirao_notificado: false'));
+assert(sessions.includes('xp_preservado: true'));
+assert(!sessions.includes('patente_notificada_nivel: 0') && !sessions.includes('papirao_notificado: false'));
 assert(rankingRoute.includes(".from('usuarios')") && rankingRoute.includes('users.map'));
 assert(rankingMigration.includes('left join public.respostas') && !rankingMigration.includes('status_aprovacao'));
 

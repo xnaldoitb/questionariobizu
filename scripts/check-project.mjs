@@ -95,6 +95,7 @@ const requiredFiles = [
     'supabase/migration-v4.43.2-adm-vitalicio.sql',
     'supabase/migration-v4.44.1-xp-missoes-notificacoes.sql',
     'supabase/migration-v4.46.1-retroativo-missoes.sql',
+    'supabase/migration-v4.46.2-historico-preserva-xp.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -126,6 +127,7 @@ const migration442 = await readFile('supabase/migration-v4.42-ranking-todos-usua
 const migration4432 = await readFile('supabase/migration-v4.43.2-adm-vitalicio.sql', 'utf8');
 const migration444 = await readFile('supabase/migration-v4.44.1-xp-missoes-notificacoes.sql', 'utf8');
 const migration461 = await readFile('supabase/migration-v4.46.1-retroativo-missoes.sql', 'utf8');
+const migration462 = await readFile('supabase/migration-v4.46.2-historico-preserva-xp.sql', 'utf8');
 const badges = await readFile('public/app/foundation/badges.js', 'utf8');
 const dashboardView = await readFile('public/views/dashboard.html', 'utf8');
 const quizView = await readFile('public/views/quiz.html', 'utf8');
@@ -191,6 +193,7 @@ const controlBindings = [
     ['refreshUsers', 'users'],
     ['userForm', 'users'],
     ['validityForm', 'users'],
+    ['xpGiftForm', 'users'],
     ['disciplineForm', 'content'],
     ['chapterForm', 'content'],
     ['refreshCatalogAdmin', 'content'],
@@ -526,6 +529,9 @@ for (const marker of ['xp_eventos', 'notificacoes', 'conceder_xp', 'retroativo-v
 for (const marker of ['America/Belem', 'sequencia-progressiva', 'ronda-progressiva', 'ritmo-progressivo', 'precisao-diaria', 'excelencia-diaria', 'constancia-7', 'centena-semanal', 'explorador-semanal', 'on conflict (usuario_id, chave) do nothing', 'retroativo-missoes-v1']) {
     if (!migration461.includes(marker)) throw new Error(`Retroativo de missões v4.46.1 incompleto: ${marker}`);
 }
+for (const marker of ['redefinir_progresso_usuario', "e.tipo <> 'plano'", 'xp_total = v_bonus', "n.tipo in ('missao', 'patente')", 'to service_role']) {
+    if (!migration462.includes(marker)) throw new Error(`Separação de histórico e progresso v4.46.2 incompleta: ${marker}`);
+}
 
 const migration418 = await readFile('supabase/migration-v4.18-sessao-mesmo-dispositivo.sql', 'utf8');
 for (const marker of ['sessao_ativa_device_hash', 'p_device_hash text', 'sessao_ativa_device_hash = p_device_hash']) {
@@ -535,4 +541,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.46.1: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.47.0: verificações estruturais concluídas.');

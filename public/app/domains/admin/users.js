@@ -117,7 +117,13 @@ function renderUserCard(user) {
                         ? `<button data-user-command="demote_admin" data-user-id="${user.id}" type="button">Tornar aluno</button>`
                         : ''}
                     ${isSupreme()
+                        ? `<button data-user-command="gift_xp" data-user-id="${user.id}" type="button">Presentear XP</button>`
+                        : ''}
+                    ${isSupreme()
                         ? `<button data-user-command="reset_history" data-user-id="${user.id}" type="button">Resetar histórico / ranking</button>`
+                        : ''}
+                    ${isSupreme() && user.perfil !== 'supremo'
+                        ? `<button class="danger-menu-action" data-user-command="reset_progress" data-user-id="${user.id}" type="button">Redefinir progresso e patente</button>`
                         : ''}
                     ${isStudent
                         ? `<button data-user-command="end_sessions" data-user-id="${user.id}" type="button">Encerrar sessões e liberar login</button>`
@@ -282,6 +288,7 @@ async function handleUserCommand(button) {
 
     if (command === 'edit') return openUserEdit(id);
     if (command === 'validity') return openValidity(id);
+    if (command === 'gift_xp') return openXpGift(id);
 
     const confirmations = {
         approve: 'Aprovar este cadastro?',
@@ -290,7 +297,8 @@ async function handleUserCommand(button) {
         deactivate: 'Desativar esta conta? Uma sessão de aluno será encerrada.',
         promote_admin: 'Tornar este aluno administrador?',
         demote_admin: 'Remover os privilégios administrativos desta conta?',
-        reset_history: 'Apagar todo o histórico e ranking deste usuário?',
+        reset_history: 'Apagar somente o histórico e ranking deste usuário? O XP, as missões e a patente serão preservados.',
+        reset_progress: 'ATENÇÃO: redefinir o progresso de estudo removerá XP de questões e missões e recalculará a patente. O bônus permanente do plano será preservado. Deseja continuar?',
         end_sessions: 'Desconectar este aluno de todos os dispositivos e liberar as tentativas de login da conta?',
         delete: user.vip
             ? 'Apagar esta conta VIP e todo o histórico dela? Esta ação é definitiva.'
@@ -298,6 +306,15 @@ async function handleUserCommand(button) {
     };
 
     if (confirmations[command] && !confirm(confirmations[command])) return;
+    if (command === 'reset_progress') {
+        const required = 'REDEFINIR PROGRESSO';
+        const typed = prompt(`Para confirmar, digite exatamente:\n\n${required}`);
+        if (typed === null) return;
+        if (typed.trim().toUpperCase() !== required) {
+            notify('Frase de confirmação incorreta. Nada foi alterado.');
+            return;
+        }
+    }
 
     try {
         if (command === 'delete') {
@@ -312,14 +329,58 @@ async function handleUserCommand(button) {
                 notify('Cadastro aprovado, mas a validade venceu. Defina um novo prazo para liberar o acesso.', 4800);
             } else if (command === 'end_sessions') {
                 notify(result.mensagem || 'Sessões encerradas e login liberado.', 4800);
+            } else if (command === 'reset_progress') {
+                notify(result.mensagem || 'Progresso de estudo redefinido.', 5200);
             } else {
-                notify(command === 'reset_history' ? 'Histórico e ranking resetados.' : 'Conta atualizada.');
+                notify(command === 'reset_history'
+                    ? 'Histórico e ranking resetados. XP e patente preservados.'
+                    : 'Conta atualizada.');
             }
         }
 
         await refreshManagedUsers();
     } catch (error) {
         notify(error.message, 4200);
+    }
+}
+
+function openXpGift(id) {
+    const user = findUser(id);
+    if (!user || !isSupreme()) return;
+    one('#xpGiftForm')?.reset();
+    one('#xpGiftUserId').value = user.id;
+    one('#xpGiftUserInfo').textContent = `${user.nome} · ${Number(user.xp_total || 0).toLocaleString('pt-BR')} XP atuais`;
+    openAdminModal('xpGiftModal');
+    window.setTimeout(() => one('#xpGiftPoints')?.focus(), 40);
+}
+
+async function giftXp(event) {
+    event.preventDefault();
+    const id = one('#xpGiftUserId')?.value;
+    const user = findUser(id);
+    const points = Number(one('#xpGiftPoints')?.value);
+    const reason = one('#xpGiftReason')?.value.trim();
+    if (!user || !Number.isSafeInteger(points) || points < 1 || points > 100000) {
+        notify('Informe uma quantidade inteira entre 1 e 100.000 XP.');
+        return;
+    }
+    if (!reason || reason.length < 3 || reason.length > 120) {
+        notify('Informe um motivo entre 3 e 120 caracteres.');
+        return;
+    }
+    if (!confirm(`Presentear ${user.nome} com ${points.toLocaleString('pt-BR')} XP?`)) return;
+
+    const submit = event.submitter || one('#xpGiftSubmit');
+    if (submit) submit.disabled = true;
+    try {
+        const result = await sendUserAction(id, 'gift_xp', { pontos: points, motivo: reason });
+        closeAdminModal('xpGiftModal');
+        notify(result.mensagem || 'XP presenteado com sucesso.', 5000);
+        await refreshManagedUsers();
+    } catch (error) {
+        notify(error.message, 4200);
+    } finally {
+        if (submit) submit.disabled = false;
     }
 }
 
@@ -392,6 +453,7 @@ export function bindUserManagement() {
     one('#refreshUsers')?.addEventListener('click', () => refreshManagedUsers());
     one('#userForm')?.addEventListener('submit', createUser);
     one('#userEditForm')?.addEventListener('submit', saveUserEdit);
+    one('#xpGiftForm')?.addEventListener('submit', giftXp);
     one('#validityForm')?.addEventListener('submit', (event) => {
         event.preventDefault();
         const value = one('#validityDate').value;

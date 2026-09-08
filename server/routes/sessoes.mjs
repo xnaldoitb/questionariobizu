@@ -192,20 +192,9 @@ export const handler = async (event) => {
     if (event.httpMethod === 'DELETE') {
         const { error } = await db().from('sessoes').delete().eq('usuario_id', user.id);
         if (error) return json(500, { erro: 'Não foi possível apagar o histórico.' });
-        const { error: xpDeleteError } = await db().from('xp_eventos').delete()
-            .eq('usuario_id', user.id).neq('tipo', 'plano');
-        if (!xpDeleteError) {
-            await db().from('usuarios').update({ xp_total: Number(user.xp_bonus_plano || 0) }).eq('id', user.id);
-            await db().from('notificacoes').delete().eq('usuario_id', user.id).in('tipo', ['missao', 'patente']);
-        }
-        const { error: notificationError } = await db().from('usuarios').update({
-            patente_notificada_nivel: 0,
-            papirao_notificado: false,
-        }).eq('id', user.id);
-        if (notificationError) {
-            console.error('Histórico apagado, mas falhou ao reiniciar avisos de patente:', notificationError.message);
-        }
-        return json(200, { ok: true });
+        // Histórico e progressão são dados diferentes. Limpar respostas não
+        // pode retirar XP, missões, patente nem bônus de assinatura já ganhos.
+        return json(200, { ok: true, xp_preservado: true });
     }
 
     const body = parseBody(event);

@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { randomUUID } from 'node:crypto';
 import { db } from '../platform/db.mjs';
 import { requireUser } from '../platform/auth.mjs';
 import { json, parseBody } from '../platform/http.mjs';
@@ -10,6 +11,8 @@ import {
 import { resolveQuestionAccess } from '../platform/question-access.mjs';
 import { auditAdmin } from '../platform/admin-audit.mjs';
 import { clearRateLimit } from '../platform/rate-limit.mjs';
+import { awardXp } from '../platform/xp.mjs';
+import { createNotification } from '../platform/notifications.mjs';
 
 const MANAGEMENT_ROLES = ['admin', 'supremo'];
 const COMMON_ADMIN_ACTIONS = new Set([
@@ -176,7 +179,7 @@ export const handler = async (event) => {
 
             let usersQuery = db()
                     .from('usuarios')
-                    .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,criado_em,ultimo_acesso,validade_ate,desativado_por_validade,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,plano_atual,vip_desde,acesso_teste,teste_expira_em,teste_ciclo_em,teste_saldo_segundos,teste_ativo_ate');
+                    .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,criado_em,ultimo_acesso,validade_ate,desativado_por_validade,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,plano_atual,vip_desde,acesso_teste,teste_expira_em,teste_ciclo_em,teste_saldo_segundos,teste_ativo_ate,xp_total');
             if (!isSupreme) {
                 usersQuery = usersQuery.or(
                     `responsavel_admin_id.eq.${actor.id},and(responsavel_admin_id.is.null,perfil.eq.aluno,vip.eq.false)`,
@@ -584,7 +587,80 @@ export const handler = async (event) => {
             if (!isSupreme) return json(403, { erro: 'Somente o Desenvolvedor pode resetar resultados.' });
             const { error } = await db().from('sessoes').delete().eq('usuario_id', id);
             return error ? json(400, { erro: 'Não foi possível redefinir os resultados.' })
-                : audited(actor, 'resultados_redefinidos', id, json(200, { ok: true }));
+                : audited(actor, 'resultados_redefinidos', id, json(200, { ok: true, xp_preservado: true }));
+        }
+
+        if (action === 'reset_progress') {
+            if (!isSupreme) return json(403, { erro: 'Somente o Desenvolvedor pode redefinir o progresso.' });
+            if (target.perfil === 'supremo') {
+                return json(403, { erro: 'O progresso da conta do Desenvolvedor é protegido.' });
+            }
+            const { data, error } = await db().rpc('redefinir_progresso_usuario', {
+                p_usuario_id: id,
+            });
+            if (error) {
+                const message = String(error.message || '').toLowerCase();
+                if (error.code === 'PGRST202' || message.includes('redefinir_progresso_usuario')) {
+                    return json(503, {
+                        erro: 'Execute a migration v4.46.2 no Supabase antes de redefinir o progresso.',
+                        codigo: 'MIGRATION_V4462_REQUIRED',
+                    });
+                }
+                console.error('Falha ao redefinir progresso:', error.message);
+                return json(400, { erro: 'Não foi possível redefinir o progresso do usuário.' });
+            }
+            const result = Array.isArray(data) ? data[0] : data;
+            return audited(actor, 'progresso_redefinido', id, json(200, {
+                ok: true,
+                xp_total: Number(result?.novo_xp_total || 0),
+                eventos_removidos: Number(result?.eventos_removidos || 0),
+                mensagem: 'Progresso de estudo redefinido. O bônus permanente do plano foi preservado.',
+            }));
+        }
+
+        if (action === 'gift_xp') {
+            if (!isSupreme) return json(403, { erro: 'Somente o Desenvolvedor pode presentear XP.' });
+            if (target.perfil === 'supremo') {
+                return json(403, { erro: 'Não é permitido presentear XP à conta do Desenvolvedor.' });
+            }
+
+            const points = Number(body.pontos);
+            const reason = String(body.motivo || '').trim();
+            if (!Number.isSafeInteger(points) || points < 1 || points > 100000) {
+                return json(400, { erro: 'Informe uma quantidade inteira entre 1 e 100.000 XP.' });
+            }
+            if (reason.length < 3 || reason.length > 120) {
+                return json(400, { erro: 'Informe um motivo entre 3 e 120 caracteres.' });
+            }
+
+            const giftId = randomUUID();
+            try {
+                const result = await awardXp(id, `presente:${giftId}`, 'presente', points, {
+                    motivo: reason,
+                    concedido_por: actor.id,
+                });
+                try {
+                    await createNotification({
+                        usuario_id: id,
+                        tipo: 'sistema',
+                        titulo: 'Você recebeu um presente de XP',
+                        mensagem: `O Desenvolvedor presenteou você com ${points.toLocaleString('pt-BR')} XP. Motivo: ${reason}`,
+                        acao: 'patente',
+                        chave: `presente-xp:${giftId}`,
+                    });
+                } catch (notificationError) {
+                    console.warn('XP presenteado, mas a notificação não pôde ser criada:', notificationError.message);
+                }
+                return audited(actor, 'xp_presenteado', id, json(200, {
+                    ok: true,
+                    pontos: points,
+                    xp_total: result.xpTotal,
+                    mensagem: `${points.toLocaleString('pt-BR')} XP presenteados com sucesso.`,
+                }), { pontos: points, motivo: reason, xp_total: result.xpTotal });
+            } catch (error) {
+                console.error('Falha ao presentear XP:', error.message);
+                return json(400, { erro: 'Não foi possível presentear XP ao usuário.' });
+            }
         }
 
         if (action === 'promote_admin') {

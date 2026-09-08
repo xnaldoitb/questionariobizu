@@ -20,12 +20,15 @@ assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map((stage) => progressiveMissionReward(4
 assert.deepEqual([0, 1, 2, 3].map(validAnswersMissionTarget), [20, 40, 60, 80]);
 assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(60, stage)), [60, 120, 180, 240]);
 
-const [migration, retroactive, xp, responder, sessions, notifications, missions, router, topbar, dashboard, quiz, fragments, progression, community, ranking, patent, index, worker] = await Promise.all([
+const [migration, retroactive, historyProgress, xp, responder, sessions, adminUsers, adminUsersUi, notifications, missions, router, topbar, dashboard, quiz, fragments, progression, community, ranking, patent, index, worker] = await Promise.all([
     readFile('supabase/migration-v4.44.1-xp-missoes-notificacoes.sql', 'utf8'),
     readFile('supabase/migration-v4.46.1-retroativo-missoes.sql', 'utf8'),
+    readFile('supabase/migration-v4.46.2-historico-preserva-xp.sql', 'utf8'),
     readFile('server/platform/xp.mjs', 'utf8'),
     readFile('server/routes/responder.mjs', 'utf8'),
     readFile('server/routes/sessoes.mjs', 'utf8'),
+    readFile('server/routes/admin-users.mjs', 'utf8'),
+    readFile('public/app/domains/admin/users.js', 'utf8'),
     readFile('server/routes/notificacoes.mjs', 'utf8'),
     readFile('server/routes/missoes.mjs', 'utf8'),
     readFile('api/[...route].js', 'utf8'),
@@ -47,6 +50,7 @@ for (const marker of ['America/Belem', 'missao:sequencia:', 'missao:ronda:', 'mi
 assert(retroactive.includes('on conflict (usuario_id, chave) do nothing'));
 assert(retroactive.includes('etapa * 25') && retroactive.includes('etapa * 40') && retroactive.includes('etapa * 60'));
 assert(retroactive.includes('recompensa_progressiva_corrigida') && retroactive.includes('set xp_total = u.xp_total + t.pontos'));
+for (const marker of ['redefinir_progresso_usuario', "e.tipo <> 'plano'", 'xp_total = v_bonus', 'eventos_removidos']) assert(historyProgress.includes(marker));
 for (const marker of ["'primeiro_acerto', 10", "'correcao', 4", "'revisao', 3", "'dominio', 150", "'sessao', 20", "'precisao', 60", "'precisao', 30"]) assert(xp.includes(marker));
 for (const marker of ['sequencia-progressiva', 'ronda-progressiva', 'ritmo-progressivo', 'precisao-diaria', 'excelencia-diaria', 'constancia-7', 'centena-semanal', 'explorador-semanal']) assert(xp.includes(marker));
 for (const marker of ['roundTargets = [3, 6, 9, 12, 15, 18]', 'sequenceMissionTarget', 'roundMissionTarget', 'progressiveMissionReward', 'pontos_premiados', 'startOfLocalWeek']) assert(xp.includes(marker));
@@ -56,6 +60,12 @@ assert(xp.includes('missao:ritmo-${rhythmTarget}:${day}') && xp.includes('respos
 assert(xp.includes('progressiveMissionReward(60, rhythmStages)'));
 assert(responder.includes('awardAnswerXp') && responder.includes('chapterId: q.capitulo_id'));
 assert(sessions.includes('awardSessionXp'));
+assert(sessions.includes('xp_preservado: true'));
+assert(!sessions.includes("from('xp_eventos').delete()"));
+assert(adminUsers.includes("action === 'reset_progress'") && adminUsers.includes("rpc('redefinir_progresso_usuario'"));
+assert(adminUsersUi.includes('data-user-command="reset_progress"') && adminUsersUi.includes('REDEFINIR PROGRESSO'));
+for (const marker of ["action === 'gift_xp'", "awardXp(id, `presente:", "tipo: 'sistema'", "'xp_presenteado'"]) assert(adminUsers.includes(marker));
+for (const marker of ['data-user-command="gift_xp"', "openAdminModal('xpGiftModal')", "sendUserAction(id, 'gift_xp'"]) assert(adminUsersUi.includes(marker));
 assert(notifications.includes(".eq('usuario_id', user.id)") && notifications.includes('marcar_todas'));
 assert(missions.includes('missionStatus(user.id, {'));
 assert(missions.includes("['admin', 'supremo'].includes(user.perfil)") && missions.includes('award: true'));
@@ -75,7 +85,7 @@ assert(community.includes('Premium concede <strong>500 XP</strong>'));
 assert(community.includes('10, 20, 30…') && community.includes('3, 6, 9, 12, 15 e 18'));
 assert(community.includes('20, 40, 60… questões válidas') && community.includes('60, 120, 180… XP'));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.46.1'));
-assert(worker.includes('v4.46.1-retroativo-missoes') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.47.0'));
+assert(worker.includes('v4.47.0-presente-xp') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, notificações e tópico oficial v4.46 validados.');

@@ -370,7 +370,7 @@
             <article class="danger-action-card">
                 <div>
                     <strong>Limpar todos os resultados</strong>
-                    <p>Apaga sessões, respostas, histórico e ranking, mantendo usuários e questões.</p>
+                    <p>Apaga sessões, respostas, histórico e ranking, mantendo usuários, questões, XP, missões e patentes.</p>
                 </div>
                 <button class="ui-button danger-fill" id="clearResultsBtn" type="button">Limpar resultados</button>
             </article>
@@ -439,6 +439,27 @@
                     <button class="ui-button quiet-action" id="permanentValidityBtn" type="button">Vitalício / VIP</button>
                 </div>
                 <p class="field-help">Data = Premium. Vitalício = VIP. Sem prazo = teste encerrado, com novo teste disponível em 8h.</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-modal hidden" id="xpGiftModal" role="dialog" aria-modal="true" aria-labelledby="xpGiftTitle">
+        <div class="admin-modal-card">
+            <div class="admin-modal-head">
+                <div><p class="section-kicker">RECONHECIMENTO</p><h3 id="xpGiftTitle">Presentear XP</h3></div>
+                <button class="ui-button quiet-action mini" data-close-admin-modal="xpGiftModal" type="button">Fechar</button>
+            </div>
+            <p class="muted" id="xpGiftUserInfo"></p>
+            <form id="xpGiftForm">
+                <input id="xpGiftUserId" type="hidden"/>
+                <label>Quantidade de XP
+                    <input id="xpGiftPoints" type="number" min="1" max="100000" step="1" inputmode="numeric" required/>
+                </label>
+                <label>Motivo do presente
+                    <textarea id="xpGiftReason" minlength="3" maxlength="120" placeholder="Ex.: destaque nos estudos" required></textarea>
+                </label>
+                <p class="field-help">O usuário receberá uma notificação e a patente será atualizada automaticamente.</p>
+                <button class="ui-button main-action full" id="xpGiftSubmit" type="submit">Confirmar presente</button>
             </form>
         </div>
     </div>

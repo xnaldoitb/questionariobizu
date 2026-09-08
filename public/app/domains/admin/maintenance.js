@@ -24,7 +24,7 @@ async function endStudentSessions() {
 
 async function clearAllResults() {
     const first = confirm(
-        'ATENÇÃO: esta ação apagará todo o histórico, respostas e ranking de todos os usuários. Usuários e questões serão preservados. Deseja continuar?',
+        'ATENÇÃO: esta ação apagará todo o histórico, respostas e ranking de todos os usuários. Usuários, questões, XP, missões e patentes serão preservados. Deseja continuar?',
     );
     if (!first) return;
 
