@@ -12,7 +12,11 @@ export const handler = async (event) => {
     }, user.id);
     if (!rate.allowed) return json(rate.unavailable ? 503 : 429, { erro: 'Aguarde um instante antes de atualizar as missões.' });
     try {
-        return json(200, await missionStatus(user.id, { award: true }));
+        const institutional = ['admin', 'supremo'].includes(user.perfil);
+        return json(200, await missionStatus(user.id, {
+            award: true,
+            institutional,
+        }));
     } catch (error) {
         console.error('Falha ao carregar missões:', error.message);
         return json(500, { erro: 'Não foi possível carregar suas missões.' });

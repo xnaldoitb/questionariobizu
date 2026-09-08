@@ -116,7 +116,7 @@ async function awardedMissionKeys(userId, since) {
     return new Set((data || []).map((event) => event.chave));
 }
 
-export async function missionStatus(userId, { award = false } = {}) {
+export async function missionStatus(userId, { award = false, institutional = false } = {}) {
     const day = localDay();
     const weekStart = startOfLocalWeek();
     const week = weekStart.slice(0, 10);
@@ -158,14 +158,20 @@ export async function missionStatus(userId, { award = false } = {}) {
         awardedKeys.add(key);
         if (!result.applied) return false;
         newlyAwarded.add(id);
-        await createNotification({
-            usuario_id: userId,
-            tipo: 'missao',
-            titulo: 'Missão concluída',
-            mensagem: `${title}: você ganhou ${points} XP.`,
-            acao: 'missoes',
-            chave: `notificacao:${key}`,
-        });
+        try {
+            await createNotification({
+                usuario_id: userId,
+                tipo: 'missao',
+                titulo: 'Missão concluída',
+                mensagem: `${title}: você ganhou ${points} XP.`,
+                acao: 'missoes',
+                chave: `notificacao:${key}`,
+            });
+        } catch (error) {
+            // O XP já foi concedido de forma atômica. Uma falha secundária na
+            // notificação não pode impedir a abertura do painel de missões.
+            console.warn(`Notificação da missão ${id} não pôde ser criada:`, error.message);
+        }
         return true;
     }
 
@@ -288,6 +294,7 @@ export async function missionStatus(userId, { award = false } = {}) {
         xp_bonus_plano: Number(user?.xp_bonus_plano || 0),
         patente: patent,
         missoes: missions,
+        modo_institucional: Boolean(institutional),
         concluidas_no_ciclo: dailyDefinitions.filter((item) => awardedKeys.has(item.key)).length
             + weeklyDefinitions.filter((item) => awardedKeys.has(item.key)).length + sequenceStages + roundStages,
     };

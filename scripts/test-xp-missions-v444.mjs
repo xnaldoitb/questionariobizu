@@ -46,7 +46,8 @@ for (const marker of ['roundTargets = [3, 6, 9, 12, 15, 18]', 'sequenceMissionTa
 assert(responder.includes('awardAnswerXp') && responder.includes('chapterId: q.capitulo_id'));
 assert(sessions.includes('awardSessionXp'));
 assert(notifications.includes(".eq('usuario_id', user.id)") && notifications.includes('marcar_todas'));
-assert(missions.includes("missionStatus(user.id, { award: true })"));
+assert(missions.includes('missionStatus(user.id, {'));
+assert(missions.includes("['admin', 'supremo'].includes(user.perfil)") && missions.includes('award: true'));
 assert(router.includes("['missoes', missoes]") && router.includes("['notificacoes', notificacoes]"));
 for (const id of ['notificationsBtn', 'missionsBtn']) assert(topbar.includes(`id="${id}"`));
 assert(topbar.includes('<div class="action-brand action-brand-static"') && !topbar.includes('<button class="action-brand"'));
@@ -57,11 +58,12 @@ assert(progression.includes("requestJson('notificacoes')") && progression.includ
 assert(progression.includes('scheduleMissionRefresh') && progression.includes('missionsRetry'));
 assert(missions.includes('limit: 90'));
 assert(xp.includes('Promise.allSettled') && xp.includes('awardsAvailable'));
+assert(xp.includes('modo_institucional') && xp.includes('Notificação da missão'));
 assert(community.includes("XP_RULES_TOPIC_ID = 'regras-xp'") && community.includes('XP necessário para cada patente'));
 assert(community.includes('Premium concede <strong>500 XP</strong>'));
 assert(community.includes('10, 20, 30…') && community.includes('3, 6, 9, 12, 15 e 18'));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.45.2'));
-assert(worker.includes('v4.45.2-missoes-globais') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.45.4'));
+assert(worker.includes('v4.45.4-xp-todos-perfis') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, notificações e tópico oficial v4.45 validados.');

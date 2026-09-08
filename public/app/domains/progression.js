@@ -112,6 +112,10 @@ function renderMissions(payload) {
     one('#missionsNextPatent').textContent = patent.proxima
         ? `${Number(patent.faltam || 0).toLocaleString('pt-BR')} XP para ${patent.proxima}`
         : 'Patente máxima alcançada';
+    const rulesButton = one('#openXpRulesTopic');
+    if (rulesButton) rulesButton.title = payload.modo_institucional
+        ? 'Conta institucional: o XP é acumulado normalmente sem substituir sua insígnia própria.'
+        : '';
     const missions = payload.missoes || [];
     updateCount('missionCount', payload.concluidas_no_ciclo ?? missions.filter((item) => item.concluida).length);
     let currentGroup = '';
