@@ -1,7 +1,7 @@
 export function hasPaidQuestionAccess(record, nowMs = Date.now()) {
     return Boolean(
         record
-        && (record.perfil === 'supremo'
+        && (['admin', 'supremo'].includes(record.perfil)
             || record.vip
             || Date.parse(record.validade_ate || '') > nowMs)
     );
@@ -9,7 +9,7 @@ export function hasPaidQuestionAccess(record, nowMs = Date.now()) {
 
 export function resolveQuestionAccess(record, nowMs = Date.now()) {
     if (!record) return { permitido: false, codigo: 'NAO_AUTENTICADO', tipo: 'indisponivel', mensagem: 'Não autenticado.' };
-    if (record.perfil === 'supremo' || record.vip) return { permitido: true, codigo: 'ACESSO_VITALICIO', tipo: 'vitalicio', mensagem: 'Acesso vitalício.' };
+    if (['admin', 'supremo'].includes(record.perfil) || record.vip) return { permitido: true, codigo: 'ACESSO_VITALICIO', tipo: 'vitalicio', mensagem: 'Acesso vitalício.' };
     if (Date.parse(record.validade_ate || '') > nowMs) return { permitido: true, codigo: 'ACESSO_ATIVO', tipo: 'regular', validade_ate: record.validade_ate, mensagem: 'Acesso Premium ativo.' };
     const cycle = Date.parse(record.teste_ciclo_em || '');
     const next = Number.isFinite(cycle) ? cycle + 8 * 60 * 60 * 1000 : null;

@@ -30,7 +30,7 @@ assert.ok(managementUi.includes('ainda sem responsável definido'));
 assert.ok(!paymentsUi.includes("one('#paymentMineOnly')"));
 assert.ok(!usersRoute.includes('Usuários VIP só podem ser apagados pelo Desenvolvedor'));
 assert.ok(!usersRoute.includes('Somente o Desenvolvedor pode alterar o status VIP'));
-assert.ok(usersRoute.includes('const requestedVip = asBoolean(body.vip)'));
+assert.ok(usersRoute.includes("const requestedVip = requestedRole === 'admin' || asBoolean(body.vip)"));
 assert.ok(usersUi.includes('Apagar esta conta VIP e todo o histórico'));
 assert.ok(managementUi.includes('conceder ou remover VIP e excluir seus usuários'));
 

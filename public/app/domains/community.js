@@ -3,7 +3,7 @@ import { accountBadges } from '../foundation/badges.js';
 import { appState } from '../foundation/model.js';
 import { one, safeText, notify } from '../foundation/selectors.js';
 import { bindEmojiPicker, countGraphemes } from './emoji-picker.js';
-import { DEVELOPER_PATENT, PATENTS, patentInsigniaMarkup } from '../foundation/patents.js';
+import { ADMIN_PATENT, DEVELOPER_PATENT, PATENTS, patentInsigniaMarkup } from '../foundation/patents.js';
 
 const GENERAL_ROOM_ID = '00000000-0000-4000-8000-000000000001';
 const HEARTBEAT_MS = 90_000;
@@ -251,6 +251,12 @@ async function openTopic(id) {
         activeTopicId = PATENT_GUIDE_TOPIC_ID;
         one('#topicList').classList.add('hidden');
         one('#topicForm').classList.add('hidden');
+        const adminRow = `<tr class="patent-guide-special patent-guide-admin">
+            <td>${patentInsigniaMarkup(0, { compact: true, decorative: true, admin: true })}</td>
+            <td><strong>${ADMIN_PATENT.name}</strong><small>${ADMIN_PATENT.symbol}</small></td>
+            <td>ADMs</td>
+            <td>${ADMIN_PATENT.meaning}</td>
+        </tr>`;
         const developerRow = `<tr class="patent-guide-special">
             <td>${patentInsigniaMarkup(0, { compact: true, decorative: true, developer: true })}</td>
             <td><strong>${DEVELOPER_PATENT.name}</strong><small>${DEVELOPER_PATENT.symbol}</small></td>
@@ -263,7 +269,7 @@ async function openTopic(id) {
             <td>1º lugar</td>
             <td>Conquista especial e temporária de quem ocupa a primeira colocação no Top 3.</td>
         </tr>`;
-        const rows = developerRow + papiraoRow + PATENTS.map((patent, index) => {
+        const rows = adminRow + developerRow + papiraoRow + PATENTS.map((patent, index) => {
             const next = PATENTS[index + 1];
             const range = next
                 ? `${patent.min.toLocaleString('pt-BR')}–${(next.min - 1).toLocaleString('pt-BR')}`
@@ -280,7 +286,7 @@ async function openTopic(id) {
             <h3>Patentes do Ranking</h3>
             <small>Questionário Bizu · tópico fixo</small>
         </header>
-        <p class="topic-main-content">As 52 patentes representam sua evolução pelos acertos acumulados. Elas não alteram sua colocação, plano ou permissões. A coroa <strong>PAPIRÃO</strong> aparece também neste guia e é uma conquista especial e temporária, exclusiva do primeiro colocado no Top 3.</p>
+        <p class="topic-main-content">As 52 patentes representam sua evolução pelos acertos acumulados. Elas não alteram sua colocação, plano ou permissões. <strong>Oficial de Instrução</strong> e <strong>Comandante do Código</strong> são patentes institucionais. A coroa <strong>PAPIRÃO</strong> é uma conquista especial e temporária, exclusiva do primeiro colocado no Top 3.</p>
         <div class="patent-guide-table-wrap">
             <table class="patent-guide-table">
                 <thead><tr><th>Insígnia</th><th>Patente e símbolo</th><th>Acertos</th><th>Significado</th></tr></thead>

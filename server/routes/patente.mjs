@@ -42,12 +42,12 @@ async function currentState(user) {
     const patente = patentStatus(hits);
     const lider = leaderId === user.id && hits > 0;
     const notifiedLevel = Math.max(0, Number(notification?.patente_notificada_nivel || 0));
-    const developer = user.perfil === 'supremo';
+    const institutional = ['admin', 'supremo'].includes(user.perfil);
     return {
         patente,
         lider,
-        notificar_patente: !developer && patente.nivel > notifiedLevel,
-        notificar_papirao: !developer && lider && !Boolean(notification?.papirao_notificado),
+        notificar_patente: !institutional && patente.nivel > notifiedLevel,
+        notificar_papirao: !institutional && lider && !Boolean(notification?.papirao_notificado),
         notifiedLevel,
     };
 }

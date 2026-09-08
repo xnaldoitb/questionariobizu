@@ -1,6 +1,6 @@
 import { requestJson } from '../foundation/request.js';
 import { one } from '../foundation/selectors.js';
-import { DEVELOPER_PATENT, patentForHits, patentInsigniaMarkup, patentProgress } from '../foundation/patents.js';
+import { ADMIN_PATENT, DEVELOPER_PATENT, patentForHits, patentInsigniaMarkup, patentProgress } from '../foundation/patents.js';
 
 let notificationOpen = false;
 let checking = false;
@@ -11,33 +11,37 @@ function anotherPriorityModalIsOpen() {
         || one('#paymentModal')?.classList.contains('hidden') === false;
 }
 
-function renderPatentModal({ hits = 0, papirao = false, developer = false, achievement = false } = {}) {
+function renderPatentModal({ hits = 0, papirao = false, developer = false, admin = false, achievement = false } = {}) {
     const progress = patentProgress(hits);
     const modal = one('#patentModal');
     if (!modal) return;
 
-    one('#patentModalKicker').textContent = developer
+    one('#patentModalKicker').textContent = developer || admin
         ? 'PATENTE INSTITUCIONAL'
         : papirao
         ? (achievement ? 'CONQUISTA ESPECIAL' : 'LIDERANÇA DO RANKING')
         : (achievement ? 'NOVA PATENTE' : 'SUA EVOLUÇÃO');
-    one('#patentModalTitle').textContent = developer ? DEVELOPER_PATENT.name : papirao ? 'PAPIRÃO' : progress.current.name;
+    one('#patentModalTitle').textContent = developer ? DEVELOPER_PATENT.name : admin ? ADMIN_PATENT.name : papirao ? 'PAPIRÃO' : progress.current.name;
     one('#patentModalIcon').innerHTML = papirao
         ? '<span class="patent-modal-crown"><img src="/assets/icons/coroa-papirao.svg" alt="Coroa PAPIRÃO"></span>'
-        : patentInsigniaMarkup(hits, { decorative: true, developer });
+        : patentInsigniaMarkup(hits, { decorative: true, developer, admin });
     one('#patentModalDescription').textContent = developer
         ? DEVELOPER_PATENT.meaning
+        : admin
+        ? ADMIN_PATENT.meaning
         : papirao
         ? `Você alcançou a liderança. Sua patente permanente é ${progress.current.name}.`
         : progress.current.meaning;
     one('#patentModalHits').textContent = String(progress.hits);
-    one('#patentModalCurrent').textContent = developer ? DEVELOPER_PATENT.name : progress.current.name;
+    one('#patentModalCurrent').textContent = developer ? DEVELOPER_PATENT.name : admin ? ADMIN_PATENT.name : progress.current.name;
     one('#patentModalNext').textContent = developer
         ? 'Exclusiva do Desenvolvedor'
+        : admin
+        ? 'Exclusiva dos administradores'
         : progress.next
         ? `${progress.remaining} acertos para ${progress.next.name}`
         : 'Patente máxima alcançada';
-    const progressValue = developer ? 100 : progress.progress;
+    const progressValue = developer || admin ? 100 : progress.progress;
     one('#patentProgressBar').style.width = `${progressValue}%`;
     one('#patentProgressBar').parentElement?.setAttribute('aria-valuenow', String(progressValue));
     one('#patentContinue').textContent = achievement ? 'Continuar' : 'Fechar';
@@ -62,6 +66,7 @@ function openPatentFromButton(button) {
         hits: Number(button.dataset.patentHits || 0),
         papirao: button.dataset.papirao === 'true',
         developer: button.dataset.developer === 'true',
+        admin: button.dataset.admin === 'true',
         achievement: false,
     });
 }

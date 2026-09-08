@@ -32,7 +32,7 @@ export async function expireUserAccess(userId) {
         .from('usuarios')
         .update({ desativado_por_validade: true, premium: false })
         .eq('id', userId)
-        .neq('perfil', 'supremo')
+        .eq('perfil', 'aluno')
         .eq('vip', false);
 }
 
@@ -42,7 +42,7 @@ export async function expireOverdueAccounts() {
     const { error } = await db()
         .from('usuarios')
         .update({ desativado_por_validade: true, premium: false })
-        .neq('perfil', 'supremo')
+        .eq('perfil', 'aluno')
         .eq('vip', false)
         .eq('acesso_teste', false)
         .not('validade_ate', 'is', null)

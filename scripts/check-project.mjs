@@ -86,6 +86,7 @@ const requiredFiles = [
     'supabase/migration-v4.39-patentes-ranking.sql',
     'supabase/migration-v4.41-52-patentes-ranking.sql',
     'supabase/migration-v4.42-ranking-todos-usuarios.sql',
+    'supabase/migration-v4.43.2-adm-vitalicio.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -114,6 +115,7 @@ const migration437 = await readFile('supabase/migration-v4.37-premiacao.sql', 'u
 const migration439 = await readFile('supabase/migration-v4.39-patentes-ranking.sql', 'utf8');
 const migration441 = await readFile('supabase/migration-v4.41-52-patentes-ranking.sql', 'utf8');
 const migration442 = await readFile('supabase/migration-v4.42-ranking-todos-usuarios.sql', 'utf8');
+const migration4432 = await readFile('supabase/migration-v4.43.2-adm-vitalicio.sql', 'utf8');
 const badges = await readFile('public/app/foundation/badges.js', 'utf8');
 const dashboardView = await readFile('public/views/dashboard.html', 'utf8');
 const quizView = await readFile('public/views/quiz.html', 'utf8');
@@ -441,6 +443,13 @@ if (!badges.includes('else if (premium)') || !auth.includes('premiumAtivo')) {
     throw new Error('Regras Premium/VIP v4.10 incompletas.');
 }
 
+for (const marker of ["NEW.perfil IN ('admin', 'supremo')", "NEW.plano_atual := 'vitalicio'", "WHERE perfil IN ('admin', 'supremo')"]) {
+    if (!migration4432.includes(marker)) throw new Error(`Acesso vitalício automático dos ADMs incompleto: ${marker}`);
+}
+if (!badges.includes("if (profile === 'admin')") || !badges.includes('Oficial de Instrução')) {
+    throw new Error('Insígnia institucional exclusiva do ADM está incompleta.');
+}
+
 if (!migration411.includes("p_meio_pagamento not in ('pix', 'account_money')") || !paymentStatus.includes('reconcilePayment')) {
     throw new Error('Reconciliação de pagamentos por saldo v4.11 incompleta.');
 }
@@ -507,4 +516,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.43.0: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.43.3: verificações estruturais concluídas.');

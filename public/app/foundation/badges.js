@@ -3,7 +3,7 @@
  *
  * Regras:
  * - Desenvolvedor: usa somente a insígnia exclusiva de Desenvolvedor.
- * - Administrador: recebe a insígnia ADM e também a identificação do plano, quando houver.
+ * - Administrador: usa somente ADM; o acesso vitalício é inerente ao perfil.
  * - Aluno VIP: VIP.
  * - Aluno Plus: plano trimestral ainda ativo.
  * - Aluno Premium: plano mensal pago ainda ativo.
@@ -19,11 +19,11 @@ export function accountBadges(entry = {}) {
         return '<span class="account-insignia supreme-insignia" title="Desenvolvedor" aria-label="Desenvolvedor">♛ DEV</span>';
     }
 
-    const badges = [];
-
     if (profile === 'admin') {
-        badges.push('<span class="account-insignia admin-insignia" title="Administrador" aria-label="Administrador">◆ ADM</span>');
+        return '<span class="account-insignia admin-insignia" title="Administrador · Oficial de Instrução" aria-label="Administrador">◆ ADM</span>';
     }
+
+    const badges = [];
 
     if (vip) {
         badges.push('<span class="account-insignia vip-insignia" title="Usuário VIP · acesso vitalício" aria-label="VIP">✦ VIP</span>');

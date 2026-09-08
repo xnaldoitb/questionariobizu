@@ -16,7 +16,7 @@ import { startCommunity } from './domains/community.js';
 import { bindPaymentEvents, preloadPaymentPlans, startAccessIndicator } from './domains/access.js';
 import { bindRewardEvents, checkRewardNotification } from './domains/rewards.js';
 import { bindPatentEvents, checkPatentNotification } from './domains/patents.js';
-import { DEVELOPER_PATENT, patentButtonMarkup, patentForHits } from './foundation/patents.js';
+import { ADMIN_PATENT, DEVELOPER_PATENT, patentButtonMarkup, patentForHits } from './foundation/patents.js';
 import { bindPwaInstall } from './foundation/pwa.js';
 import {
     bindManagementEvents,
@@ -59,14 +59,17 @@ function alternateTheme() {
 
 function renderProfilePatent(hits = 0) {
     const developer = appState.user?.perfil === 'supremo';
-    const patent = developer ? DEVELOPER_PATENT : patentForHits(hits);
-    const advanced = !developer && lastProfilePatentLevel !== null && patent.level > lastProfilePatentLevel;
-    lastProfilePatentLevel = developer ? -1 : patent.level;
+    const admin = appState.user?.perfil === 'admin';
+    const institutional = developer || admin;
+    const patent = developer ? DEVELOPER_PATENT : admin ? ADMIN_PATENT : patentForHits(hits);
+    const advanced = !institutional && lastProfilePatentLevel !== null && patent.level > lastProfilePatentLevel;
+    lastProfilePatentLevel = institutional ? -1 : patent.level;
     const icon = one('#profileAvatar');
     if (icon) {
-        icon.innerHTML = patentButtonMarkup(hits, { developer }).replace(/^<button[^>]*>|<\/button>$/g, '');
+        icon.innerHTML = patentButtonMarkup(hits, { developer, admin }).replace(/^<button[^>]*>|<\/button>$/g, '');
         icon.dataset.patentHits = String(hits);
         icon.dataset.developer = developer ? 'true' : 'false';
+        icon.dataset.admin = admin ? 'true' : 'false';
         icon.setAttribute('aria-label', `Ver patente ${patent.name}`);
     }
     return advanced;

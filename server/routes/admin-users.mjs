@@ -247,7 +247,7 @@ export const handler = async (event) => {
             return json(400, { erro: error.message });
         }
 
-        const requestedVip = asBoolean(body.vip);
+        const requestedVip = requestedRole === 'admin' || asBoolean(body.vip);
         if (!requestedVip && isAccessExpired(validade_ate)) {
             return json(400, { erro: 'A validade deve terminar hoje ou em uma data futura.' });
         }
@@ -416,8 +416,8 @@ export const handler = async (event) => {
         }
 
         if (action === 'set_validity') {
-            if (target.perfil === 'supremo') {
-                return json(403, { erro: 'A conta do Desenvolvedor não utiliza prazo de validade.' });
+            if (['admin', 'supremo'].includes(target.perfil)) {
+                return json(403, { erro: 'Administradores e Desenvolvedor possuem acesso vitalício automático.' });
             }
             const vitalicio = body.vitalicio === true;
 
@@ -539,6 +539,9 @@ export const handler = async (event) => {
 
             if (body.vip !== undefined) {
                 const nextVip = asBoolean(body.vip);
+                if (target.perfil === 'admin' && !nextVip) {
+                    return json(400, { erro: 'Administradores possuem acesso vitalício automático.' });
+                }
                 payload.vip = nextVip;
                 if (nextVip) {
                     payload.vip_desde = target.vip_desde || new Date().toISOString();
@@ -588,15 +591,21 @@ export const handler = async (event) => {
             if (!isSupreme) return json(403, { erro: 'Somente o Desenvolvedor pode promover administradores.' });
             if (target.perfil !== 'aluno') return json(400, { erro: 'Somente alunos podem ser promovidos.' });
 
-            const expirado = !target.vip && isAccessExpired(target.validade_ate);
             await revokeDeviceSessions(id);
             const { error } = await db()
                 .from('usuarios')
                 .update({
                     perfil: 'admin',
+                    vip: true,
+                    vip_desde: target.vip_desde || new Date().toISOString(),
+                    premium: false,
+                    plano_atual: 'vitalicio',
+                    validade_ate: null,
+                    acesso_teste: false,
+                    teste_ativo_ate: null,
                     status_aprovacao: 'aprovado',
                     ativo: true,
-                    desativado_por_validade: expirado,
+                    desativado_por_validade: false,
                     sessao_ativa_id: null,
                     sessao_ativa_expira_em: null,
                     sessao_ativa_device_hash: null,

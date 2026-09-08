@@ -7,6 +7,8 @@ assert.match(accountBadges({ perfil: 'aluno', premium: true, plano_atual: 'mensa
 assert.doesNotMatch(accountBadges({ perfil: 'aluno', premium: true, plano_atual: 'mensal' }), /PLUS/);
 assert.match(accountBadges({ perfil: 'aluno', premium: true, plano_atual: 'trimestral' }), /PLUS/);
 assert.match(accountBadges({ perfil: 'aluno', premium: true, vip: true, plano_atual: 'trimestral' }), /VIP/);
+assert.match(accountBadges({ perfil: 'admin', premium: true, vip: true, plano_atual: 'vitalicio' }), /ADM/);
+assert.doesNotMatch(accountBadges({ perfil: 'admin', premium: true, vip: true, plano_atual: 'vitalicio' }), /PREMIUM|PLUS|VIP/);
 assert.equal(paymentPlanTier({ id: 'mensal' }).label, 'PREMIUM');
 assert.equal(paymentPlanTier({ id: 'trimestral' }).label, 'PLUS');
 assert.equal(paymentPlanTier({ id: 'vitalicio', acesso_permanente: true }).label, 'VIP');

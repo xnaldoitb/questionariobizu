@@ -87,6 +87,15 @@ export const DEVELOPER_PATENT = {
     meaning: 'Patente institucional exclusiva de quem desenvolve e mantém o Questionário Bizu.',
 };
 
+export const ADMIN_PATENT = {
+    level: 'admin',
+    family: 'admin',
+    grade: 1,
+    name: 'Oficial de Instrução',
+    symbol: 'Livro aberto dourado, estrela azul e ADM',
+    meaning: 'Patente institucional exclusiva dos administradores que orientam e apoiam a comunidade do Questionário Bizu.',
+};
+
 export function patentForHits(value) {
     const hits = Math.max(0, Number(value) || 0);
     for (let index = PATENTS.length - 1; index >= 0; index -= 1) {
@@ -126,6 +135,18 @@ function gradeMarks(grade, { y = 49, stars = false } = {}) {
         : `<circle class="patent-grade-dot" cx="${start + index * gap}" cy="${y}" r="2.4"/>`).join('');
 }
 
+function fieldGradeMarks(grade, kind) {
+    const count = Math.max(1, Math.min(5, grade));
+    const gap = 7.5;
+    const start = 32 - ((count - 1) * gap) / 2;
+    return Array.from({ length: count }, (_, index) => {
+        const x = start + index * gap;
+        return kind === 'major'
+            ? `<rect class="patent-field-grade patent-major-grade" x="${(x - 2.7).toFixed(1)}" y="45" width="5.4" height="4.8" rx="1"/>`
+            : `<polygon class="patent-field-grade patent-lieutenant-grade" points="${x.toFixed(1)},43 ${(x + 3.3).toFixed(1)},47 ${(x).toFixed(1)},51 ${(x - 3.3).toFixed(1)},47"/>`;
+    }).join('');
+}
+
 function chevrons(count, startY = 20) {
     return Array.from({ length: count }, (_, index) => {
         const y = startY + index * 8;
@@ -160,10 +181,9 @@ function patentMarks(patent) {
     if (family === 'juniorOfficer') return `<g class="patent-officer-pips">${officerPip(32, 29, 1.08)}${gradeMarks(grade)}</g>`;
     if (family === 'officer') return `<g class="patent-officer-pips">${officerPip(24, 29, .9)}${officerPip(40, 29, .9)}${gradeMarks(grade)}</g>`;
     if (family === 'captain') return `<g class="patent-officer-stars">${star(32, 29, 9)}${gradeMarks(grade)}</g>`;
-    if (['major', 'lieutenantColonel', 'colonel'].includes(family)) {
-        const radius = family === 'major' ? 8 : family === 'lieutenantColonel' ? 9 : 10;
-        return `<g class="patent-field-officer patent-${family}">${star(32, 28, radius)}${gradeMarks(grade, { stars: family === 'colonel' })}</g>`;
-    }
+    if (family === 'major') return `<g class="patent-field-officer patent-major">${star(32, 27, 8)}<g class="patent-major-progress">${fieldGradeMarks(grade, 'major')}</g></g>`;
+    if (family === 'lieutenantColonel') return `<g class="patent-field-officer patent-lieutenantColonel">${star(32, 27, 9)}<g class="patent-lieutenant-progress">${fieldGradeMarks(grade, 'lieutenant')}</g></g>`;
+    if (family === 'colonel') return `<g class="patent-field-officer patent-colonel">${star(32, 27, 10)}${gradeMarks(grade, { stars: true })}</g>`;
     if (family === 'general') {
         if (level === 50) return `<g class="patent-command-marks patent-command-${level} patent-command-stars">${star(32, 25, 10.5)}${gradeMarks(4, { y: 47, stars: true })}</g>`;
         const count = Math.min(4, grade);
@@ -195,22 +215,31 @@ function developerMarks() {
     </g>`;
 }
 
-export function patentInsigniaMarkup(value, { compact = false, decorative = false, developer = false } = {}) {
-    const patent = developer ? DEVELOPER_PATENT : patentForHits(value);
+function adminMarks() {
+    return `<g class="patent-admin-marks">
+        ${star(32, 15, 5.8)}
+        <path class="patent-admin-book" d="M13 25c7.5-2.2 13.8-.5 19 4.2V50c-5.2-4.1-11.5-5.6-19-3.6V25Zm38 0c-7.5-2.2-13.8-.5-19 4.2V50c5.2-4.1 11.5-5.6 19-3.6V25Z"/>
+        <path class="patent-admin-page" d="M32 29.2V50M17 31c4.6-.6 8.3.3 11.4 2.6M47 31c-4.6-.6-8.3.3-11.4 2.6"/>
+        <text class="patent-admin-label" x="32" y="57" text-anchor="middle">ADM</text>
+    </g>`;
+}
+
+export function patentInsigniaMarkup(value, { compact = false, decorative = false, developer = false, admin = false } = {}) {
+    const patent = developer ? DEVELOPER_PATENT : admin ? ADMIN_PATENT : patentForHits(value);
     const aria = decorative ? 'aria-hidden="true"' : `role="img" aria-label="${patent.name}"`;
-    const framePatent = developer ? { family: 'general' } : patent;
-    return `<span class="patent-insignia patent-level-${patent.level} patent-family-${patent.family}${developer ? ' is-developer' : ''}${compact ? ' is-compact' : ''}" data-patent-level="${patent.level}" ${aria}>
+    const framePatent = developer ? { family: 'general' } : admin ? { family: 'officer' } : patent;
+    return `<span class="patent-insignia patent-level-${patent.level} patent-family-${patent.family}${developer ? ' is-developer' : ''}${admin ? ' is-admin' : ''}${compact ? ' is-compact' : ''}" data-patent-level="${patent.level}" ${aria}>
         <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
             ${patentFrame(framePatent)}
-            ${developer ? developerMarks() : patentMarks(patent)}
+            ${developer ? developerMarks() : admin ? adminMarks() : patentMarks(patent)}
         </svg>
     </span>`;
 }
 
-export function patentButtonMarkup(value, { compact = false, papirao = false, developer = false } = {}) {
-    const patent = developer ? DEVELOPER_PATENT : patentForHits(value);
+export function patentButtonMarkup(value, { compact = false, papirao = false, developer = false, admin = false } = {}) {
+    const patent = developer ? DEVELOPER_PATENT : admin ? ADMIN_PATENT : patentForHits(value);
     if (papirao) {
         return `<button class="patent-button papirao-patent-button" type="button" data-patent-detail data-patent-hits="${Math.max(0, Number(value) || 0)}" data-papirao="true" aria-label="Ver conquista PAPIRÃO e patente ${patent.name}"><span class="podium-champion-crown"><img src="/assets/icons/coroa-papirao.svg" alt="" aria-hidden="true"></span></button>`;
     }
-    return `<button class="patent-button${compact ? ' is-compact' : ''}" type="button" data-patent-detail data-patent-hits="${Math.max(0, Number(value) || 0)}"${developer ? ' data-developer="true"' : ''} aria-label="Ver patente ${patent.name}">${patentInsigniaMarkup(value, { compact, decorative: true, developer })}</button>`;
+    return `<button class="patent-button${compact ? ' is-compact' : ''}" type="button" data-patent-detail data-patent-hits="${Math.max(0, Number(value) || 0)}"${developer ? ' data-developer="true"' : ''}${admin ? ' data-admin="true"' : ''} aria-label="Ver patente ${patent.name}">${patentInsigniaMarkup(value, { compact, decorative: true, developer, admin })}</button>`;
 }

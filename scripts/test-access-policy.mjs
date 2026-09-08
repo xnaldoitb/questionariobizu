@@ -21,6 +21,8 @@ assert.equal(resolveQuestionAccess({ ...exhausted, validade_ate: new Date(now - 
 assert.equal(resolveQuestionAccess({ ...active, validade_ate: new Date(now + 86400000).toISOString() }, now).codigo, 'ACESSO_ATIVO');
 assert.equal(resolveQuestionAccess({ ...exhausted, vip: true }, now).codigo, 'ACESSO_VITALICIO');
 assert.equal(resolveQuestionAccess({ ...exhausted, perfil: 'supremo' }, now).permitido, true);
+assert.equal(resolveQuestionAccess({ ...exhausted, perfil: 'admin' }, now).codigo, 'ACESSO_VITALICIO');
+assert.equal(hasPaidQuestionAccess({ ...exhausted, perfil: 'admin' }, now), true);
 assert.equal(hasPaidQuestionAccess({ ...exhausted, vip: true }, now), true);
 assert.equal(hasPaidQuestionAccess({ ...exhausted, validade_ate: new Date(now + 86400000).toISOString() }, now), true);
 assert.equal(hasPaidQuestionAccess(exhausted, now), false);
