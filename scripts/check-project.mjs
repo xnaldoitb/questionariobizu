@@ -94,6 +94,7 @@ const requiredFiles = [
     'supabase/migration-v4.42-ranking-todos-usuarios.sql',
     'supabase/migration-v4.43.2-adm-vitalicio.sql',
     'supabase/migration-v4.44.1-xp-missoes-notificacoes.sql',
+    'supabase/migration-v4.46.1-retroativo-missoes.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -124,6 +125,7 @@ const migration441 = await readFile('supabase/migration-v4.41-52-patentes-rankin
 const migration442 = await readFile('supabase/migration-v4.42-ranking-todos-usuarios.sql', 'utf8');
 const migration4432 = await readFile('supabase/migration-v4.43.2-adm-vitalicio.sql', 'utf8');
 const migration444 = await readFile('supabase/migration-v4.44.1-xp-missoes-notificacoes.sql', 'utf8');
+const migration461 = await readFile('supabase/migration-v4.46.1-retroativo-missoes.sql', 'utf8');
 const badges = await readFile('public/app/foundation/badges.js', 'utf8');
 const dashboardView = await readFile('public/views/dashboard.html', 'utf8');
 const quizView = await readFile('public/views/quiz.html', 'utf8');
@@ -521,6 +523,9 @@ for (const route of ['missoes', 'notificacoes']) {
 for (const marker of ['xp_eventos', 'notificacoes', 'conceder_xp', 'retroativo-v1', 'bonus-plano-', 'xp_total']) {
     if (!migration444.includes(marker)) throw new Error(`Progressão v4.44 incompleta: ${marker}`);
 }
+for (const marker of ['America/Belem', 'sequencia-progressiva', 'ronda-progressiva', 'ritmo-progressivo', 'precisao-diaria', 'excelencia-diaria', 'constancia-7', 'centena-semanal', 'explorador-semanal', 'on conflict (usuario_id, chave) do nothing', 'retroativo-missoes-v1']) {
+    if (!migration461.includes(marker)) throw new Error(`Retroativo de missões v4.46.1 incompleto: ${marker}`);
+}
 
 const migration418 = await readFile('supabase/migration-v4.18-sessao-mesmo-dispositivo.sql', 'utf8');
 for (const marker of ['sessao_ativa_device_hash', 'p_device_hash text', 'sessao_ativa_device_hash = p_device_hash']) {
@@ -530,4 +535,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.45.5: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.46.1: verificações estruturais concluídas.');

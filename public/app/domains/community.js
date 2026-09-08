@@ -282,7 +282,7 @@ async function openTopic(id) {
         <div class="xp-rules-grid">
             <article><strong>25, 50, 75… XP</strong><span><b>Sequência certeira:</b> 10, 20, 30… acertos seguidos. A meta cresce em 10 e a recompensa em 25 XP por etapa; ambas reiniciam diariamente.</span></article>
             <article><strong>40 a 240 XP</strong><span><b>Ronda de disciplinas:</b> metas de 3, 6, 9, 12, 15 e 18. A recompensa progride para 40, 80, 120, 160, 200 e 240 XP; reinicia diariamente.</span></article>
-            <article><strong>+20 XP</strong><span><b>Ritmo diário:</b> responder 20 questões válidas no dia.</span></article>
+            <article><strong>60, 120, 180… XP</strong><span><b>Ritmo diário:</b> responder 20, 40, 60… questões válidas. A recompensa vale o triplo da meta e ambas reiniciam diariamente.</span></article>
             <article><strong>+30 XP</strong><span><b>Precisão diária:</b> obter 80% de acertos em pelo menos 10 questões no dia.</span></article>
             <article><strong>+60 XP</strong><span><b>Excelência diária:</b> obter 90% de acertos em pelo menos 20 questões no dia.</span></article>
         </div>

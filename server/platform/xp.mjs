@@ -32,6 +32,10 @@ export function sequenceMissionTarget(completedStages = 0) {
     return (Math.max(0, Number(completedStages) || 0) + 1) * 10;
 }
 
+export function validAnswersMissionTarget(completedStages = 0) {
+    return (Math.max(0, Number(completedStages) || 0) + 1) * 20;
+}
+
 export function roundMissionTarget(completedStages = 0) {
     const targets = [3, 6, 9, 12, 15, 18];
     return targets[Math.min(Math.max(0, Number(completedStages) || 0), targets.length - 1)];
@@ -208,12 +212,25 @@ export async function missionStatus(userId, { award = false, institutional = fal
         roundTarget = roundMissionTarget(roundStages);
     }
 
+    const rhythmPattern = new RegExp(`^missao:ritmo-(\\d+):${day}$`);
+    const rhythmCompletedTargets = [...awardedKeys].map((key) => Number(key.match(rhythmPattern)?.[1] || 0));
+    let rhythmStages = rhythmCompletedTargets.length ? Math.max(...rhythmCompletedTargets) / 20 : 0;
+    let rhythmTarget = validAnswersMissionTarget(rhythmStages);
+    let rhythmAwardedPoints = 0;
+    if (dailyAnswers >= rhythmTarget) {
+        const points = progressiveMissionReward(60, rhythmStages);
+        const applied = await grantMission({
+            id: 'ritmo-progressivo', key: `missao:ritmo-${rhythmTarget}:${day}`,
+            title: `Ritmo diário ${rhythmTarget}`, points,
+            details: { meta: rhythmTarget, respostas_validas: dailyAnswers },
+        });
+        if (applied) rhythmAwardedPoints = points;
+        const completed = [...awardedKeys].map((key) => Number(key.match(rhythmPattern)?.[1] || 0));
+        rhythmStages = completed.length ? Math.max(...completed) / 20 : 0;
+        rhythmTarget = validAnswersMissionTarget(rhythmStages);
+    }
+
     const dailyDefinitions = [
-        {
-            id: 'ritmo-diario', key: `missao:ritmo-20:${day}`, titulo: 'Ritmo diário',
-            descricao: 'Responda 20 questões válidas hoje.', atual: Math.min(dailyAnswers, 20), meta: 20,
-            unidade: 'questões hoje', pontos: 20, ready: dailyAnswers >= 20,
-        },
         {
             id: 'precisao-diaria', key: `missao:precisao-80:${day}`, titulo: 'Precisão diária',
             descricao: 'Mantenha pelo menos 80% de acertos em 10 questões no dia.', atual: Math.min(dailyAccuracy, 80), meta: 80,
@@ -270,6 +287,13 @@ export async function missionStatus(userId, { award = false, institutional = fal
             pontos: progressiveMissionReward(40, roundStages, roundTargets.length), pontos_premiados: roundAwardedPoints,
             concluida: roundStages >= roundTargets.length, premiada: newlyAwarded.has('ronda-progressiva'), etapas_concluidas: roundStages,
         },
+        {
+            id: 'ritmo-progressivo', grupo: 'Diárias', titulo: 'Ritmo diário',
+            descricao: `Próxima etapa: responder ${rhythmTarget} questões válidas hoje. Questões puladas não contam.`,
+            atual: Math.min(dailyAnswers, rhythmTarget), meta: rhythmTarget, unidade: 'questões válidas hoje',
+            pontos: progressiveMissionReward(60, rhythmStages), pontos_premiados: rhythmAwardedPoints,
+            concluida: false, premiada: newlyAwarded.has('ritmo-progressivo'), etapas_concluidas: rhythmStages,
+        },
         ...dailyDefinitions.map(({ key, ready, ...mission }) => ({
             ...mission, grupo: 'Diárias', concluida: awardedKeys.has(key), premiada: newlyAwarded.has(mission.id),
         })),
@@ -296,7 +320,8 @@ export async function missionStatus(userId, { award = false, institutional = fal
         missoes: missions,
         modo_institucional: Boolean(institutional),
         concluidas_no_ciclo: dailyDefinitions.filter((item) => awardedKeys.has(item.key)).length
-            + weeklyDefinitions.filter((item) => awardedKeys.has(item.key)).length + sequenceStages + roundStages,
+            + weeklyDefinitions.filter((item) => awardedKeys.has(item.key)).length
+            + sequenceStages + roundStages + rhythmStages,
     };
 }
 
