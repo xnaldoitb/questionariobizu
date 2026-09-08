@@ -130,15 +130,6 @@ function bindPrimaryNavigation() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    one('#navQuiz').addEventListener('click', () => {
-        refreshProfileSummary();
-        openScreen('dashboard');
-        document.querySelector('.study-panel')?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-    });
-
     one('#navAdmin').addEventListener('click', async () => {
         openScreen('adminView');
         await openManagementWorkspace();

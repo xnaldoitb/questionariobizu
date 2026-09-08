@@ -38,12 +38,13 @@ assert(notifications.includes(".eq('usuario_id', user.id)") && notifications.inc
 assert(missions.includes("missionStatus(user.id, { award: true })"));
 assert(router.includes("['missoes', missoes]") && router.includes("['notificacoes', notificacoes]"));
 for (const id of ['notificationsBtn', 'missionsBtn']) assert(topbar.includes(`id="${id}"`));
+assert(topbar.includes('<div class="action-brand action-brand-static"') && !topbar.includes('<button class="action-brand"'));
 for (const id of ['notificationsModal', 'missionsModal', 'notificationsClose', 'missionsClose']) assert(dashboard.includes(`id="${id}"`));
 assert(progression.includes("requestJson('notificacoes')") && progression.includes("requestJson('missoes')"));
 assert(community.includes("XP_RULES_TOPIC_ID = 'regras-xp'") && community.includes('XP necessário para cada patente'));
 assert(community.includes('Premium concede <strong>500 XP</strong>'));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.44.1'));
-assert(worker.includes('v4.44.1-xp-missoes-notificacoes') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.44.2'));
+assert(worker.includes('v4.44.2-slogan-estatico') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões, notificações e tópico oficial v4.44 validados.');

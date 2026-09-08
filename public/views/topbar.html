@@ -1,18 +1,16 @@
 <div class="action-bar" role="navigation" aria-label="Navegação principal">
-    <div class="action-brand-stack">
-        <button class="action-brand" id="navQuiz" type="button" aria-label="Abrir simulado">
-            <img class="action-slogan-image" src="/assets/logo-questionario-bizu.svg?v=4.35.0" alt="Questionário Bizu — Seu bizu para a aprovação">
+    <div class="action-brand action-brand-static" id="navQuiz">
+        <img class="action-slogan-image" src="/assets/logo-questionario-bizu.svg?v=4.35.0" alt="Questionário Bizu — Seu bizu para a aprovação">
+    </div>
+    <div class="action-quick-tools" aria-label="Progresso e avisos">
+        <button class="quick-tool-button" id="notificationsBtn" type="button" aria-haspopup="dialog" aria-controls="notificationsModal">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.7 10.2c0-3.3 2.1-5.8 5.3-5.8s5.3 2.5 5.3 5.8v3.2l1.6 2.4H5.1l1.6-2.4v-3.2Z"/><path d="M9.7 18.1c.5.9 1.2 1.4 2.3 1.4s1.8-.5 2.3-1.4"/></svg>
+            <span>Notificações</span><b class="quick-tool-count hidden" id="notificationCount">0</b>
         </button>
-        <div class="action-quick-tools" aria-label="Progresso e avisos">
-            <button class="quick-tool-button" id="notificationsBtn" type="button" aria-haspopup="dialog" aria-controls="notificationsModal">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.7 10.2c0-3.3 2.1-5.8 5.3-5.8s5.3 2.5 5.3 5.8v3.2l1.6 2.4H5.1l1.6-2.4v-3.2Z"/><path d="M9.7 18.1c.5.9 1.2 1.4 2.3 1.4s1.8-.5 2.3-1.4"/></svg>
-                <span>Notificações</span><b class="quick-tool-count hidden" id="notificationCount">0</b>
-            </button>
-            <button class="quick-tool-button" id="missionsBtn" type="button" aria-haspopup="dialog" aria-controls="missionsModal">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V5.1M6 6h10l-2.5 3L16 12H6"/><circle cx="18.2" cy="17.2" r="2.4"/><path d="m17.1 17.2.7.7 1.5-1.6"/></svg>
-                <span>Missões</span><b class="quick-tool-count hidden" id="missionCount">0</b>
-            </button>
-        </div>
+        <button class="quick-tool-button" id="missionsBtn" type="button" aria-haspopup="dialog" aria-controls="missionsModal">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V5.1M6 6h10l-2.5 3L16 12H6"/><circle cx="18.2" cy="17.2" r="2.4"/><path d="m17.1 17.2.7.7 1.5-1.6"/></svg>
+            <span>Missões</span><b class="quick-tool-count hidden" id="missionCount">0</b>
+        </button>
     </div>
 
     <div class="action-menu">
