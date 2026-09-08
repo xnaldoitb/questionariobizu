@@ -276,11 +276,23 @@ async function openTopic(id) {
             <article><strong>+4 XP</strong><span>Corrigir uma questão errada pela primeira vez</span></article>
             <article><strong>+20 XP</strong><span>Finalizar um simulado com 20 ou mais respostas</span></article>
             <article><strong>+30 / +60 XP</strong><span>Alcançar 80% / 90% em um simulado</span></article>
-            <article><strong>+25 XP</strong><span>Acertar 10 questões seguidas</span></article>
-            <article><strong>+40 XP</strong><span>Estudar 3 disciplinas no mesmo dia</span></article>
             <article><strong>+150 XP</strong><span>Dominar um capítulo: 30 questões e 80% de acertos</span></article>
-            <article><strong>+200 XP</strong><span>Estudar por 7 dias consecutivos</span></article>
         </div>
+        <h4 class="xp-topic-subtitle">Missões diárias visíveis</h4>
+        <div class="xp-rules-grid">
+            <article><strong>25, 50, 75… XP</strong><span><b>Sequência certeira:</b> 10, 20, 30… acertos seguidos. A meta cresce em 10 e a recompensa em 25 XP por etapa; ambas reiniciam diariamente.</span></article>
+            <article><strong>40 a 240 XP</strong><span><b>Ronda de disciplinas:</b> metas de 3, 6, 9, 12, 15 e 18. A recompensa progride para 40, 80, 120, 160, 200 e 240 XP; reinicia diariamente.</span></article>
+            <article><strong>+20 XP</strong><span><b>Ritmo diário:</b> responder 20 questões válidas no dia.</span></article>
+            <article><strong>+30 XP</strong><span><b>Precisão diária:</b> obter 80% de acertos em pelo menos 10 questões no dia.</span></article>
+            <article><strong>+60 XP</strong><span><b>Excelência diária:</b> obter 90% de acertos em pelo menos 20 questões no dia.</span></article>
+        </div>
+        <h4 class="xp-topic-subtitle">Missões semanais visíveis</h4>
+        <div class="xp-rules-grid">
+            <article><strong>+200 XP</strong><span><b>Constância semanal:</b> estudar por 7 dias consecutivos.</span></article>
+            <article><strong>+150 XP</strong><span><b>Centena da semana:</b> responder 100 questões válidas entre segunda e domingo.</span></article>
+            <article><strong>+100 XP</strong><span><b>Explorador semanal:</b> estudar 5 capítulos diferentes na semana.</span></article>
+        </div>
+        <p class="topic-main-content">As missões podem ser realizadas em qualquer ordem. Questões puladas não contam. Cada etapa concede XP uma única vez; as diárias reiniciam no começo do novo dia e as metas semanais renovam na segunda-feira.</p>
         <h4 class="xp-topic-subtitle">Bônus único por plano</h4>
         <p class="topic-main-content">Premium concede <strong>500 XP</strong>, Plus concede <strong>1.200 XP</strong> e VIP concede <strong>2.500 XP</strong>. Em um upgrade, o usuário recebe somente a diferença; renovar o mesmo plano não repete o bônus.</p>
         <h4 class="xp-topic-subtitle">XP necessário para cada patente</h4>

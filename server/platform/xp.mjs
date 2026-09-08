@@ -20,6 +20,29 @@ export function startOfLocalDay(value = new Date()) {
     return new Date(`${localDay(value)}T03:00:00.000Z`).toISOString();
 }
 
+export function startOfLocalWeek(value = new Date()) {
+    const [year, month, day] = localDay(value).split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const daysSinceMonday = (date.getUTCDay() + 6) % 7;
+    date.setUTCDate(date.getUTCDate() - daysSinceMonday);
+    return `${date.toISOString().slice(0, 10)}T03:00:00.000Z`;
+}
+
+export function sequenceMissionTarget(completedStages = 0) {
+    return (Math.max(0, Number(completedStages) || 0) + 1) * 10;
+}
+
+export function roundMissionTarget(completedStages = 0) {
+    const targets = [3, 6, 9, 12, 15, 18];
+    return targets[Math.min(Math.max(0, Number(completedStages) || 0), targets.length - 1)];
+}
+
+export function progressiveMissionReward(basePoints, completedStages = 0, maxStages = null) {
+    const nextStage = Math.max(0, Number(completedStages) || 0) + 1;
+    const rewardedStage = maxStages ? Math.min(nextStage, maxStages) : nextStage;
+    return Math.max(0, Number(basePoints) || 0) * rewardedStage;
+}
+
 export async function awardXp(userId, key, type, points, details = {}) {
     const { data, error } = await db().rpc('conceder_xp', {
         p_usuario_id: userId,
@@ -49,7 +72,7 @@ export async function awardXp(userId, key, type, points, details = {}) {
 
 async function recentResponses(userId, since = startOfLocalDay()) {
     const { data, error } = await db().from('respostas')
-        .select('id,acertou,pulada,respondida_em,disciplina_id_snapshot')
+        .select('id,acertou,pulada,respondida_em,disciplina_id_snapshot,capitulo_id_snapshot')
         .eq('usuario_id', userId)
         .gte('respondida_em', since)
         .order('respondida_em', { ascending: false })
@@ -68,7 +91,7 @@ function correctStreak(rows) {
 }
 
 async function studyStreak(userId) {
-    const since = new Date(Date.now() - 12 * DAY_MS).toISOString();
+    const since = new Date(Date.now() - 120 * DAY_MS).toISOString();
     const { data, error } = await db().from('respostas')
         .select('respondida_em').eq('usuario_id', userId).eq('pulada', false)
         .gte('respondida_em', since).order('respondida_em', { ascending: false }).limit(5000);
@@ -76,7 +99,7 @@ async function studyStreak(userId) {
     const days = new Set((data || []).map((row) => localDay(row.respondida_em)));
     let streak = 0;
     const cursor = new Date();
-    for (let index = 0; index < 12; index += 1) {
+    for (let index = 0; index < 120; index += 1) {
         if (!days.has(localDay(cursor))) break;
         streak += 1;
         cursor.setUTCDate(cursor.getUTCDate() - 1);
@@ -84,37 +107,156 @@ async function studyStreak(userId) {
     return streak;
 }
 
-export async function missionStatus(userId, { award = false } = {}) {
-    const [rows, streakDays] = await Promise.all([recentResponses(userId), studyStreak(userId)]);
-    const valid = rows.filter((row) => !row.pulada);
-    const disciplines = new Set(valid.map((row) => row.disciplina_id_snapshot).filter(Boolean)).size;
-    const sequence = correctStreak(rows);
-    const day = localDay();
-    const missions = [
-        { id: 'sequencia-10', titulo: 'Sequência certeira', descricao: 'Acerte 10 questões seguidas. Um erro reinicia esta contagem.', atual: Math.min(sequence, 10), meta: 10, unidade: 'acertos seguidos', pontos: 25, concluida: sequence >= 10 },
-        { id: 'disciplinas-3', titulo: 'Ronda de disciplinas', descricao: 'Responda em 3 disciplinas diferentes no mesmo dia.', atual: Math.min(disciplines, 3), meta: 3, unidade: 'disciplinas hoje', pontos: 40, concluida: disciplines >= 3 },
-        { id: 'constancia-7', titulo: 'Constância semanal', descricao: 'Estude em 7 dias consecutivos. Conta apenas 1 avanço por dia.', atual: Math.min(streakDays, 7), meta: 7, unidade: 'dias seguidos', pontos: 200, concluida: streakDays >= 7 },
-    ];
+async function awardedMissionKeys(userId, since) {
+    const { data, error } = await db().from('xp_eventos')
+        .select('chave').eq('usuario_id', userId).eq('tipo', 'missao')
+        .gte('criado_em', since).order('criado_em', { ascending: false }).limit(500);
+    if (error) throw error;
+    return new Set((data || []).map((event) => event.chave));
+}
 
-    if (award) {
-        for (const mission of missions.filter((item) => item.concluida)) {
-            const suffix = mission.id === 'constancia-7'
-                ? localDay(new Date(Date.now() - Math.max(streakDays - 1, 0) * DAY_MS))
-                : day;
-            const result = await awardXp(userId, `missao:${mission.id}:${suffix}`, 'missao', mission.pontos, { missao: mission.id, dia: day });
-            mission.premiada = result.applied;
-            if (result.applied) {
-                await createNotification({
-                    usuario_id: userId,
-                    tipo: 'missao',
-                    titulo: 'Missão concluída',
-                    mensagem: `${mission.titulo}: você ganhou ${mission.pontos} XP.`,
-                    acao: 'missoes',
-                    chave: `notificacao:missao:${mission.id}:${day}`,
-                });
-            }
-        }
+export async function missionStatus(userId, { award = false } = {}) {
+    const day = localDay();
+    const weekStart = startOfLocalWeek();
+    const week = weekStart.slice(0, 10);
+    const missionHistoryStart = new Date(Date.now() - 120 * DAY_MS).toISOString();
+    const [dailyRows, weeklyRows, streakDays, awardedKeys] = await Promise.all([
+        recentResponses(userId),
+        recentResponses(userId, weekStart),
+        studyStreak(userId),
+        awardedMissionKeys(userId, missionHistoryStart),
+    ]);
+    const validDaily = dailyRows.filter((row) => !row.pulada);
+    const validWeekly = weeklyRows.filter((row) => !row.pulada);
+    const disciplines = new Set(validDaily.map((row) => row.disciplina_id_snapshot).filter(Boolean)).size;
+    const weeklyChapters = new Set(validWeekly.map((row) => row.capitulo_id_snapshot).filter(Boolean)).size;
+    const sequence = correctStreak(dailyRows);
+    const dailyAnswers = validDaily.length;
+    const dailyCorrect = validDaily.filter((row) => row.acertou).length;
+    const dailyAccuracy = dailyAnswers ? Math.round((dailyCorrect / dailyAnswers) * 100) : 0;
+    const newlyAwarded = new Set();
+
+    async function grantMission({ id, key, title, points, details = {} }) {
+        if (!award || awardedKeys.has(key)) return false;
+        const result = await awardXp(userId, key, 'missao', points, { missao: id, dia: day, ...details });
+        // Mesmo se uma chamada paralela tiver concedido o prêmio primeiro, a
+        // chave única passa a representar uma etapa concluída nesta resposta.
+        awardedKeys.add(key);
+        if (!result.applied) return false;
+        newlyAwarded.add(id);
+        await createNotification({
+            usuario_id: userId,
+            tipo: 'missao',
+            titulo: 'Missão concluída',
+            mensagem: `${title}: você ganhou ${points} XP.`,
+            acao: 'missoes',
+            chave: `notificacao:${key}`,
+        });
+        return true;
     }
+
+    const sequencePrefix = `missao:sequencia:${day}:`;
+    let sequenceStages = [...awardedKeys].filter((key) => key.startsWith(sequencePrefix)).length;
+    let sequenceTarget = sequenceMissionTarget(sequenceStages);
+    let sequenceAwardedPoints = 0;
+    if (sequence >= sequenceTarget) {
+        const points = progressiveMissionReward(25, sequenceStages);
+        const applied = await grantMission({
+            id: 'sequencia-progressiva', key: `${sequencePrefix}${sequenceTarget}`,
+            title: `Sequência certeira ${sequenceTarget}`, points,
+            details: { meta: sequenceTarget, sequencia: sequence },
+        });
+        if (applied) sequenceAwardedPoints = points;
+        sequenceStages = [...awardedKeys].filter((key) => key.startsWith(sequencePrefix)).length;
+        sequenceTarget = sequenceMissionTarget(sequenceStages);
+    }
+
+    const roundTargets = [3, 6, 9, 12, 15, 18];
+    const roundPrefix = `missao:ronda:${day}:`;
+    let roundStages = [...awardedKeys].filter((key) => key.startsWith(roundPrefix)).length;
+    let roundTarget = roundMissionTarget(roundStages);
+    let roundAwardedPoints = 0;
+    if (roundStages < roundTargets.length && disciplines >= roundTarget) {
+        const points = progressiveMissionReward(40, roundStages, roundTargets.length);
+        const applied = await grantMission({
+            id: 'ronda-progressiva', key: `${roundPrefix}${roundTarget}`,
+            title: `Ronda de ${roundTarget} disciplinas`, points,
+            details: { meta: roundTarget, disciplinas },
+        });
+        if (applied) roundAwardedPoints = points;
+        roundStages = [...awardedKeys].filter((key) => key.startsWith(roundPrefix)).length;
+        roundTarget = roundMissionTarget(roundStages);
+    }
+
+    const dailyDefinitions = [
+        {
+            id: 'ritmo-diario', key: `missao:ritmo-20:${day}`, titulo: 'Ritmo diário',
+            descricao: 'Responda 20 questões válidas hoje.', atual: Math.min(dailyAnswers, 20), meta: 20,
+            unidade: 'questões hoje', pontos: 20, ready: dailyAnswers >= 20,
+        },
+        {
+            id: 'precisao-diaria', key: `missao:precisao-80:${day}`, titulo: 'Precisão diária',
+            descricao: 'Mantenha pelo menos 80% de acertos em 10 questões no dia.', atual: Math.min(dailyAccuracy, 80), meta: 80,
+            unidade: `% · ${Math.min(dailyAnswers, 10)}/10 questões`, pontos: 30, ready: dailyAnswers >= 10 && dailyAccuracy >= 80,
+            progresso: Math.min(100, Math.round(Math.min(dailyAnswers / 10, dailyAccuracy / 80) * 100)),
+        },
+        {
+            id: 'excelencia-diaria', key: `missao:excelencia-90:${day}`, titulo: 'Excelência diária',
+            descricao: 'Mantenha pelo menos 90% de acertos em 20 questões no dia.', atual: Math.min(dailyAccuracy, 90), meta: 90,
+            unidade: `% · ${Math.min(dailyAnswers, 20)}/20 questões`, pontos: 60, ready: dailyAnswers >= 20 && dailyAccuracy >= 90,
+            progresso: Math.min(100, Math.round(Math.min(dailyAnswers / 20, dailyAccuracy / 90) * 100)),
+        },
+    ];
+    for (const mission of dailyDefinitions) {
+        if (mission.ready) await grantMission({ id: mission.id, key: mission.key, title: mission.titulo, points: mission.pontos });
+    }
+
+    const streakStart = localDay(new Date(Date.now() - Math.max(streakDays - 1, 0) * DAY_MS));
+    const weeklyDefinitions = [
+        {
+            id: 'constancia-7', key: `missao:constancia-7:${streakStart}`, titulo: 'Constância semanal',
+            descricao: 'Estude em 7 dias consecutivos. Conta um avanço por dia.', atual: Math.min(streakDays, 7), meta: 7,
+            unidade: 'dias seguidos', pontos: 200, ready: streakDays >= 7,
+        },
+        {
+            id: 'centena-semanal', key: `missao:centena-100:${week}`, titulo: 'Centena da semana',
+            descricao: 'Responda 100 questões válidas entre segunda e domingo.', atual: Math.min(validWeekly.length, 100), meta: 100,
+            unidade: 'questões na semana', pontos: 150, ready: validWeekly.length >= 100,
+        },
+        {
+            id: 'explorador-semanal', key: `missao:explorador-5:${week}`, titulo: 'Explorador semanal',
+            descricao: 'Estude 5 capítulos diferentes durante a semana.', atual: Math.min(weeklyChapters, 5), meta: 5,
+            unidade: 'capítulos na semana', pontos: 100, ready: weeklyChapters >= 5,
+        },
+    ];
+    for (const mission of weeklyDefinitions) {
+        if (mission.ready) await grantMission({ id: mission.id, key: mission.key, title: mission.titulo, points: mission.pontos });
+    }
+
+    const missions = [
+        {
+            id: 'sequencia-progressiva', grupo: 'Diárias', titulo: 'Sequência certeira',
+            descricao: `Próxima etapa: ${sequenceTarget} acertos seguidos. Um erro reinicia somente a sequência atual.`,
+            atual: Math.min(sequence, sequenceTarget), meta: sequenceTarget, unidade: 'acertos seguidos',
+            pontos: progressiveMissionReward(25, sequenceStages), pontos_premiados: sequenceAwardedPoints,
+            concluida: false, premiada: newlyAwarded.has('sequencia-progressiva'), etapas_concluidas: sequenceStages,
+        },
+        {
+            id: 'ronda-progressiva', grupo: 'Diárias', titulo: 'Ronda de disciplinas',
+            descricao: roundStages >= roundTargets.length
+                ? 'Todas as 6 etapas de hoje foram concluídas. A missão volta para 3 amanhã.'
+                : `Próxima etapa: estudar ${roundTarget} disciplinas diferentes hoje.`,
+            atual: Math.min(disciplines, roundTarget), meta: roundTarget, unidade: 'disciplinas hoje',
+            pontos: progressiveMissionReward(40, roundStages, roundTargets.length), pontos_premiados: roundAwardedPoints,
+            concluida: roundStages >= roundTargets.length, premiada: newlyAwarded.has('ronda-progressiva'), etapas_concluidas: roundStages,
+        },
+        ...dailyDefinitions.map(({ key, ready, ...mission }) => ({
+            ...mission, grupo: 'Diárias', concluida: awardedKeys.has(key), premiada: newlyAwarded.has(mission.id),
+        })),
+        ...weeklyDefinitions.map(({ key, ready, ...mission }) => ({
+            ...mission, grupo: 'Semanais', concluida: awardedKeys.has(key), premiada: newlyAwarded.has(mission.id),
+        })),
+    ];
 
     const { data: user, error } = await db().from('usuarios').select('xp_total,xp_bonus_plano').eq('id', userId).single();
     if (error) throw error;
@@ -124,6 +266,8 @@ export async function missionStatus(userId, { award = false } = {}) {
         xp_bonus_plano: Number(user?.xp_bonus_plano || 0),
         patente: patent,
         missoes: missions,
+        concluidas_no_ciclo: dailyDefinitions.filter((item) => awardedKeys.has(item.key)).length
+            + weeklyDefinitions.filter((item) => awardedKeys.has(item.key)).length + sequenceStages + roundStages,
     };
 }
 
@@ -174,7 +318,8 @@ export async function awardAnswerXp({ userId, questionId, chapterId, correct, pr
     const missions = await missionStatus(userId, { award: true });
     return {
         xp_ganho: awarded.filter((item) => item.applied).reduce((sum, item) => sum + item.points, 0)
-            + missions.missoes.filter((item) => item.premiada).reduce((sum, item) => sum + item.pontos, 0),
+            + missions.missoes.filter((item) => item.premiada)
+                .reduce((sum, item) => sum + Number(item.pontos_premiados ?? item.pontos), 0),
         xp_total: missions.xp_total,
         missoes_concluidas: missions.missoes.filter((item) => item.premiada).map((item) => item.id),
     };

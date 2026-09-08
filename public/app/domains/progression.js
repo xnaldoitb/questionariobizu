@@ -111,13 +111,22 @@ function renderMissions(payload) {
         ? `${Number(patent.faltam || 0).toLocaleString('pt-BR')} XP para ${patent.proxima}`
         : 'Patente máxima alcançada';
     const missions = payload.missoes || [];
-    updateCount('missionCount', missions.filter((item) => item.concluida).length);
+    updateCount('missionCount', payload.concluidas_no_ciclo ?? missions.filter((item) => item.concluida).length);
+    let currentGroup = '';
     one('#missionsList').innerHTML = missions.map((mission) => {
-        const progress = Math.min(100, Math.round((Number(mission.atual || 0) / Math.max(Number(mission.meta || 1), 1)) * 100));
-        return `<article class="mission-item ${mission.concluida ? 'is-complete' : ''}">
-            <span class="mission-check" aria-hidden="true">${mission.concluida ? '✓' : ''}</span>
+        const calculatedProgress = Math.round((Number(mission.atual || 0) / Math.max(Number(mission.meta || 1), 1)) * 100);
+        const progress = mission.concluida ? 100 : Math.min(100, Number(mission.progresso ?? calculatedProgress));
+        const group = mission.grupo || 'Missões';
+        const groupHeader = group !== currentGroup
+            ? `<h3 class="mission-group-title"><span>${safeText(group)}</span><small>${group === 'Diárias' ? 'renovam diariamente' : 'segunda a domingo'}</small></h3>`
+            : '';
+        currentGroup = group;
+        const stages = Number(mission.etapas_concluidas || 0);
+        const stageLabel = stages ? `<em>${stages} ${stages === 1 ? 'etapa concluída' : 'etapas concluídas'}</em>` : '';
+        return `${groupHeader}<article class="mission-item ${mission.concluida ? 'is-complete' : ''} ${mission.premiada ? 'is-newly-complete' : ''}">
+            <span class="mission-check" aria-hidden="true">${mission.concluida ? '✓' : (stages || '')}</span>
             <div class="mission-copy"><div><strong>${safeText(mission.titulo)}</strong><b>+${mission.pontos} XP</b></div><span>${safeText(mission.descricao)}</span>
-                <div class="mission-progress"><i style="width:${progress}%"></i></div><small>${mission.atual}/${mission.meta} ${safeText(mission.unidade || '')}</small>
+                <div class="mission-progress"><i style="width:${progress}%"></i></div><footer>${stageLabel}<small>${mission.atual}/${mission.meta} ${safeText(mission.unidade || '')}</small></footer>
             </div>
         </article>`;
     }).join('') || '<div class="progression-empty">Nenhuma missão disponível.</div>';

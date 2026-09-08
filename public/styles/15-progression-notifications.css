@@ -1,4 +1,4 @@
-/* v4.44 · atalhos, missões, XP e notificações */
+/* v4.45 · atalhos, missões progressivas, XP e notificações */
 .action-bar { padding-bottom:44px !important; }
 .action-brand-static { cursor:default !important; pointer-events:none; }
 .action-brand-static:hover { transform:none !important; }
@@ -54,20 +54,26 @@
 .xp-summary-progress { grid-column:1/-1; height:7px; margin-top:6px; overflow:hidden; background:var(--canvas-soft); border:1px solid var(--line); border-radius:999px; }
 .xp-summary-progress i { display:block; width:0; height:100%; background:linear-gradient(90deg,#315f9b,#d7aa3d); border-radius:inherit; transition:width .45s ease; }
 .xp-summary > small { grid-column:1/-1; color:var(--text-muted); font:650 9px var(--type-ui); }
+.mission-group-title { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0; padding:9px 15px; color:var(--text-main); background:var(--canvas-soft); border-bottom:1px solid var(--line); font:800 10px/1.2 var(--type-heading); letter-spacing:.045em; text-transform:uppercase; }
+.mission-group-title small { color:var(--text-muted); font:650 7.5px/1.2 var(--type-ui); letter-spacing:.035em; text-transform:none; }
 .mission-item { display:grid; grid-template-columns:30px minmax(0,1fr); gap:10px; padding:12px 15px; border-bottom:1px solid var(--line); }
 .mission-check { display:grid; place-items:center; width:28px; height:28px; color:var(--text-muted); background:var(--canvas-soft); border:1px solid var(--line); border-radius:50%; font:800 13px var(--type-ui); }
 .mission-item.is-complete .mission-check { color:#fff; background:#3e7c5e; border-color:#3e7c5e; }
+.mission-item.is-newly-complete { animation:mission-reward-flash .8s ease-out; }
 .mission-copy { display:grid; gap:4px; min-width:0; }
 .mission-copy > div:first-child { display:flex; align-items:start; justify-content:space-between; gap:9px; }
 .mission-copy strong { color:var(--text-main); font:750 12px/1.2 var(--type-heading); }
 .mission-copy b { flex:none; color:#9a7020; font:800 9px var(--type-ui); }
 .mission-copy > span { color:var(--text-muted); font:500 9.5px/1.35 var(--type-ui); }
-.mission-copy small { justify-self:end; color:var(--text-muted); font:700 8px var(--type-ui); }
+.mission-copy footer { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; }
+.mission-copy footer em { color:#3e7c5e; font:750 8px/1.2 var(--type-ui); font-style:normal; }
+.mission-copy small { margin-left:auto; color:var(--text-muted); font:700 8px var(--type-ui); text-align:right; }
 .mission-progress { height:5px; overflow:hidden; background:var(--canvas-soft); border-radius:999px; }
 .mission-progress i { display:block; height:100%; background:#557ea8; border-radius:inherit; }
 .mission-item.is-complete .mission-progress i { background:#3e7c5e; }
 .mission-rules-link { display:block; width:calc(100% - 30px); margin:12px 15px 15px; padding:10px; border:1px solid var(--line); border-radius:8px; text-decoration:none; }
 .mission-rules-link:hover { background:var(--canvas-soft); }
+@keyframes mission-reward-flash { 0% { background:color-mix(in srgb,#d7aa3d 24%,var(--panel-surface)); } 100% { background:transparent; } }
 .xp-rules-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin:12px 0 18px; }
 .xp-rules-grid article { display:grid; gap:3px; padding:10px; background:var(--canvas-soft); border:1px solid var(--line); border-radius:9px; }
 .xp-rules-grid strong { color:#a27520; font:800 12px var(--type-heading); }
