@@ -33,7 +33,10 @@ export async function mercadoPagoRequest(path, options = {}) {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
         console.error('Mercado Pago:', response.status, payload?.message || payload?.error);
-        throw new Error('Não foi possível iniciar ou confirmar o pagamento no Mercado Pago.');
+        const error = new Error('Não foi possível iniciar ou confirmar o pagamento no Mercado Pago.');
+        error.status = response.status;
+        error.providerCode = String(payload?.error || payload?.code || '').slice(0, 80) || null;
+        throw error;
     }
     return payload;
 }
@@ -224,7 +227,18 @@ export async function reconcilePayment(paymentRecord) {
     if (touchError) throw touchError;
     const signal = AbortSignal.timeout(15000);
     const mercadoPagoPayment = await findProviderPayment(paymentRecord, path => mercadoPagoRequest(path, { signal }));
-    if (!mercadoPagoPayment) return paymentRecord;
+    if (!mercadoPagoPayment) {
+        const createdAt = new Date(paymentRecord.criado_em || 0).getTime();
+        if (Number.isFinite(createdAt) && createdAt > 0 && createdAt < Date.now() - 86_400_000) {
+            const { error } = await db().from('pagamentos').update({
+                status: 'expirado',
+                atualizado_em: new Date().toISOString(),
+            }).eq('id', paymentRecord.id).is('aplicado_em', null);
+            if (error) throw error;
+            return { ...paymentRecord, status: 'expirado' };
+        }
+        return paymentRecord;
+    }
     await applyMercadoPagoPayment(mercadoPagoPayment);
     const { data, error } = await db().from('pagamentos').select('*').eq('id', paymentRecord.id).single();
     if (error) throw error;

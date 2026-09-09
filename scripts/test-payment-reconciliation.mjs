@@ -21,10 +21,18 @@ const paginated = await findProviderPayment({ id: 'original' }, async path => {
 assert.equal(pages, 2);
 assert.equal(paginated.status, 'approved');
 assert.equal(await findProviderPayment({ id: 'original' }, async () => ({ results: [{ ...approved, external_reference: 'other' }] })), null);
+const recoveredFromMissingId = await findProviderPayment({ id: 'original', mercado_pago_payment_id: '999' }, async path => {
+    if (path === '/v1/payments/999') throw Object.assign(new Error('not found'), { status: 404 });
+    return { results: [approved], paging: { total: 1 } };
+});
+assert.equal(recoveredFromMissingId.status, 'approved');
+let capturedFailure;
 assert.deepEqual(await reconcileRecords([{ id: 1 }, { id: 2 }], async r => {
     if (r.id === 1) throw new Error('provider unavailable');
     return { status: 'approved', aplicado_em: '2026-08-28' };
-}), { confirmados: 1, falhas: 1, verificados: 2 });
+}, { onError: failure => { capturedFailure = failure; } }), { confirmados: 1, falhas: 1, verificados: 2 });
+assert.equal(capturedFailure.id, 1);
+assert.match(capturedFailure.error.message, /provider unavailable/);
 
 // Structural guards complement unit tests; these do not execute PostgreSQL.
 const sql = await readFile(new URL('../supabase/migration-v4.20-reconciliacao-compensacao.sql', import.meta.url), 'utf8');

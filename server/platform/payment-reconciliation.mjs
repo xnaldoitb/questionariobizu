@@ -7,7 +7,16 @@ export async function findProviderPayment(record, request) {
     const knownId = hintedId || record.mercado_pago_payment_id;
     let known = null;
     if (knownId) {
-        known = await request(`/v1/payments/${encodeURIComponent(knownId)}`);
+        try {
+            known = await request(`/v1/payments/${encodeURIComponent(knownId)}`);
+        } catch (error) {
+            // IDs antigos ou digitados incorretamente podem não existir mais.
+            // Nesse caso, a busca pela referência interna ainda pode localizar
+            // a cobrança correta sem interromper todo o lote.
+            if (Number(error?.status) !== 404) throw error;
+        }
+    }
+    if (known) {
         if (paymentReference(known) !== record.id || String(known.id) !== String(knownId)) {
             throw new Error('A transação não corresponde à cobrança selecionada.');
         }
@@ -27,10 +36,13 @@ export async function findProviderPayment(record, request) {
     throw new Error('Há muitas tentativas nesta cobrança. Consulte o administrador.');
 }
 
-export async function reconcileRecords(records, reconcile) {
+export async function reconcileRecords(records, reconcile, { onError } = {}) {
     const results = await Promise.all(records.map(async record => {
         try { return { payment: await reconcile(record) }; }
-        catch { return { error: true, id: record.id }; }
+        catch (error) {
+            onError?.({ id: record.id, error });
+            return { error: true, id: record.id };
+        }
     }));
     return {
         confirmados: results.filter(r => r.payment?.status === 'approved' && r.payment?.aplicado_em).length,

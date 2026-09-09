@@ -96,6 +96,7 @@ const requiredFiles = [
     'supabase/migration-v4.44.1-xp-missoes-notificacoes.sql',
     'supabase/migration-v4.46.1-retroativo-missoes.sql',
     'supabase/migration-v4.46.2-historico-preserva-xp.sql',
+    'supabase/migration-v4.47.1-fila-reconciliacao.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -128,6 +129,7 @@ const migration4432 = await readFile('supabase/migration-v4.43.2-adm-vitalicio.s
 const migration444 = await readFile('supabase/migration-v4.44.1-xp-missoes-notificacoes.sql', 'utf8');
 const migration461 = await readFile('supabase/migration-v4.46.1-retroativo-missoes.sql', 'utf8');
 const migration462 = await readFile('supabase/migration-v4.46.2-historico-preserva-xp.sql', 'utf8');
+const migration471 = await readFile('supabase/migration-v4.47.1-fila-reconciliacao.sql', 'utf8');
 const badges = await readFile('public/app/foundation/badges.js', 'utf8');
 const dashboardView = await readFile('public/views/dashboard.html', 'utf8');
 const quizView = await readFile('public/views/quiz.html', 'utf8');
@@ -532,6 +534,9 @@ for (const marker of ['America/Belem', 'sequencia-progressiva', 'ronda-progressi
 for (const marker of ['redefinir_progresso_usuario', "e.tipo <> 'plano'", 'xp_total = v_bonus', "n.tipo in ('missao', 'patente')", 'to service_role']) {
     if (!migration462.includes(marker)) throw new Error(`Separação de histórico e progresso v4.46.2 incompleta: ${marker}`);
 }
+for (const marker of ["lower(coalesce(status, 'pendente'))", "'approved'", 'excluido_em is null', 'limit 10', 'for update skip locked', 'to service_role']) {
+    if (!migration471.includes(marker)) throw new Error(`Fila de reconciliação v4.47.1 incompleta: ${marker}`);
+}
 
 const migration418 = await readFile('supabase/migration-v4.18-sessao-mesmo-dispositivo.sql', 'utf8');
 for (const marker of ['sessao_ativa_device_hash', 'p_device_hash text', 'sessao_ativa_device_hash = p_device_hash']) {
@@ -541,4 +546,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.47.0: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.47.1: verificações estruturais concluídas.');

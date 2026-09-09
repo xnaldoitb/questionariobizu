@@ -16,11 +16,15 @@ export function createScheduledPaymentHandler({ secret, claim, reconcile, rateLi
             if (!await rateLimit(event)) return json(429, { erro: 'Aguarde a próxima execução.' });
             const records = await claim();
             const result = await reconcile(records);
-            const summary = { ...result, limite_lote: 10 };
+            const summary = { ...result, limite_lote: 10, parcial: result.falhas > 0 };
             log('Reconciliação agendada de pagamentos:', summary);
-            return json(result.falhas ? 503 : 200, summary);
-        } catch {
-            log('Reconciliação agendada de pagamentos: falha; nova tentativa no próximo ciclo.');
+            // Uma falha isolada não invalida as demais verificações do lote. O
+            // cron continuará tentando o registro no ciclo seguinte.
+            return json(200, summary);
+        } catch (error) {
+            log('Reconciliação agendada de pagamentos: falha geral; nova tentativa no próximo ciclo.', {
+                motivo: String(error?.message || 'erro desconhecido').slice(0, 180),
+            });
             return json(503, { erro: 'Não foi possível concluir a verificação. Será tentada no próximo ciclo.' });
         }
     };

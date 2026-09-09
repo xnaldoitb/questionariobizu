@@ -85,7 +85,7 @@ assert(community.includes('Premium concede <strong>500 XP</strong>'));
 assert(community.includes('10, 20, 30…') && community.includes('3, 6, 9, 12, 15 e 18'));
 assert(community.includes('20, 40, 60… questões válidas') && community.includes('60, 120, 180… XP'));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.47.0'));
-assert(worker.includes('v4.47.0-presente-xp') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.47.1'));
+assert(worker.includes('v4.47.1-reconciliacao') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, notificações e tópico oficial v4.46 validados.');

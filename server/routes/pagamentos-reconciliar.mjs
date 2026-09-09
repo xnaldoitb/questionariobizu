@@ -15,5 +15,12 @@ export const handler = createScheduledPaymentHandler({
         if (error) throw error;
         return data || [];
     },
-    reconcile: records => reconcileRecords(records, reconcilePayment),
+    reconcile: records => reconcileRecords(records, reconcilePayment, {
+        onError: ({ id, error }) => console.error('Falha ao reconciliar cobrança agendada:', {
+            pagamento_id: String(id || ''),
+            status_provedor: Number(error?.status) || null,
+            codigo_provedor: error?.providerCode || null,
+            motivo: String(error?.message || 'erro desconhecido').slice(0, 180),
+        }),
+    }),
 });
