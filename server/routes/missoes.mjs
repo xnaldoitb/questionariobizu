@@ -14,7 +14,7 @@ export const handler = async (event) => {
     if (!rate.allowed) return json(rate.unavailable ? 503 : 429, { erro: 'Aguarde um instante antes de atualizar as missões.' });
     try {
         return json(200, await missionStatus(user.id, {
-            award: true,
+            award: false,
             institutional,
         }));
     } catch (error) {

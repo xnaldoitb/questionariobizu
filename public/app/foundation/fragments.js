@@ -1,4 +1,4 @@
-const fragments = [
+const coreFragments = [
     'auth.html',
     'topbar.html',
     'dashboard.html',
@@ -6,9 +6,10 @@ const fragments = [
     'result.html',
     'history.html',
     'ranking.html',
-    'payment.html',
-    'admin.html'
+    'payment.html'
 ];
+
+let adminFragmentPromise = null;
 
 async function loadFragment(fileName) {
     const response = await fetch(`/views/${fileName}`);
@@ -22,7 +23,7 @@ async function loadFragment(fileName) {
 
 export async function mountInterface() {
     const root = document.querySelector('#appRoot');
-    const loaded = await Promise.all(fragments.map(loadFragment));
+    const loaded = await Promise.all(coreFragments.map(loadFragment));
     const [auth, topbar, ...screens] = loaded;
 
     root.innerHTML = `
@@ -63,4 +64,23 @@ export async function mountInterface() {
         const modal = root.querySelector(`#${id}`);
         if (modal) appView?.append(modal);
     }
+}
+
+export async function mountAdminInterface() {
+    const existing = document.querySelector('#adminView');
+    if (existing) return existing;
+
+    if (!adminFragmentPromise) {
+        adminFragmentPromise = loadFragment('admin.html').then((html) => {
+            const main = document.querySelector('#appView main');
+            if (!main) throw new Error('A área principal não está disponível.');
+            main.insertAdjacentHTML('beforeend', html);
+            return document.querySelector('#adminView');
+        }).catch((error) => {
+            adminFragmentPromise = null;
+            throw error;
+        });
+    }
+
+    return adminFragmentPromise;
 }

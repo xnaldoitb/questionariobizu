@@ -18,6 +18,10 @@ mock('admin-audit.mjs',{auditAdmin:async()=>true});
 mock('rate-limit.mjs',{clearRateLimit:async()=>{loginLimitCleared=true;}});
 mock('xp.mjs',{awardXp:async(id,key,type,points,details)=>{gifted={id,key,type,points,details};return {applied:true,xpTotal:points};}});
 mock('notifications.mjs',{createNotification:async(record)=>{giftNotification=record;}});
+mock('admin-permissions.mjs',{
+    canManageAdminTarget:(currentActor,currentTarget)=>currentActor.perfil==='supremo'||currentTarget.responsavel_admin_id===currentActor.id,
+    claimUnassignedAdminTarget:async()=>true,
+});
 mock('db.mjs',{db:()=>({from:()=>{
     const q = {select:()=>q,eq:()=>q,neq:()=>q,in:()=>q,delete:()=>q,maybeSingle:async()=>({data:target,error:null}),
         update:payload=>{saved=payload;return q;},insert:payload=>{saved=payload;return q;},

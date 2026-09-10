@@ -1,5 +1,5 @@
-import { mountInterface } from './foundation/fragments.js';
-import { one, safeText } from './foundation/selectors.js';
+import { mountAdminInterface, mountInterface } from './foundation/fragments.js';
+import { one, safeText, notify } from './foundation/selectors.js';
 import { appState } from './foundation/model.js';
 import { accountBadges, roleConnectedLabel } from './foundation/badges.js';
 import { openScreen } from './foundation/navigation.js';
@@ -19,16 +19,37 @@ import { bindRewardEvents, checkRewardNotification } from './domains/rewards.js'
 import { bindPatentEvents, checkPatentNotification } from './domains/patents.js';
 import { ADMIN_PATENT, DEVELOPER_PATENT, patentButtonMarkup, patentForHits } from './foundation/patents.js';
 import { bindPwaInstall } from './foundation/pwa.js';
-import {
-    bindManagementEvents,
-    renderManagedCatalog,
-    applyManagementAccess,
-    openManagementWorkspace
-} from './domains/management.js';
 
 const PROFILE_REFRESH_MS = 15_000;
 let lastProfileRefresh = 0;
 let lastProfilePatentLevel = null;
+let managementPromise = null;
+
+function canManage() {
+    return ['admin', 'supremo'].includes(appState.user?.perfil);
+}
+
+async function ensureManagement() {
+    if (!canManage()) throw new Error('Acesso restrito.');
+    if (!managementPromise) {
+        managementPromise = (async () => {
+            await mountAdminInterface();
+            const management = await import('./domains/management.js');
+            onCatalogReady(management.renderManagedCatalog);
+            management.bindManagementEvents();
+            one('#adminSubject')?.addEventListener('change', () => {
+                populateChapterSelector('#adminSubject', '#adminChapter', false);
+            });
+            management.applyManagementAccess();
+            management.renderManagedCatalog();
+            return management;
+        })().catch((error) => {
+            managementPromise = null;
+            throw error;
+        });
+    }
+    return managementPromise;
+}
 
 function refreshThemeControl() {
     const dark = document.documentElement.dataset.theme === 'dark';
@@ -85,17 +106,12 @@ async function refreshProfileSummary({ force = false } = {}) {
     if (!force && Date.now() - lastProfileRefresh < PROFILE_REFRESH_MS) return;
 
     try {
-        const response = await fetch('/api/ranking', { credentials: 'same-origin' });
+        const response = await fetch('/api/ranking?resumo=1', { credentials: 'same-origin' });
         const payload = await response.json();
-        const ranking = payload.ranking || [];
-        const index = ranking.findIndex(
-            (entry) =>
-                entry.usuario_id === appState.user.id ||
-                entry.usuario === appState.user.usuario
-        );
-        const current = index >= 0 ? ranking[index] : null;
+        if (!response.ok) throw new Error(payload.erro || 'Não foi possível carregar seu resumo.');
+        const current = payload.resumo || null;
 
-        one('#profileRanking').textContent = index >= 0 ? `${index + 1}º` : '—';
+        one('#profileRanking').textContent = current?.posicao ? `${current.posicao}º` : '—';
         one('#profileAnswered').textContent = current?.respondidas || 0;
         one('#profileCorrect').textContent = current?.acertos || 0;
         const patentAdvanced = renderProfilePatent(current?.xp_total || 0);
@@ -115,7 +131,7 @@ async function enterWorkspace() {
     startAccessIndicator();
     startCommunity();
     startProgression();
-    applyManagementAccess();
+    one('#navAdmin')?.classList.toggle('hidden', !canManage());
     await refreshCatalog();
     openScreen('dashboard');
     checkRewardNotification().then((shown) => {
@@ -131,8 +147,17 @@ function bindPrimaryNavigation() {
     });
 
     one('#navAdmin').addEventListener('click', async () => {
-        openScreen('adminView');
-        await openManagementWorkspace();
+        const button = one('#navAdmin');
+        button.disabled = true;
+        try {
+            const management = await ensureManagement();
+            openScreen('adminView');
+            await management.openManagementWorkspace();
+        } catch (error) {
+            notify(error.message || 'Não foi possível abrir a área administrativa.');
+        } finally {
+            button.disabled = false;
+        }
     });
 
     one('#themeBtn').addEventListener('click', alternateTheme);
@@ -155,15 +180,11 @@ function bindPrimaryNavigation() {
         populateChapterSelector('#subjectSelect', '#chapterSelect', true);
     });
 
-    one('#adminSubject').addEventListener('change', () => {
-        populateChapterSelector('#adminSubject', '#adminChapter', false);
-    });
 }
 
 async function bootstrap() {
     await mountInterface();
     restoreThemePreference();
-    onCatalogReady(renderManagedCatalog);
 
     bindIdentityEvents(enterWorkspace);
     bindPrimaryNavigation();
@@ -174,7 +195,6 @@ async function bootstrap() {
     bindRewardEvents();
     bindPatentEvents();
     bindPwaInstall();
-    bindManagementEvents();
 
     try {
         await recoverIdentity();

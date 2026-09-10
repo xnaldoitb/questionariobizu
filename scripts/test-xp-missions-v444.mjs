@@ -68,8 +68,8 @@ for (const marker of ["action === 'gift_xp'", "awardXp(id, `presente:", "tipo: '
 for (const marker of ['data-user-command="gift_xp"', "openAdminModal('xpGiftModal')", "sendUserAction(id, 'gift_xp'"]) assert(adminUsersUi.includes(marker));
 assert(notifications.includes(".eq('usuario_id', user.id)") && notifications.includes('marcar_todas'));
 assert(missions.includes('missionStatus(user.id, {'));
-assert(missions.includes("['admin', 'supremo'].includes(user.perfil)") && missions.includes('award: true'));
-assert(router.includes("['missoes', missoes]") && router.includes("['notificacoes', notificacoes]"));
+assert(missions.includes("['admin', 'supremo'].includes(user.perfil)") && missions.includes('award: false'));
+assert(router.includes("['missoes',") && router.includes("['notificacoes',"));
 for (const id of ['notificationsBtn', 'missionsBtn']) assert(topbar.includes(`id="${id}"`));
 assert(topbar.includes('<div class="action-brand action-brand-static"') && !topbar.includes('<button class="action-brand"'));
 for (const id of ['notificationsModal', 'missionsModal', 'notificationsClose', 'missionsClose']) assert(dashboard.includes(`id="${id}"`));
@@ -85,7 +85,8 @@ assert(community.includes('Premium concede <strong>500 XP</strong>'));
 assert(community.includes('10, 20, 30…') && community.includes('3, 6, 9, 12, 15 e 18'));
 assert(community.includes('20, 40, 60… questões válidas') && community.includes('60, 120, 180… XP'));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.47.1'));
-assert(worker.includes('v4.47.1-reconciliacao') && worker.includes('15-progression-notifications.css'));
+assert(xp.includes("rpc('metricas_missoes_v448'") && xp.includes("rpc('metricas_dominio_capitulo_v448'"));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.48.0'));
+assert(worker.includes('questionario-bizu-v4.48.0') && worker.includes('15-progression-notifications.css'));
 
-console.log('XP, missões progressivas, notificações e tópico oficial v4.46 validados.');
+console.log('XP, missões progressivas, métricas agregadas e notificações v4.48 validados.');

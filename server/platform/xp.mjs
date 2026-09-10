@@ -120,31 +120,70 @@ async function awardedMissionKeys(userId, since) {
     return new Set((data || []).map((event) => event.chave));
 }
 
+async function aggregatedMissionMetrics(userId, day, weekStart) {
+    const { data, error } = await db().rpc('metricas_missoes_v448', {
+        p_usuario_id: userId,
+        p_dia: day,
+        p_inicio_semana: weekStart.slice(0, 10),
+    });
+    if (error) throw error;
+    const metrics = Array.isArray(data) ? data[0] : data;
+    if (!metrics || typeof metrics !== 'object') throw new Error('Métricas de missões inválidas.');
+    return {
+        dailyAnswers: Number(metrics.respostas_dia || 0),
+        dailyCorrect: Number(metrics.acertos_dia || 0),
+        disciplines: Number(metrics.disciplinas_dia || 0),
+        weeklyAnswers: Number(metrics.respostas_semana || 0),
+        weeklyChapters: Number(metrics.capitulos_semana || 0),
+        sequence: Number(metrics.sequencia_acertos || 0),
+        streakDays: Number(metrics.dias_consecutivos || 0),
+    };
+}
+
+async function fallbackMissionMetrics(userId, day, weekStart) {
+    const [weeklyRows, streakDays] = await Promise.all([
+        recentResponses(userId, weekStart),
+        studyStreak(userId),
+    ]);
+    const dailyRows = weeklyRows.filter((row) => localDay(row.respondida_em) === day);
+    const validDaily = dailyRows.filter((row) => !row.pulada);
+    const validWeekly = weeklyRows.filter((row) => !row.pulada);
+    return {
+        dailyAnswers: validDaily.length,
+        dailyCorrect: validDaily.filter((row) => row.acertou).length,
+        disciplines: new Set(validDaily.map((row) => row.disciplina_id_snapshot).filter(Boolean)).size,
+        weeklyAnswers: validWeekly.length,
+        weeklyChapters: new Set(validWeekly.map((row) => row.capitulo_id_snapshot).filter(Boolean)).size,
+        sequence: correctStreak(dailyRows),
+        streakDays,
+    };
+}
+
 export async function missionStatus(userId, { award = false, institutional = false } = {}) {
     const day = localDay();
     const weekStart = startOfLocalWeek();
     const week = weekStart.slice(0, 10);
     const missionHistoryStart = new Date(Date.now() - 120 * DAY_MS).toISOString();
-    const [weeklyResult, streakResult, keysResult] = await Promise.allSettled([
-        recentResponses(userId, weekStart),
-        studyStreak(userId),
+    const [metricsResult, keysResult] = await Promise.allSettled([
+        aggregatedMissionMetrics(userId, day, weekStart),
         awardedMissionKeys(userId, missionHistoryStart),
     ]);
-    const weeklyRows = weeklyResult.status === 'fulfilled' ? weeklyResult.value : [];
-    const dailyRows = weeklyRows.filter((row) => localDay(row.respondida_em) === day);
-    const streakDays = streakResult.status === 'fulfilled' ? streakResult.value : 0;
+    let metrics;
+    if (metricsResult.status === 'fulfilled') {
+        metrics = metricsResult.value;
+    } else {
+        console.warn('Agregação SQL de missões indisponível; usando compatibilidade temporária:', metricsResult.reason?.message || metricsResult.reason);
+        metrics = await fallbackMissionMetrics(userId, day, weekStart);
+    }
     const awardedKeys = keysResult.status === 'fulfilled' ? keysResult.value : new Set();
     const awardsAvailable = keysResult.status === 'fulfilled';
-    for (const result of [weeklyResult, streakResult, keysResult]) {
+    for (const result of [keysResult]) {
         if (result.status === 'rejected') console.warn('Métrica de missão temporariamente indisponível:', result.reason?.message || result.reason);
     }
-    const validDaily = dailyRows.filter((row) => !row.pulada);
-    const validWeekly = weeklyRows.filter((row) => !row.pulada);
-    const disciplines = new Set(validDaily.map((row) => row.disciplina_id_snapshot).filter(Boolean)).size;
-    const weeklyChapters = new Set(validWeekly.map((row) => row.capitulo_id_snapshot).filter(Boolean)).size;
-    const sequence = correctStreak(dailyRows);
-    const dailyAnswers = validDaily.length;
-    const dailyCorrect = validDaily.filter((row) => row.acertou).length;
+    const {
+        dailyAnswers, dailyCorrect, disciplines, weeklyAnswers,
+        weeklyChapters, sequence, streakDays,
+    } = metrics;
     const dailyAccuracy = dailyAnswers ? Math.round((dailyCorrect / dailyAnswers) * 100) : 0;
     const newlyAwarded = new Set();
 
@@ -257,8 +296,8 @@ export async function missionStatus(userId, { award = false, institutional = fal
         },
         {
             id: 'centena-semanal', key: `missao:centena-100:${week}`, titulo: 'Centena da semana',
-            descricao: 'Responda 100 questões válidas entre segunda e domingo.', atual: Math.min(validWeekly.length, 100), meta: 100,
-            unidade: 'questões na semana', pontos: 150, ready: validWeekly.length >= 100,
+            descricao: 'Responda 100 questões válidas entre segunda e domingo.', atual: Math.min(weeklyAnswers, 100), meta: 100,
+            unidade: 'questões na semana', pontos: 150, ready: weeklyAnswers >= 100,
         },
         {
             id: 'explorador-semanal', key: `missao:explorador-5:${week}`, titulo: 'Explorador semanal',
@@ -327,18 +366,32 @@ export async function missionStatus(userId, { award = false, institutional = fal
 
 async function awardChapterMastery(userId, chapterId) {
     if (!chapterId) return null;
-    const { data, error } = await db().from('respostas')
-        .select('questao_id,acertou,respondida_em').eq('usuario_id', userId)
-        .eq('capitulo_id_snapshot', chapterId).eq('pulada', false)
-        .order('respondida_em', { ascending: false }).limit(5000);
-    if (error) throw error;
-    const latest = new Map();
-    for (const row of data || []) if (row.questao_id && !latest.has(row.questao_id)) latest.set(row.questao_id, row);
-    const rows = [...latest.values()];
-    const correct = rows.filter((row) => row.acertou).length;
-    if (rows.length < 30 || correct / rows.length < 0.8) return null;
+    let questionCount = 0;
+    let correct = 0;
+    const aggregated = await db().rpc('metricas_dominio_capitulo_v448', {
+        p_usuario_id: userId,
+        p_capitulo_id: chapterId,
+    });
+    if (!aggregated.error) {
+        const metrics = Array.isArray(aggregated.data) ? aggregated.data[0] : aggregated.data;
+        questionCount = Number(metrics?.questoes || 0);
+        correct = Number(metrics?.acertos || 0);
+    } else {
+        console.warn('Agregação SQL de domínio indisponível; usando compatibilidade temporária:', aggregated.error.message);
+        const { data, error } = await db().from('respostas')
+            .select('questao_id,acertou,respondida_em').eq('usuario_id', userId)
+            .eq('capitulo_id_snapshot', chapterId).eq('pulada', false)
+            .order('respondida_em', { ascending: false }).limit(5000);
+        if (error) throw error;
+        const latest = new Map();
+        for (const row of data || []) if (row.questao_id && !latest.has(row.questao_id)) latest.set(row.questao_id, row);
+        const rows = [...latest.values()];
+        questionCount = rows.length;
+        correct = rows.filter((row) => row.acertou).length;
+    }
+    if (questionCount < 30 || correct / questionCount < 0.8) return null;
     const result = await awardXp(userId, `dominio-capitulo:${chapterId}`, 'dominio', 150, {
-        capitulo_id: chapterId, questoes: rows.length, acertos: correct,
+        capitulo_id: chapterId, questoes: questionCount, acertos: correct,
     });
     if (result.applied) await createNotification({
         usuario_id: userId,

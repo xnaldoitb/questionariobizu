@@ -4,6 +4,12 @@ import { db } from './db.mjs';
 import { resolveQuestionAccess } from './question-access.mjs';
 
 const encoder = new TextEncoder();
+const USER_SESSION_COLUMNS = [
+    'id', 'usuario', 'nome', 'whatsapp', 'perfil', 'vip', 'premium', 'plano_atual',
+    'xp_total', 'xp_bonus_plano', 'ativo', 'desativado_por_validade', 'status_aprovacao',
+    'acesso_teste', 'teste_expira_em', 'validade_ate', 'teste_ciclo_em',
+    'teste_saldo_segundos', 'teste_ativo_ate',
+].join(',');
 
 function carregarEnvLocal() {
     if (process.env.JWT_SECRET) return;
@@ -68,7 +74,7 @@ export async function getUser(event) {
         const { payload } = await jwtVerify(token, secret());
         const { data: registro, error } = await db()
             .from('usuarios')
-            .select('*')
+            .select(USER_SESSION_COLUMNS)
             .eq('id', payload.sub)
             .maybeSingle();
 

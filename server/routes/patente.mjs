@@ -18,18 +18,26 @@ async function rankingLeaderId() {
     return ranking[0]?.usuario_id || null;
 }
 
+async function currentUserIsLeader(userId) {
+    const { data, error } = await db().rpc('resumo_ranking_usuario_v448', {
+        p_usuario_id: userId,
+    });
+    if (!error && data) return Boolean(data.lider);
+    return (await rankingLeaderId()) === userId;
+}
+
 async function currentState(user) {
-    const [{ data: notification, error }, leaderId] = await Promise.all([
+    const [{ data: notification, error }, leader] = await Promise.all([
         db().from('usuarios')
             .select('patente_notificada_nivel,papirao_notificado,xp_total')
             .eq('id', user.id)
             .single(),
-        rankingLeaderId(),
+        currentUserIsLeader(user.id),
     ]);
     if (error) throw error;
     const xp = Number(notification?.xp_total || 0);
     const patente = patentStatus(xp);
-    const lider = leaderId === user.id && xp > 0;
+    const lider = leader && xp > 0;
     const notifiedLevel = Math.max(0, Number(notification?.patente_notificada_nivel || 0));
     const institutional = ['admin', 'supremo'].includes(user.perfil);
     return {

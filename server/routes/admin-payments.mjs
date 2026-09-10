@@ -6,6 +6,10 @@ import {
     paymentCanBeRemoved, reconcilePayment,
 } from '../platform/payments.mjs';
 import { auditAdmin } from '../platform/admin-audit.mjs';
+import {
+    canManageAdminTarget,
+    claimUnassignedAdminTarget,
+} from '../platform/admin-permissions.mjs';
 
 const ROLES = ['admin', 'supremo'];
 
@@ -23,26 +27,7 @@ async function targetUser(id) {
     return data;
 }
 
-export function canManage(actor, target) {
-    if (actor.perfil === 'supremo') return true;
-    return target?.perfil === 'aluno' && (
-        target.responsavel_admin_id === actor.id
-        || (!target.responsavel_admin_id && !target.vip)
-    );
-}
-
-async function claimUnassignedTarget(actor, target) {
-    if (actor.perfil === 'supremo' || target.responsavel_admin_id) return target.responsavel_admin_id === actor.id || actor.perfil === 'supremo';
-    const { data, error } = await db().from('usuarios')
-        .update({ responsavel_admin_id: actor.id })
-        .eq('id', target.id)
-        .is('responsavel_admin_id', null)
-        .select('id')
-        .maybeSingle();
-    if (error) throw error;
-    if (data) target.responsavel_admin_id = actor.id;
-    return Boolean(data);
-}
+export const canManage = canManageAdminTarget;
 
 async function loadPaymentHistory(actor) {
     let allowedUserIds = null;
@@ -171,7 +156,7 @@ export const handler = async (event) => {
     if (!target) return json(404, { erro: 'Usuário não encontrado.' });
     if (!canManage(actor, target)) return json(403, { erro: 'Você não pode alterar o acesso deste usuário.' });
     if (actor.perfil !== 'supremo' && !target.responsavel_admin_id) {
-        const claimed = await claimUnassignedTarget(actor, target);
+        const claimed = await claimUnassignedAdminTarget(actor, target);
         if (!claimed) return json(409, { erro: 'Este usuário acabou de ser assumido por outro administrador. Atualize a lista.' });
     }
     const plan = await loadPlan(String(body.plano_id || ''));

@@ -72,7 +72,7 @@ for (const marker of ['premios_usuario', 'premiar_usuario_plano', "origem = 'pre
 }
 assert(adminRoute.includes("action === 'award_plan'") && adminRoute.includes("rpc('premiar_usuario_plano'"));
 assert(adminUi.includes("adminPaymentAction('award_plan')"));
-assert(apiRouter.includes("['premio', premio]"));
+assert(apiRouter.includes("['premio',"));
 assert(css.includes('#paymentModal.modal-overlay') && css.includes('#rewardModal.modal-overlay'));
 assert(css.includes('align-items: center !important'));
 assert(css.includes('@media (prefers-reduced-motion: reduce)'));

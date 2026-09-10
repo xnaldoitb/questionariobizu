@@ -114,7 +114,7 @@ assert(patentInsigniaMarkup(320000).includes('patent-tile-frame'));
 assert(patentInsigniaMarkup(320000).includes('patent-tile-gloss'));
 assert(route.includes(".select('patente_notificada_nivel,papirao_notificado,xp_total')") && route.includes('patente_notificada_nivel'));
 assert(route.includes("['admin', 'supremo'].includes(user.perfil)") && route.includes('!institutional'));
-assert(router.includes("['patente', patente]"));
+assert(router.includes("['patente',"));
 assert(migration.includes('between 0 and 51') && migration.includes('patente_notificada_nivel'));
 assert(sessions.includes('xp_preservado: true'));
 assert(!sessions.includes('patente_notificada_nivel: 0') && !sessions.includes('papirao_notificado: false'));

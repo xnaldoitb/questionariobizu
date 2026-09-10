@@ -40,6 +40,32 @@ async function loadFromView() {
     return sortRanking((data || []).map(publicRankingEntry));
 }
 
+async function loadUserSummary(user) {
+    const { data, error } = await db().rpc('resumo_ranking_usuario_v448', {
+        p_usuario_id: user.id,
+    });
+    if (!error && data) {
+        return {
+            nome: data.nome,
+            usuario: data.usuario,
+            xp_total: Number(data.xp_total || 0),
+            respondidas: Number(data.respondidas || 0),
+            acertos: Number(data.acertos || 0),
+            percentual: Number(data.percentual || 0),
+            posicao: Number(data.posicao || 0),
+            lider: Boolean(data.lider),
+        };
+    }
+
+    // Compatibilidade temporária enquanto a migração v4.48 ainda não foi executada.
+    let ranking;
+    try { ranking = await loadFromView(); }
+    catch { ranking = await loadFallback(); }
+    const index = ranking.findIndex((entry) => entry.usuario === user.usuario);
+    const entry = index >= 0 ? ranking[index] : null;
+    return entry ? { ...entry, posicao: index + 1, lider: index === 0 } : null;
+}
+
 async function loadFallback() {
     const users = [];
     let userFrom = 0;
@@ -124,6 +150,10 @@ export const handler = async (event) => {
     }, { 'retry-after': '60' });
 
     try {
+        if (event.queryStringParameters?.resumo === '1') {
+            return json(200, { resumo: await loadUserSummary(user) });
+        }
+
         let ranking;
         try {
             ranking = await loadFromView();

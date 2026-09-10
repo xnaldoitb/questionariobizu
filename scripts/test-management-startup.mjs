@@ -69,4 +69,6 @@ assert.equal(notices.length, 2);
 assert(one('#maintenancePanel').classList.contains('hidden'));
 const main = await readFile(new URL('../public/app/main.js',import.meta.url),'utf8');
 assert(!main.includes('appStartup'));
+assert(main.includes("import('./domains/management.js')"));
+assert(!main.includes("from './domains/management.js'"));
 console.log('Inicialização: aluno sem aviso, acesso administrativo protegido e abertura removida.');

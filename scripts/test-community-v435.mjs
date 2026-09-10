@@ -5,8 +5,8 @@ const root = new URL('../', import.meta.url);
 const files = [
     'server/routes/chat-salas.mjs','server/routes/suporte.mjs','server/routes/topicos.mjs',
     'supabase/migration-v4.35-comunidade-suporte-topicos.sql','public/styles/12-community-hub.css',
-    'public/styles/13-visual-refinement.css','public/assets/icons/icon-192-v435.png',
-    'public/assets/icons/icon-512-v435.png','public/assets/icons/icon-maskable-512-v435.png',
+    'public/styles/13-visual-refinement.css','public/assets/icons/icon-192-v448.png',
+    'public/assets/icons/icon-512-v448.png','public/assets/icons/icon-maskable-512-v448.png',
 ];
 await Promise.all(files.map((file) => access(new URL(file, root))));
 
@@ -42,7 +42,9 @@ assert(login.includes('includeIp: false'));
 assert(pwa.includes("type: 'SKIP_WAITING'"));
 assert(worker.includes("event.data?.type === 'SKIP_WAITING'"));
 assert(!worker.match(/install[\s\S]{0,180}self\.skipWaiting\(\)/));
-assert(manifest.includes('icon-512-v435.png'));
+assert(manifest.includes('icon-512-v448.png'));
+assert(worker.includes('questionario-bizu-v4.48.0'));
+assert(!worker.includes('OPENMOJI_CODES'));
 assert(!authView.includes('admin-contact-links'));
 assert(fragments.includes('id="installAppClose"'));
 assert(pwa.includes('!isInstalled() && !dismissed'));

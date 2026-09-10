@@ -30,9 +30,9 @@ const requiredFiles = [
     'public/app/domains/admin/payments.js',
     'public/manifest.webmanifest',
     'public/service-worker.js',
-    'public/assets/icons/icon-192-v435.png',
-    'public/assets/icons/icon-512-v435.png',
-    'public/assets/icons/icon-maskable-512-v435.png',
+    'public/assets/icons/icon-192-v448.png',
+    'public/assets/icons/icon-512-v448.png',
+    'public/assets/icons/icon-maskable-512-v448.png',
     'public/assets/icons/questionario-bizu-icon.svg',
     'public/assets/icons/coroa-papirao.svg',
     'public/assets/logo-questionario-bizu.svg',
@@ -47,6 +47,7 @@ const requiredFiles = [
     'server/platform/community.mjs',
     'server/platform/question-access.mjs',
     'server/platform/admin-audit.mjs',
+    'server/platform/admin-permissions.mjs',
     'server/platform/payments.mjs',
     'server/platform/patents.mjs',
     'server/platform/xp.mjs',
@@ -97,6 +98,7 @@ const requiredFiles = [
     'supabase/migration-v4.46.1-retroativo-missoes.sql',
     'supabase/migration-v4.46.2-historico-preserva-xp.sql',
     'supabase/migration-v4.47.1-fila-reconciliacao.sql',
+    'supabase/migration-v4.48.0-otimizacao-escalabilidade.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -130,6 +132,7 @@ const migration444 = await readFile('supabase/migration-v4.44.1-xp-missoes-notif
 const migration461 = await readFile('supabase/migration-v4.46.1-retroativo-missoes.sql', 'utf8');
 const migration462 = await readFile('supabase/migration-v4.46.2-historico-preserva-xp.sql', 'utf8');
 const migration471 = await readFile('supabase/migration-v4.47.1-fila-reconciliacao.sql', 'utf8');
+const migration448 = await readFile('supabase/migration-v4.48.0-otimizacao-escalabilidade.sql', 'utf8');
 const badges = await readFile('public/app/foundation/badges.js', 'utf8');
 const dashboardView = await readFile('public/views/dashboard.html', 'utf8');
 const quizView = await readFile('public/views/quiz.html', 'utf8');
@@ -164,6 +167,7 @@ const serviceWorker = await readFile('public/service-worker.js', 'utf8');
 const pwaModule = await readFile('public/app/foundation/pwa.js', 'utf8');
 const pwaBrand = await readFile('public/styles/10-pwa-brand.css', 'utf8');
 const fragments = await readFile('public/app/foundation/fragments.js', 'utf8');
+const mainModule = await readFile('public/app/main.js', 'utf8');
 
 const adminModules = {
     management: await readFile('public/app/domains/management.js', 'utf8'),
@@ -222,7 +226,7 @@ for (const [id, moduleName] of controlBindings) {
 }
 
 const routeNames = new Set(
-    [...apiRouter.matchAll(/\['([^']+)',\s*\w+\]/g)].map((match) => match[1]),
+    [...apiRouter.matchAll(/\['([^']+)',\s*[^\]]+\]/g)].map((match) => match[1]),
 );
 
 for (const requiredRoute of [
@@ -370,7 +374,7 @@ for (const marker of ['presencas_online', 'chat_temporario']) {
     }
 }
 
-if (!apiRouter.includes("['presenca', presenca]") || !apiRouter.includes("['chat', chat]")) {
+if (!apiRouter.includes("['presenca', () => import(") || !apiRouter.includes("['chat', () => import(")) {
     throw new Error('Rotas de presença/chat v4.6 não estão registradas.');
 }
 
@@ -537,6 +541,18 @@ for (const marker of ['redefinir_progresso_usuario', "e.tipo <> 'plano'", 'xp_to
 for (const marker of ["lower(coalesce(status, 'pendente'))", "'approved'", 'excluido_em is null', 'limit 10', 'for update skip locked', 'to service_role']) {
     if (!migration471.includes(marker)) throw new Error(`Fila de reconciliação v4.47.1 incompleta: ${marker}`);
 }
+for (const marker of ['metricas_missoes_v448', 'metricas_dominio_capitulo_v448', 'resumo_ranking_usuario_v448', 'dia_ordenado.posicao', 'primeira_falha.posicao', 'America/Belem', 'to service_role']) {
+    if (!migration448.includes(marker)) throw new Error(`Otimização v4.48 incompleta: ${marker}`);
+}
+if (!index.includes('manifest.webmanifest?v=4.48.0') || !serviceWorker.includes('questionario-bizu-v4.48.0')) {
+    throw new Error('Versão e cache PWA v4.48 não estão sincronizados.');
+}
+if (!fragments.includes('mountAdminInterface') || !mainModule.includes("import('./domains/management.js')")) {
+    throw new Error('Carregamento sob demanda do painel administrativo v4.48 incompleto.');
+}
+if (auth.includes(".select('*')") || login.includes(".select('*')")) {
+    throw new Error('Autenticação ainda consulta colunas desnecessárias.');
+}
 
 const migration418 = await readFile('supabase/migration-v4.18-sessao-mesmo-dispositivo.sql', 'utf8');
 for (const marker of ['sessao_ativa_device_hash', 'p_device_hash text', 'sessao_ativa_device_hash = p_device_hash']) {
@@ -546,4 +562,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.47.1: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.48.0: verificações estruturais concluídas.');

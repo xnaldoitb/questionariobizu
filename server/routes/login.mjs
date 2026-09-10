@@ -7,6 +7,12 @@ import { consumeRateLimit } from '../platform/rate-limit.mjs';
 import { resolveQuestionAccess } from '../platform/question-access.mjs';
 
 const SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
+const LOGIN_COLUMNS = [
+    'id', 'usuario', 'nome', 'senha_hash', 'perfil', 'status_aprovacao', 'ativo',
+    'desativado_por_validade', 'vip', 'premium', 'plano_atual', 'validade_ate',
+    'acesso_teste', 'teste_expira_em', 'teste_ciclo_em', 'teste_saldo_segundos',
+    'teste_ativo_ate',
+].join(',');
 
 export const handler = async (event) => {
     if (event.httpMethod !== 'POST') {
@@ -53,7 +59,7 @@ export const handler = async (event) => {
 
         const { data: user, error } = await db()
             .from('usuarios')
-            .select('*')
+            .select(LOGIN_COLUMNS)
             .eq('usuario', login)
             .maybeSingle();
 

@@ -13,6 +13,10 @@ import { auditAdmin } from '../platform/admin-audit.mjs';
 import { clearRateLimit } from '../platform/rate-limit.mjs';
 import { awardXp } from '../platform/xp.mjs';
 import { createNotification } from '../platform/notifications.mjs';
+import {
+    canManageAdminTarget,
+    claimUnassignedAdminTarget,
+} from '../platform/admin-permissions.mjs';
 
 const MANAGEMENT_ROLES = ['admin', 'supremo'];
 const COMMON_ADMIN_ACTIONS = new Set([
@@ -61,7 +65,7 @@ function migrationResponse() {
 async function findTarget(id) {
     const { data, error } = await db()
         .from('usuarios')
-        .select('*')
+        .select('id,usuario,perfil,ativo,status_aprovacao,validade_ate,desativado_por_validade,responsavel_admin_id,vip,vip_desde,acesso_teste')
         .eq('id', id)
         .maybeSingle();
 
@@ -72,31 +76,7 @@ function isProtectedFromCommonAdmin(target) {
     return target?.perfil === 'admin' || target?.perfil === 'supremo';
 }
 
-export function canManageTarget(actor, target) {
-    if (actor.perfil === 'supremo') return true;
-    return target?.perfil === 'aluno' && (
-        target.responsavel_admin_id === actor.id
-        || (!target.responsavel_admin_id && !target.vip)
-    );
-}
-
-async function claimUnassignedTarget(actor, target) {
-    if (actor.perfil === 'supremo' || target.responsavel_admin_id) return target.responsavel_admin_id === actor.id || actor.perfil === 'supremo';
-
-    const { data, error } = await db()
-        .from('usuarios')
-        .update({ responsavel_admin_id: actor.id })
-        .eq('id', target.id)
-        .is('responsavel_admin_id', null)
-        .select('id')
-        .maybeSingle();
-    if (error) throw error;
-    if (data) {
-        target.responsavel_admin_id = actor.id;
-        return true;
-    }
-    return false;
-}
+export const canManageTarget = canManageAdminTarget;
 
 async function audited(actor, action, targetId, response, details = {}) {
     await auditAdmin(actor, action, 'usuario', targetId, details);
@@ -341,7 +321,7 @@ export const handler = async (event) => {
         }
 
         if (!isSupreme && !target.responsavel_admin_id) {
-            const claimed = await claimUnassignedTarget(actor, target);
+        const claimed = await claimUnassignedAdminTarget(actor, target);
             if (!claimed) {
                 return json(409, { erro: 'Este usuário acabou de ser assumido por outro administrador. Atualize a lista.' });
             }

@@ -65,7 +65,18 @@ def create_icon(size, filename):
     image.resize((size, size), Image.Resampling.LANCZOS).save(OUTPUT / filename, optimize=True)
 
 
+def create_maskable_icon(size, filename, source):
+    """Mantém o livro dentro da área segura de 80% exigida por ícones maskable."""
+    base = Image.new("RGB", (size, size), "#0d315f")
+    artwork = Image.open(OUTPUT / source).convert("RGB")
+    safe_size = round(size * 0.76)
+    artwork = artwork.resize((safe_size, safe_size), Image.Resampling.LANCZOS)
+    offset = (size - safe_size) // 2
+    base.paste(artwork, (offset, offset))
+    base.save(OUTPUT / filename, optimize=True)
+
+
 OUTPUT.mkdir(parents=True, exist_ok=True)
-create_icon(192, "icon-192-v435.png")
-create_icon(512, "icon-512-v435.png")
-create_icon(512, "icon-maskable-512-v435.png")
+create_icon(192, "icon-192-v448.png")
+create_icon(512, "icon-512-v448.png")
+create_maskable_icon(512, "icon-maskable-512-v448.png", "icon-512-v448.png")
