@@ -214,8 +214,8 @@ export const handler = async (event) => {
         if (!body.usuario || !body.senha || !body.nome) {
             return json(400, { erro: 'Preencha AL SD PM Nº, senha e Nome de Guerra.' });
         }
-        if (String(body.senha).length < 8 || String(body.senha).length > 72) {
-            return json(400, { erro: 'A senha deve ter entre 8 e 72 caracteres.' });
+        if (String(body.senha).length < 6 || String(body.senha).length > 72) {
+            return json(400, { erro: 'A senha deve ter entre 6 e 72 caracteres.' });
         }
 
         const requestedRole = normalizedRole(body);
@@ -501,8 +501,8 @@ export const handler = async (event) => {
                 if (!isSupreme) {
                     return json(403, { erro: 'Somente o Desenvolvedor pode redefinir senhas.' });
                 }
-                if (String(body.senha).length < 8 || String(body.senha).length > 72) {
-                    return json(400, { erro: 'A senha deve ter entre 8 e 72 caracteres.' });
+                if (String(body.senha).length < 6 || String(body.senha).length > 72) {
+                    return json(400, { erro: 'A senha deve ter entre 6 e 72 caracteres.' });
                 }
                 payload.senha_hash = await bcrypt.hash(String(body.senha), 12);
                 Object.assign(payload, clearSessionFields({}));

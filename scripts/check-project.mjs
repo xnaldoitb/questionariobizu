@@ -169,6 +169,10 @@ const pwaBrand = await readFile('public/styles/10-pwa-brand.css', 'utf8');
 const fragments = await readFile('public/app/foundation/fragments.js', 'utf8');
 const mainModule = await readFile('public/app/main.js', 'utf8');
 
+if (!adminView.includes('minlength="6"') || !cadastro.includes('senha.length < 6') || !cadastro.includes('entre 6 e 72 caracteres')) {
+    throw new Error('Política de senha com mínimo de 6 caracteres não está sincronizada.');
+}
+
 const adminModules = {
     management: await readFile('public/app/domains/management.js', 'utf8'),
     users: await readFile('public/app/domains/admin/users.js', 'utf8'),

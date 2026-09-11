@@ -36,8 +36,8 @@ export const handler = async (event) => {
         return json(400, { erro: 'Informe o Nome de Guerra.' });
     }
 
-    if (senha.length < 8 || senha.length > 72) {
-        return json(400, { erro: 'A senha deve ter entre 8 e 72 caracteres.' });
+    if (senha.length < 6 || senha.length > 72) {
+        return json(400, { erro: 'A senha deve ter entre 6 e 72 caracteres.' });
     }
 
     if (!/^55\d{10,11}$/.test(whatsapp)) {
