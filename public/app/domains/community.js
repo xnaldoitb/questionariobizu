@@ -10,6 +10,7 @@ const HEARTBEAT_MS = 90_000;
 const PRESENCE_REFRESH_MS = 60_000;
 const CHAT_REFRESH_MS = 10_000;
 const SUPPORT_REFRESH_MS = 12_000;
+const SUPPORT_DIRECTORY_REFRESH_MS = 48_000;
 const ACTIVITY_PING_THROTTLE_MS = 30_000;
 const PATENT_GUIDE_TOPIC_ID = 'guia-patentes';
 const XP_RULES_TOPIC_ID = 'regras-xp';
@@ -25,6 +26,9 @@ let activeModal = null;
 let rooms = [];
 let currentRoomId = GENERAL_ROOM_ID;
 let supportConversationId = null;
+let supportDirectory = [];
+let supportDirectoryRefreshedAt = 0;
+let supportRequestSequence = 0;
 let activeTopicId = null;
 
 function formatTime(value, includeDate = false) {
@@ -49,6 +53,7 @@ function closeModal(id) {
     modal?.classList.add('hidden');
     modal?.classList.remove('community-open');
     if (activeModal === id) activeModal = null;
+    if (id === 'supportModal') supportRequestSequence += 1;
     clearInterval(communityTimer);
     communityTimer = null;
     if (!document.querySelector('.modal-overlay:not(.hidden)')) document.body.classList.remove('modal-open');
@@ -187,30 +192,48 @@ async function createRoom(event) {
 function renderSupportConversations(items) {
     const list = one('#supportConversations');
     if (!list) return;
+    supportDirectory = items;
     list.classList.remove('hidden');
-    list.innerHTML = items.map((item) => `<button type="button" class="support-conversation ${item.id === supportConversationId ? 'is-active' : ''}" data-support-id="${item.id}">
-        <strong>${safeText(item.usuarios?.nome || 'Aluno')}</strong><small>${safeText(item.usuarios?.usuario || '')} · ${safeText(item.status)}</small>
+    list.innerHTML = items.map((item) => `<button type="button" class="support-conversation ${item.id === supportConversationId ? 'is-active' : ''}" data-support-id="${item.id}" aria-pressed="${item.id === supportConversationId}">
+        <strong>${safeText(item.usuarios?.nome || 'Aluno')}</strong>
+        <span class="support-conversation-preview">${safeText(item.ultima_mensagem || 'Atendimento iniciado')}</span>
+        <small>${safeText(item.usuarios?.usuario || '')} · ${safeText(item.status)}</small>
     </button>`).join('') || '<div class="chat-empty">Nenhum atendimento.</div>';
 }
 
-async function loadSupport({ quiet = false } = {}) {
+async function loadSupport({ quiet = false, refreshDirectory = false } = {}) {
+    const requestSequence = ++supportRequestSequence;
     try {
-        if (appState.user?.perfil === 'supremo') {
-            const directory = await requestJson('suporte?listar=1');
-            if (!supportConversationId) supportConversationId = directory.conversas?.[0]?.id || null;
-            renderSupportConversations(directory.conversas || []);
+        const developer = appState.user?.perfil === 'supremo';
+        const directoryDue = developer && (
+            refreshDirectory
+            || !supportDirectoryRefreshedAt
+            || Date.now() - supportDirectoryRefreshedAt >= SUPPORT_DIRECTORY_REFRESH_MS
+        );
+        const selectedQuery = supportConversationId
+            ? `${directoryDue ? '&' : '?'}conversa_id=${encodeURIComponent(supportConversationId)}`
+            : '';
+        const payload = await requestJson(directoryDue
+            ? `suporte?listar=1${selectedQuery}`
+            : `suporte${selectedQuery}`);
+        if (requestSequence !== supportRequestSequence || activeModal !== 'supportModal') return;
+
+        if (directoryDue) {
+            supportDirectoryRefreshedAt = Date.now();
+            supportConversationId = payload.conversa?.id || supportConversationId || payload.conversas?.[0]?.id || null;
+            renderSupportConversations(payload.conversas || []);
         }
-        const query = supportConversationId ? `?conversa_id=${encodeURIComponent(supportConversationId)}` : '';
-        const payload = await requestJson(`suporte${query}`);
         supportConversationId = payload.conversa?.id || supportConversationId;
         renderMessages('#supportMessages', payload.mensagens || [], { support: true });
-    } catch (error) { if (!quiet) notify(error.message); }
+    } catch (error) {
+        if (requestSequence === supportRequestSequence && !quiet) notify(error.message);
+    }
 }
 
 export async function openCommunitySupport(conversationId = null) {
     if (conversationId) supportConversationId = String(conversationId);
     openModal('supportModal');
-    await loadSupport();
+    await loadSupport({ refreshDirectory: appState.user?.perfil === 'supremo' });
     one('#supportInput')?.focus();
     clearInterval(communityTimer);
     communityTimer = setInterval(() => activeModal === 'supportModal' && loadSupport({ quiet: true }), SUPPORT_REFRESH_MS);
@@ -222,7 +245,7 @@ async function submitSupport(event) {
     try {
         await requestJson('suporte', { method: 'POST', body: JSON.stringify({ conversa_id: supportConversationId, mensagem: input.value }) });
         input.value = '';
-        await loadSupport();
+        await loadSupport({ refreshDirectory: appState.user?.perfil === 'supremo' });
     } catch (error) { notify(error.message); }
 }
 
@@ -416,7 +439,14 @@ function bindCommunityUi() {
     one('#chatRoomForm')?.addEventListener('submit', createRoom);
     one('#chatRoomList')?.addEventListener('click', async (event) => { const button = event.target.closest('[data-room-id]'); if (!button) return; currentRoomId = button.dataset.roomId; renderRooms(); one('#chatRoomPanel').classList.add('hidden'); await refreshChat({ quiet: false }); });
     one('#supportForm')?.addEventListener('submit', submitSupport);
-    one('#supportConversations')?.addEventListener('click', async (event) => { const button = event.target.closest('[data-support-id]'); if (!button) return; supportConversationId = button.dataset.supportId; await loadSupport(); });
+    one('#supportConversations')?.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-support-id]');
+        if (!button) return;
+        supportConversationId = button.dataset.supportId;
+        renderSupportConversations(supportDirectory);
+        one('#supportMessages').innerHTML = '<div class="chat-empty">Carregando conversa…</div>';
+        await loadSupport({ refreshDirectory: false });
+    });
     one('#topicForm')?.addEventListener('submit', submitTopic);
     one('#topicReplyForm')?.addEventListener('submit', submitTopicReply);
     one('#newTopicBtn')?.addEventListener('click', () => { one('#topicDetail').classList.add('hidden'); one('#topicList').classList.add('hidden'); one('#topicForm').classList.remove('hidden'); one('#topicTitleInput').focus(); });

@@ -43,7 +43,7 @@ assert(pwa.includes("type: 'SKIP_WAITING'"));
 assert(worker.includes("event.data?.type === 'SKIP_WAITING'"));
 assert(!worker.match(/install[\s\S]{0,180}self\.skipWaiting\(\)/));
 assert(manifest.includes('icon-512-v448.png'));
-assert(worker.includes('questionario-bizu-v4.48.0'));
+assert(worker.includes('questionario-bizu-v4.48.1'));
 assert(!worker.includes('OPENMOJI_CODES'));
 assert(!authView.includes('admin-contact-links'));
 assert(fragments.includes('id="installAppClose"'));

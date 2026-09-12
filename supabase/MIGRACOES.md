@@ -1,14 +1,16 @@
 # Migrações do Supabase
 
-## Banco de produção atualmente na v4.47.1
+## Banco de produção atualmente na v4.48.0
 
 Execute somente:
 
 ```text
-migration-v4.48.0-otimizacao-escalabilidade.sql
+migration-v4.48.1-suporte-otimizado.sql
 ```
 
-O script é idempotente para o índice e substitui apenas as três funções da própria versão. Ele não remove dados.
+O script adiciona um índice e uma função de listagem do suporte. Ele não remove conversas nem mensagens.
+
+Se o banco ainda estiver na v4.47.1, execute primeiro `migration-v4.48.0-otimizacao-escalabilidade.sql` e depois a v4.48.1.
 
 ## Instalação nova
 

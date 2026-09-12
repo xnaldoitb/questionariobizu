@@ -86,7 +86,7 @@ assert(community.includes('10, 20, 30…') && community.includes('3, 6, 9, 12, 1
 assert(community.includes('20, 40, 60… questões válidas') && community.includes('60, 120, 180… XP'));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
 assert(xp.includes("rpc('metricas_missoes_v448'") && xp.includes("rpc('metricas_dominio_capitulo_v448'"));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.48.0'));
-assert(worker.includes('questionario-bizu-v4.48.0') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.48.1'));
+assert(worker.includes('questionario-bizu-v4.48.1') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, métricas agregadas e notificações v4.48 validados.');

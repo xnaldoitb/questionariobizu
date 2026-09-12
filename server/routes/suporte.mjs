@@ -5,28 +5,73 @@ import { consumeRateLimit } from '../platform/rate-limit.mjs';
 import { cleanText, graphemeLength } from '../platform/community-access.mjs';
 import { createNotifications } from '../platform/notifications.mjs';
 
-async function ownConversation(user) {
+const SUPPORT_LIST_LIMIT = 100;
+
+async function findOwnConversation(user) {
     const { data, error } = await db().from('suporte_conversas')
-        .upsert({ usuario_id: user.id }, { onConflict: 'usuario_id', ignoreDuplicates: false })
-        .select('id,usuario_id,status,atualizado_em,criado_em').single();
+        .select('id,usuario_id,status,atualizado_em,criado_em,usuarios:usuario_id(id,nome,usuario)')
+        .eq('usuario_id', user.id).maybeSingle();
     if (error) throw error;
     return data;
 }
 
-async function conversationFor(user, requestedId) {
-    if (user.perfil !== 'supremo') return ownConversation(user);
+async function ensureOwnConversation(user) {
+    const { data, error } = await db().from('suporte_conversas')
+        .upsert({ usuario_id: user.id }, { onConflict: 'usuario_id', ignoreDuplicates: false })
+        .select('id,usuario_id,status,atualizado_em,criado_em,usuarios:usuario_id(id,nome,usuario)').single();
+    if (error) throw error;
+    return data;
+}
+
+async function conversationFor(user, requestedId, { create = false } = {}) {
+    if (user.perfil !== 'supremo') {
+        return create ? ensureOwnConversation(user) : findOwnConversation(user);
+    }
     const id = String(requestedId || '').trim();
     if (!id) return null;
     const { data, error } = await db().from('suporte_conversas')
-        .select('id,usuario_id,status,atualizado_em,criado_em').eq('id', id).maybeSingle();
+        .select('id,usuario_id,status,atualizado_em,criado_em,usuarios:usuario_id(id,nome,usuario)')
+        .eq('id', id).maybeSingle();
     if (error) throw error;
     return data;
 }
 
-async function publicConversation(record) {
+function publicConversation(record) {
     if (!record) return null;
-    const { data: owner } = await db().from('usuarios').select('id,nome,usuario').eq('id', record.usuario_id).maybeSingle();
-    return { ...record, usuario: owner || null };
+    const { usuarios, nome, usuario, ...conversation } = record;
+    const owner = usuarios || (nome || usuario ? { nome, usuario } : null);
+    return { ...conversation, usuario: owner };
+}
+
+function directoryConversation(record) {
+    return {
+        id: record.id,
+        usuario_id: record.usuario_id,
+        status: record.status,
+        atualizado_em: record.atualizado_em,
+        criado_em: record.criado_em,
+        ultima_mensagem: record.ultima_mensagem || '',
+        ultima_mensagem_em: record.ultima_mensagem_em || record.atualizado_em,
+        usuarios: {
+            nome: record.nome || record.usuarios?.nome || 'Aluno',
+            usuario: record.usuario || record.usuarios?.usuario || '',
+        },
+    };
+}
+
+async function listConversations() {
+    const { data, error } = await db().rpc('listar_suporte_conversas_v4481', {
+        p_limite: SUPPORT_LIST_LIMIT,
+    });
+    if (!error) return (data || []).map(directoryConversation);
+
+    // Compatibilidade enquanto a migração v4.48.1 ainda não foi executada.
+    if (!['PGRST202', '42883'].includes(error.code)) throw error;
+    const fallback = await db().from('suporte_conversas')
+        .select('id,usuario_id,status,atualizado_em,criado_em,usuarios:usuario_id(nome,usuario)')
+        .order('atualizado_em', { ascending: false }).limit(SUPPORT_LIST_LIMIT);
+    if (fallback.error) throw fallback.error;
+    return (fallback.data || []).map(directoryConversation);
 }
 
 async function messages(conversationId, currentUserId) {
@@ -59,16 +104,24 @@ export const handler = async (event) => {
                 erro: 'Muitas atualizações do suporte. Aguarde um minuto.',
             }, { 'retry-after': '60' });
             if (user.perfil === 'supremo' && params.listar === '1') {
-                const { data, error } = await db().from('suporte_conversas')
-                    .select('id,usuario_id,status,atualizado_em,criado_em,usuarios:usuario_id(nome,usuario)')
-                    .order('atualizado_em', { ascending: false }).limit(100);
-                if (error) throw error;
-                return json(200, { conversas: data || [] });
+                const conversations = await listConversations();
+                const requestedId = String(params.conversa_id || '').trim();
+                let conversation = requestedId
+                    ? conversations.find((item) => item.id === requestedId) || null
+                    : conversations[0] || null;
+                if (requestedId && !conversation) {
+                    conversation = await conversationFor(user, requestedId);
+                }
+                return json(200, {
+                    conversas: conversations,
+                    conversa: publicConversation(conversation),
+                    mensagens: conversation ? await messages(conversation.id, user.id) : [],
+                });
             }
             const conversation = await conversationFor(user, params.conversa_id);
             if (!conversation) return json(200, { conversa: null, mensagens: [] });
             return json(200, {
-                conversa: await publicConversation(conversation),
+                conversa: publicConversation(conversation),
                 mensagens: await messages(conversation.id, user.id),
             });
         }
@@ -79,7 +132,7 @@ export const handler = async (event) => {
             if (!content || graphemeLength(content) > 1000) return json(400, { erro: 'A mensagem deve ter entre 1 e 1000 caracteres.' });
             const rate = await consumeRateLimit(event, 'suporte-mensagem', { limit: 30, windowSeconds: 60 }, user.id);
             if (!rate.allowed) return json(429, { erro: 'Muitas mensagens em sequência. Aguarde um instante.' });
-            const conversation = await conversationFor(user, body.conversa_id);
+            const conversation = await conversationFor(user, body.conversa_id, { create: true });
             if (!conversation) return json(404, { erro: 'Conversa de suporte não encontrada.' });
 
             const { data: savedMessage, error } = await db().from('suporte_mensagens').insert({
