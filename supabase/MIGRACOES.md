@@ -1,6 +1,6 @@
 # Migrações do Supabase
 
-## Atualização para v4.50.5
+## Atualização para v4.51.0
 
 Execute, nesta ordem, apenas o que ainda não tiver sido aplicado:
 
@@ -8,9 +8,10 @@ Execute, nesta ordem, apenas o que ainda não tiver sido aplicado:
 migration-v4.48.1-suporte-otimizado.sql
 migration-v4.49-topicos-completos.sql
 migration-v4.50-colaboradores.sql
+migration-v4.51-xp-rapido.sql
 ```
 
-A v4.48.1 otimiza a listagem do suporte. A v4.49 cria as reações dos tópicos. A v4.50 adiciona o reconhecimento de Colaborador BIZU. Nenhuma delas remove conversas, mensagens, tópicos, respostas ou usuários existentes.
+A v4.48.1 otimiza a listagem do suporte. A v4.49 cria as reações dos tópicos. A v4.50 adiciona o reconhecimento de Colaborador BIZU. A v4.51 acelera somente os ganhos futuros e controla o limite diário de XP de questões. Nenhuma delas remove conversas, mensagens, tópicos, respostas ou usuários existentes.
 
 Se o banco ainda estiver na v4.47.1, execute primeiro `migration-v4.48.0-otimizacao-escalabilidade.sql` e depois a v4.48.1.
 

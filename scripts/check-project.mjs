@@ -102,6 +102,7 @@ const requiredFiles = [
     'supabase/migration-v4.48.1-suporte-otimizado.sql',
     'supabase/migration-v4.49-topicos-completos.sql',
     'supabase/migration-v4.50-colaboradores.sql',
+    'supabase/migration-v4.51-xp-rapido.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -137,6 +138,7 @@ const migration462 = await readFile('supabase/migration-v4.46.2-historico-preser
 const migration471 = await readFile('supabase/migration-v4.47.1-fila-reconciliacao.sql', 'utf8');
 const migration448 = await readFile('supabase/migration-v4.48.0-otimizacao-escalabilidade.sql', 'utf8');
 const migration4481 = await readFile('supabase/migration-v4.48.1-suporte-otimizado.sql', 'utf8');
+const migration451 = await readFile('supabase/migration-v4.51-xp-rapido.sql', 'utf8');
 const badges = await readFile('public/app/foundation/badges.js', 'utf8');
 const dashboardView = await readFile('public/views/dashboard.html', 'utf8');
 const quizView = await readFile('public/views/quiz.html', 'utf8');
@@ -552,11 +554,14 @@ for (const marker of ["lower(coalesce(status, 'pendente'))", "'approved'", 'excl
 for (const marker of ['metricas_missoes_v448', 'metricas_dominio_capitulo_v448', 'resumo_ranking_usuario_v448', 'dia_ordenado.posicao', 'primeira_falha.posicao', 'America/Belem', 'to service_role']) {
     if (!migration448.includes(marker)) throw new Error(`Otimização v4.48 incompleta: ${marker}`);
 }
+for (const marker of ['conceder_xp_questao_limitado', 'for update', 'p_limite_diario integer default 10000', 'America/Belem', 'to service_role']) {
+    if (!migration451.includes(marker)) throw new Error(`Progressão rápida v4.51 incompleta: ${marker}`);
+}
 for (const marker of ['listar_suporte_conversas_v4481', 'join lateral', 'suporte_mensagens_conversa_recente_idx', 'to service_role']) {
     if (!migration4481.includes(marker)) throw new Error(`Suporte otimizado v4.48.1 incompleto: ${marker}`);
 }
-if (!index.includes('manifest.webmanifest?v=4.50.5') || !serviceWorker.includes('questionario-bizu-v4.50.5')) {
-    throw new Error('Versão e cache PWA v4.50.5 não estão sincronizados.');
+if (!index.includes('manifest.webmanifest?v=4.51.0') || !serviceWorker.includes('questionario-bizu-v4.51.0')) {
+    throw new Error('Versão e cache PWA v4.51.0 não estão sincronizados.');
 }
 if (!fragments.includes('mountAdminInterface') || !mainModule.includes("import('./domains/management.js')")) {
     throw new Error('Carregamento sob demanda do painel administrativo v4.48 incompleto.');
@@ -573,4 +578,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.50.5: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.51.0: verificações estruturais concluídas.');

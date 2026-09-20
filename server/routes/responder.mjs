@@ -82,13 +82,16 @@ export const handler = async (event) => {
   });
   let progression = { xp_ganho: 0 };
   try {
+    if (!pulada) {
     progression = await awardAnswerXp({
       userId: user.id,
+      sessionId: sessao.id,
       questionId: Number(questao_id),
       chapterId: q.capitulo_id,
       correct: acertou,
       previous: previous || [],
     });
+    }
   } catch (xpError) {
     // A resposta nunca é perdida se o serviço de progressão ficar indisponível.
     console.error('Resposta salva, mas falhou ao conceder XP:', xpError.message);
