@@ -37,6 +37,13 @@ export async function checkRewardNotification() {
         currentReward = data.premio;
         one('#rewardMessage').textContent = data.premio.mensagem;
         one('#rewardPlan').textContent = data.premio.plano_nome;
+        const collaborator = data.premio.plano === 'colaborador';
+        if (collaborator) one('#rewardModal')?.classList.add('is-contributor-reward');
+        else one('#rewardModal')?.classList.remove('is-contributor-reward');
+        const medal = one('#rewardModal .reward-medal');
+        if (medal) medal.innerHTML = collaborator
+            ? '<img src="/assets/icons/colaborador-bizu.webp" alt="Emblema Colaborador BIZU">'
+            : '<span aria-hidden="true">★</span>';
         one('#rewardModal').classList.remove('hidden');
         document.body?.classList.add('modal-open');
         return true;

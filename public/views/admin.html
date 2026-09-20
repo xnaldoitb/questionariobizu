@@ -80,6 +80,7 @@
                         <option value="expirado">Acesso às questões vencido</option>
                         <option value="desativado">Desativados</option>
                         <option value="negado">Negados</option>
+                        <option value="colaborador">Colaboradores</option>
                     </select>
                 </label>
                 <label class="admin-filter-field">
@@ -461,6 +462,16 @@
                 <p class="field-help">O usuário receberá uma notificação e a patente será atualizada automaticamente.</p>
                 <button class="ui-button main-action full" id="xpGiftSubmit" type="submit">Confirmar presente</button>
             </form>
+        </div>
+    </div>
+
+    <div class="admin-modal hidden" id="contributorHistoryModal" role="dialog" aria-modal="true" aria-labelledby="contributorHistoryTitle">
+        <div class="admin-modal-card">
+            <div class="admin-modal-head">
+                <div><p class="section-kicker">RECONHECIMENTO</p><h3 id="contributorHistoryTitle">Histórico de colaboração</h3></div>
+                <button class="ui-button quiet-action mini" data-close-admin-modal="contributorHistoryModal" type="button">Fechar</button>
+            </div>
+            <div class="contributor-history-list" id="contributorHistoryList"></div>
         </div>
     </div>
 

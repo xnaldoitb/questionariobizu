@@ -14,6 +14,7 @@ const SUPPORT_DIRECTORY_REFRESH_MS = 48_000;
 const ACTIVITY_PING_THROTTLE_MS = 30_000;
 const PATENT_GUIDE_TOPIC_ID = 'guia-patentes';
 const XP_RULES_TOPIC_ID = 'regras-xp';
+const COLLABORATOR_TOPIC_ID = 'mural-colaboradores';
 
 let initialized = false;
 let onlineUsers = [];
@@ -303,13 +304,18 @@ function renderTopics(items) {
         <strong>Patentes do Ranking</strong><p>Conheça todas as insígnias e o significado de cada patente.</p>
         <small>Questionário Bizu · tópico fixo</small><span class="topic-card-stats">Guia</span>
     </button>`;
+    const collaboratorGuide = `<button class="topic-card system-topic-card collaborator-system-topic" type="button" data-topic-id="${COLLABORATOR_TOPIC_ID}">
+        <span class="topic-category category-aviso">Reconhecimento</span>
+        <strong>Mural de Colaboradores</strong><p>Conheça os usuários que contribuíram com o crescimento do Questionário Bizu.</p>
+        <small>Questionário Bizu · atualizado automaticamente</small><span class="topic-card-stats">Oficial</span>
+    </button>`;
     const userTopics = filtered.map((topic) => `<button class="topic-card" type="button" data-topic-id="${topic.id}">
         <span class="topic-category category-${topic.categoria}">${categoryNames[topic.categoria] || 'Tópico'}</span>
         <strong>${safeText(topic.titulo)}</strong><p>${safeText(topic.conteudo)}</p>
-        <small>${safeText(topic.usuarios?.nome || 'Usuário')} · ${safeText(formatTime(topic.atualizado_em, true))}${topic.fechado ? ' · Encerrado' : ''}</small>
+        <small>${safeText(topic.usuarios?.nome || 'Usuário')} ${accountBadges(topic.usuarios)} · ${safeText(formatTime(topic.atualizado_em, true))}${topic.fechado ? ' · Encerrado' : ''}</small>
         <span class="topic-card-stats"><span title="Respostas">◌ ${topic.respostas || 0}</span><span title="Gostei">♡ ${topic.gostei || 0}</span><span title="Não gostei">▽ ${topic.nao_gostei || 0}</span></span>
     </button>`).join('');
-    const guides = category === 'todos' && !search ? xpGuide + patentGuide : '';
+    const guides = category === 'todos' && !search ? collaboratorGuide + xpGuide + patentGuide : '';
     list.innerHTML = guides + (userTopics || '<div class="chat-empty">Nenhum tópico encontrado.</div>');
 }
 
@@ -320,6 +326,28 @@ async function loadTopics() {
 }
 
 async function openTopic(id) {
+    if (String(id) === COLLABORATOR_TOPIC_ID) {
+        activeTopicId = COLLABORATOR_TOPIC_ID;
+        activeTopic = null;
+        setTopicView('detail');
+        const payload = await requestJson('topicos?colaboradores=1');
+        const collaborators = payload.colaboradores || [];
+        const rows = collaborators.map((item, index) => `<article class="collaborator-wall-item">
+            <span class="collaborator-wall-position">${index + 1}</span>
+            <img src="/assets/icons/colaborador-bizu.webp" alt="" aria-hidden="true">
+            <span><strong>${safeText(item.nome)}</strong><small>AL SD PM Nº ${safeText(item.usuario)} · desde ${safeText(formatTime(item.colaborador_desde, true))}</small></span>
+        </article>`).join('');
+        one('#topicDetailContent').innerHTML = `<header class="topic-detail-head collaborator-wall-head">
+            <span class="topic-category category-aviso">Reconhecimento</span>
+            <img src="/assets/icons/colaborador-bizu.webp" alt="Emblema Colaborador BIZU">
+            <h3>Mural de Colaboradores</h3>
+            <small>Questionário Bizu · tópico oficial</small>
+        </header>
+        <p class="topic-main-content">Reconhecimento aos usuários que ajudaram o Questionário Bizu a crescer. Cada colaborador recebe uma insígnia permanente enquanto estiver destacado e um bônus único de <strong>2.000 XP</strong>.</p>
+        <div class="collaborator-wall-list">${rows || '<div class="chat-empty">Nenhum colaborador destacado ainda.</div>'}</div>`;
+        one('#topicReplyForm').classList.add('hidden');
+        return;
+    }
     if (String(id) === XP_RULES_TOPIC_ID) {
         activeTopicId = XP_RULES_TOPIC_ID;
         activeTopic = null;
@@ -422,7 +450,7 @@ async function openTopic(id) {
     activeTopicId = String(topic.id);
     activeTopic = topic;
     setTopicView('detail');
-    const replies = (payload.respostas || []).map((reply) => `<article class="topic-answer"><strong>${safeText(reply.usuarios?.nome || 'Usuário')}</strong><p>${safeText(reply.conteudo).replace(/\n/g, '<br>')}</p><small>${safeText(formatTime(reply.criado_em, true))}</small></article>`).join('');
+    const replies = (payload.respostas || []).map((reply) => `<article class="topic-answer"><strong>${safeText(reply.usuarios?.nome || 'Usuário')} ${accountBadges(reply.usuarios)}</strong><p>${safeText(reply.conteudo).replace(/\n/g, '<br>')}</p><small>${safeText(formatTime(reply.criado_em, true))}</small></article>`).join('');
     const manage = topic.pode_gerenciar ? `<div class="topic-manage-actions">
         <button type="button" data-topic-action="editar">Editar</button>
         <button type="button" data-topic-action="fechar">${topic.fechado ? 'Reabrir' : 'Encerrar'}</button>
@@ -431,7 +459,7 @@ async function openTopic(id) {
     one('#topicDetailContent').innerHTML = `<header class="topic-detail-head">
         <div class="topic-detail-labels"><span class="topic-category category-${topic.categoria}">${categoryNames[topic.categoria]}</span>${topic.fechado ? '<span class="topic-closed">Encerrado</span>' : ''}</div>
         <h3>${safeText(topic.titulo)}</h3>
-        <small>${safeText(topic.usuarios?.nome || 'Usuário')} · ${safeText(formatTime(topic.criado_em, true))}</small>
+        <small>${safeText(topic.usuarios?.nome || 'Usuário')} ${accountBadges(topic.usuarios)} · ${safeText(formatTime(topic.criado_em, true))}</small>
         ${manage}
     </header>
     <p class="topic-main-content">${safeText(topic.conteudo).replace(/\n/g, '<br>')}</p>
@@ -457,6 +485,11 @@ async function openTopics() {
 export async function openXpRulesTopic() {
     await openTopics();
     await openTopic(XP_RULES_TOPIC_ID);
+}
+
+export async function openCollaboratorsTopic() {
+    await openTopics();
+    await openTopic(COLLABORATOR_TOPIC_ID);
 }
 
 async function submitTopic(event) {

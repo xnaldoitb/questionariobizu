@@ -9,7 +9,7 @@ import { resolveQuestionAccess } from '../platform/question-access.mjs';
 const SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
 const LOGIN_COLUMNS = [
     'id', 'usuario', 'nome', 'senha_hash', 'perfil', 'status_aprovacao', 'ativo',
-    'desativado_por_validade', 'vip', 'premium', 'plano_atual', 'validade_ate',
+    'desativado_por_validade', 'vip', 'premium', 'plano_atual', 'validade_ate', 'colaborador', 'colaborador_desde',
     'acesso_teste', 'teste_expira_em', 'teste_ciclo_em', 'teste_saldo_segundos',
     'teste_ativo_ate',
 ].join(',');
@@ -132,6 +132,8 @@ export const handler = async (event) => {
                     vip: Boolean(user.vip),
                     premium: acesso.codigo === 'ACESSO_ATIVO',
                     plano_atual: user.plano_atual || null,
+                    colaborador: Boolean(user.colaborador),
+                    colaborador_desde: user.colaborador_desde || null,
                     acesso_teste: !['ACESSO_ATIVO', 'ACESSO_VITALICIO'].includes(acesso.codigo),
                     teste_ativo_ate: acesso.teste_ativo_ate || null,
                     teste_proximo_em: acesso.teste_proximo_em || null,

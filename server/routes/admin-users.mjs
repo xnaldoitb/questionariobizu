@@ -45,6 +45,8 @@ function migrationMissing(error) {
     const missingKnownColumn = [
         'validade_ate',
         'desativado_por_validade',
+        'colaborador',
+        'colaboracoes_usuario',
         ...V43_COLUMNS,
     ].some((column) => message.includes(column));
 
@@ -57,8 +59,8 @@ function migrationMissing(error) {
 
 function migrationResponse() {
     return json(503, {
-        erro: 'Esta versão requer a migration v4.36. Execute supabase/migration-v4.36-plus-pagamentos.sql no Supabase antes de publicar.',
-        codigo: 'MIGRATION_V436_REQUIRED',
+        erro: 'O banco ainda não possui todas as estruturas desta versão. Execute as migrations pendentes indicadas em supabase/MIGRACOES.md.',
+        codigo: 'MIGRATIONS_REQUIRED',
     });
 }
 
@@ -155,11 +157,21 @@ export const handler = async (event) => {
 
     if (event.httpMethod === 'GET') {
         try {
+            if (params.colaborador_historico) {
+                if (!isSupreme) return json(403, { erro: 'Somente o Desenvolvedor pode consultar este histórico.' });
+                const { data, error } = await db().from('colaboracoes_usuario')
+                    .select('id,acao,xp_concedido,criado_em,usuarios:criado_por_admin_id(nome)')
+                    .eq('usuario_id', params.colaborador_historico)
+                    .order('criado_em', { ascending: false })
+                    .limit(100);
+                if (error) throw error;
+                return json(200, { historico: data || [] });
+            }
             await expireOverdueAccounts();
 
             let usersQuery = db()
                     .from('usuarios')
-                    .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,criado_em,ultimo_acesso,validade_ate,desativado_por_validade,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,plano_atual,vip_desde,acesso_teste,teste_expira_em,teste_ciclo_em,teste_saldo_segundos,teste_ativo_ate,xp_total');
+                    .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,criado_em,ultimo_acesso,validade_ate,desativado_por_validade,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,plano_atual,vip_desde,acesso_teste,teste_expira_em,teste_ciclo_em,teste_saldo_segundos,teste_ativo_ate,xp_total,colaborador,colaborador_desde');
             if (!isSupreme) {
                 usersQuery = usersQuery.or(
                     `responsavel_admin_id.eq.${actor.id},and(responsavel_admin_id.is.null,perfil.eq.aluno,vip.eq.false)`,
@@ -280,7 +292,7 @@ export const handler = async (event) => {
         const { data, error } = await db()
             .from('usuarios')
             .insert(payload)
-            .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,validade_ate,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,plano_atual,vip_desde,acesso_teste,teste_expira_em')
+            .select('id,usuario,nome,whatsapp,perfil,ativo,status_aprovacao,validade_ate,criado_por_admin_id,aprovado_por_admin_id,responsavel_admin_id,vip,premium,plano_atual,vip_desde,acesso_teste,teste_expira_em,xp_total,colaborador,colaborador_desde')
             .single();
 
         if (error) {
@@ -641,6 +653,74 @@ export const handler = async (event) => {
                 console.error('Falha ao presentear XP:', error.message);
                 return json(400, { erro: 'Não foi possível presentear XP ao usuário.' });
             }
+        }
+
+        if (action === 'set_contributor') {
+            if (!isSupreme) return json(403, { erro: 'Somente o Desenvolvedor pode gerenciar colaboradores.' });
+            if (target.perfil === 'supremo') return json(403, { erro: 'A conta do Desenvolvedor já possui reconhecimento institucional próprio.' });
+
+            const enabled = Boolean(body.ativo);
+            let points = 0;
+            if (enabled && !target.colaborador) {
+                const { data: previousBonus, error: bonusError } = await db().from('xp_eventos')
+                    .select('id').eq('usuario_id', id).eq('chave', 'bonus-colaborador').maybeSingle();
+                if (bonusError) throw bonusError;
+                points = previousBonus ? 0 : 2000;
+            }
+
+            const recognitionId = randomUUID();
+            const now = new Date().toISOString();
+            const { error: updateError } = await db().from('usuarios').update({
+                colaborador: enabled,
+                colaborador_desde: enabled ? (target.colaborador_desde || now) : null,
+            }).eq('id', id);
+            if (updateError) {
+                if (String(updateError.message || '').includes('colaborador')) return json(503, { erro: 'Execute a migration v4.50 no Supabase antes de destacar colaboradores.' });
+                throw updateError;
+            }
+
+            const { error: historyError } = await db().from('colaboracoes_usuario').insert({
+                usuario_id: id,
+                acao: enabled ? 'concedido' : 'removido',
+                xp_concedido: points,
+                criado_por_admin_id: actor.id,
+            });
+            if (historyError) throw historyError;
+
+            let xpTotal = Number(target.xp_total || 0);
+            if (enabled && points > 0) {
+                const xpResult = await awardXp(id, 'bonus-colaborador', 'colaborador', points, {
+                    reconhecimento: 'Colaborador BIZU', concedido_por: actor.id,
+                });
+                xpTotal = xpResult.xpTotal;
+            }
+
+            if (enabled) {
+                await Promise.all([
+                    createNotification({
+                        usuario_id: id,
+                        tipo: 'sistema',
+                        titulo: 'Reconhecimento de Colaborador BIZU',
+                        mensagem: `Você recebeu o reconhecimento de Colaborador BIZU${points ? ` e um prêmio único de ${points.toLocaleString('pt-BR')} XP.` : '.'}`,
+                        acao: 'colaborador',
+                        chave: `colaborador:${recognitionId}`,
+                    }),
+                    db().from('premios_usuario').insert({
+                        usuario_id: id,
+                        plano: 'colaborador',
+                        plano_nome: 'COLABORADOR BIZU',
+                        mensagem: `Parabéns! Sua contribuição com o Questionário Bizu foi reconhecida.${points ? ` Você também recebeu um prêmio único de ${points.toLocaleString('pt-BR')} XP.` : ''}`,
+                        criado_por_admin_id: actor.id,
+                    }).then(({ error }) => { if (error) throw error; }),
+                ]);
+            }
+
+            return audited(actor, enabled ? 'colaborador_destacado' : 'colaborador_removido', id, json(200, {
+                ok: true,
+                colaborador: enabled,
+                xp_total: xpTotal,
+                mensagem: enabled ? 'Reconhecimento de Colaborador BIZU concedido.' : 'Destaque de colaborador removido.',
+            }), { pontos: points });
         }
 
         if (action === 'promote_admin') {

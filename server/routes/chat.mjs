@@ -11,7 +11,7 @@ const MESSAGE_LIMIT = 80;
 
 async function loadMessages(roomId, currentUserId) {
     const { data, error } = await db().from('chat_mensagens')
-        .select('id,mensagem,criado_em,usuario_id,usuarios(nome,perfil,vip,premium,plano_atual)')
+        .select('id,mensagem,criado_em,usuario_id,usuarios(nome,perfil,vip,premium,plano_atual,colaborador)')
         .eq('sala_id', roomId).order('id', { ascending: false }).limit(MESSAGE_LIMIT);
     if (error) throw error;
 
@@ -26,6 +26,7 @@ async function loadMessages(roomId, currentUserId) {
             vip: Boolean(row.usuarios?.vip),
             premium: Boolean(row.usuarios?.premium),
             plano_atual: row.usuarios?.plano_atual || null,
+            colaborador: Boolean(row.usuarios?.colaborador),
         },
     }));
 }
@@ -98,6 +99,7 @@ export const handler = async (event) => {
                         vip: Boolean(user.vip),
                         premium: Boolean(user.premium),
                         plano_atual: user.plano_atual || null,
+                        colaborador: Boolean(user.colaborador),
                     },
                 },
             });

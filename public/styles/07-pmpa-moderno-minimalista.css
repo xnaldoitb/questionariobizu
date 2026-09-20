@@ -648,6 +648,15 @@ html[data-theme="dark"] .vip-insignia {
     color: #67470b;
 }
 
+.contributor-insignia {
+    border: 1px solid rgba(177, 119, 13, .42);
+    background: linear-gradient(135deg, #fff8d8, #e7bd55);
+    color: #65430a;
+    box-shadow: 0 1px 4px rgba(126, 80, 5, .18);
+}
+.contributor-insignia img { width:16px; height:16px; border-radius:50%; object-fit:cover; }
+.contributor-insignia b { font:inherit; }
+
 html[data-theme="dark"] .premium-insignia {
     border-color: rgba(126, 166, 207, .36);
     background: linear-gradient(135deg, #17283a, #24425f);
@@ -676,6 +685,18 @@ html[data-theme="dark"] .account-insignia.vip-insignia {
     background: linear-gradient(135deg, #3a3117, #6b541c);
     border-color: rgba(240, 211, 123, .42);
     color: #ffe69a;
+}
+
+html[data-theme="dark"] .contributor-insignia {
+    border-color: rgba(244, 202, 99, .5);
+    background: linear-gradient(135deg, #3d3013, #765817);
+    color: #ffe59a;
+}
+
+@media (max-width:680px) {
+    .contributor-insignia { width:22px; min-width:22px; height:22px; padding:2px; }
+    .contributor-insignia img { width:17px; height:17px; }
+    .contributor-insignia b { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
 }
 
 .admin-user-card:has(.supreme-insignia) {

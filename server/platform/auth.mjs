@@ -5,7 +5,7 @@ import { resolveQuestionAccess } from './question-access.mjs';
 
 const encoder = new TextEncoder();
 const USER_SESSION_COLUMNS = [
-    'id', 'usuario', 'nome', 'whatsapp', 'perfil', 'vip', 'premium', 'plano_atual',
+    'id', 'usuario', 'nome', 'whatsapp', 'perfil', 'vip', 'premium', 'plano_atual', 'colaborador', 'colaborador_desde',
     'xp_total', 'xp_bonus_plano', 'ativo', 'desativado_por_validade', 'status_aprovacao',
     'acesso_teste', 'teste_expira_em', 'validade_ate', 'teste_ciclo_em',
     'teste_saldo_segundos', 'teste_ativo_ate',
@@ -99,6 +99,8 @@ export async function getUser(event) {
             vip: Boolean(registro.vip),
             premium: premiumAtivo,
             plano_atual: registro.plano_atual || null,
+            colaborador: Boolean(registro.colaborador),
+            colaborador_desde: registro.colaborador_desde || null,
             xp_total: Number(registro.xp_total || 0),
             xp_bonus_plano: Number(registro.xp_bonus_plano || 0),
             sessao_id: payload.sessao_id || null,

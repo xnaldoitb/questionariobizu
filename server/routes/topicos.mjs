@@ -55,8 +55,8 @@ function metricsFor(topicId, replies = [], reactions = [], currentUserId = null)
 
 async function topicDetail(id, user) {
     const [{ data: topic, error }, { data: replies, error: repliesError }, { data: reactions, error: reactionsError }] = await Promise.all([
-        db().from('topicos_comunidade').select('id,autor_id,titulo,conteudo,categoria,fechado,criado_em,atualizado_em,usuarios:autor_id(nome,perfil)').eq('id', id).maybeSingle(),
-        db().from('topico_respostas').select('id,topico_id,autor_id,conteudo,criado_em,usuarios:autor_id(nome,perfil)').eq('topico_id', id).order('criado_em').limit(300),
+        db().from('topicos_comunidade').select('id,autor_id,titulo,conteudo,categoria,fechado,criado_em,atualizado_em,usuarios:autor_id(nome,perfil,colaborador)').eq('id', id).maybeSingle(),
+        db().from('topico_respostas').select('id,topico_id,autor_id,conteudo,criado_em,usuarios:autor_id(nome,perfil,colaborador)').eq('topico_id', id).order('criado_em').limit(300),
         db().from('topico_reacoes').select('topico_id,usuario_id,reacao').eq('topico_id', id),
     ]);
     if (error || repliesError || reactionsError) throw error || repliesError || reactionsError;
@@ -88,10 +88,19 @@ export const handler = async (event) => {
             if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
                 erro: 'Muitas atualizações dos tópicos. Aguarde um minuto.',
             }, { 'retry-after': '60' });
+            if (params.colaboradores === '1') {
+                const { data, error } = await db().from('usuarios')
+                    .select('nome,usuario,colaborador_desde')
+                    .eq('colaborador', true)
+                    .order('colaborador_desde', { ascending: true, nullsFirst: false })
+                    .limit(200);
+                if (error) throw error;
+                return json(200, { colaboradores: data || [] });
+            }
             if (params.id) return json(200, await topicDetail(params.id, user));
 
             const { data, error } = await db().from('topicos_comunidade')
-                .select('id,autor_id,titulo,conteudo,categoria,fechado,criado_em,atualizado_em,usuarios:autor_id(nome,perfil)')
+                .select('id,autor_id,titulo,conteudo,categoria,fechado,criado_em,atualizado_em,usuarios:autor_id(nome,perfil,colaborador)')
                 .order('atualizado_em', { ascending: false }).limit(80);
             if (error) throw error;
             const topics = data || [];

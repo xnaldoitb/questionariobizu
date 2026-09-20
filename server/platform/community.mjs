@@ -95,7 +95,7 @@ export async function listActiveUsers(limit = 30, currentUserId = null) {
 
     const { data, count, error } = await db()
         .from('presencas_online')
-        .select('usuario_id,atividade_em,usuarios(id,nome,perfil,vip,premium,plano_atual)', { count: 'exact' })
+        .select('usuario_id,atividade_em,usuarios(id,nome,perfil,vip,premium,plano_atual,colaborador)', { count: 'exact' })
         .gte('visto_em', connectedCutoff)
         .gte('atividade_em', activeCutoff)
         .order('atividade_em', { ascending: false })
@@ -112,6 +112,7 @@ export async function listActiveUsers(limit = 30, currentUserId = null) {
                 vip: Boolean(row.usuarios?.vip),
                 premium: Boolean(row.usuarios?.premium),
                 plano_atual: row.usuarios?.plano_atual || null,
+                colaborador: Boolean(row.usuarios?.colaborador),
                 proprio: Boolean(currentUserId && (row.usuarios?.id || row.usuario_id) === currentUserId),
             })),
     };

@@ -119,6 +119,12 @@ function renderUserCard(user) {
                     ${isSupreme()
                         ? `<button data-user-command="gift_xp" data-user-id="${user.id}" type="button">Presentear XP</button>`
                         : ''}
+                    ${isSupreme() && user.perfil !== 'supremo'
+                        ? `<button data-user-command="set_contributor" data-user-id="${user.id}" type="button">${user.colaborador ? 'Remover destaque de colaborador' : 'Destacar como colaborador'}</button>`
+                        : ''}
+                    ${isSupreme() && user.perfil !== 'supremo'
+                        ? `<button data-user-command="contributor_history" data-user-id="${user.id}" type="button">Histórico de colaboração</button>`
+                        : ''}
                     ${isSupreme()
                         ? `<button data-user-command="reset_history" data-user-id="${user.id}" type="button">Resetar histórico / ranking</button>`
                         : ''}
@@ -178,7 +184,7 @@ function filteredUsers() {
         const responsible = user.responsavel_admin?.nome || '';
         const matchesSearch = !search || `${user.nome} ${user.usuario} ${user.whatsapp || ''} ${responsible}`.toLowerCase().includes(search);
         const matchesRole = role === 'todos' || user.perfil === role;
-        const matchesStatus = status === 'todos' || statusOf(user).key === status;
+        const matchesStatus = status === 'todos' || (status === 'colaborador' ? Boolean(user.colaborador) : statusOf(user).key === status);
         const matchesResponsibility = responsibility === 'todos'
             || (responsibility === 'sem_responsavel' && !user.responsavel_admin_id)
             || user.responsavel_admin_id === responsibility;
@@ -289,6 +295,7 @@ async function handleUserCommand(button) {
     if (command === 'edit') return openUserEdit(id);
     if (command === 'validity') return openValidity(id);
     if (command === 'gift_xp') return openXpGift(id);
+    if (command === 'contributor_history') return openContributorHistory(id);
 
     const confirmations = {
         approve: 'Aprovar este cadastro?',
@@ -300,6 +307,9 @@ async function handleUserCommand(button) {
         reset_history: 'Apagar somente o histórico e ranking deste usuário? O XP, as missões e a patente serão preservados.',
         reset_progress: 'ATENÇÃO: redefinir o progresso de estudo removerá XP de questões e missões e recalculará a patente. O bônus permanente do plano será preservado. Deseja continuar?',
         end_sessions: 'Desconectar este aluno de todos os dispositivos e liberar as tentativas de login da conta?',
+        set_contributor: user.colaborador
+            ? 'Remover o destaque de Colaborador BIZU? O histórico e o XP já concedido serão preservados.'
+            : 'Destacar este usuário como Colaborador BIZU e conceder o bônus único de 2.000 XP?',
         delete: user.vip
             ? 'Apagar esta conta VIP e todo o histórico dela? Esta ação é definitiva.'
             : 'Apagar esta conta e todo o histórico dela? Esta ação é definitiva.',
@@ -324,13 +334,17 @@ async function handleUserCommand(button) {
             await sendUserAction(id, 'toggle_active', { ativo: command === 'activate' });
             notify(command === 'activate' ? 'Conta reativada.' : 'Conta desativada.');
         } else {
-            const result = await sendUserAction(id, command);
+            const result = command === 'set_contributor'
+                ? await sendUserAction(id, command, { ativo: !user.colaborador })
+                : await sendUserAction(id, command);
             if (command === 'approve' && result.expirado) {
                 notify('Cadastro aprovado, mas a validade venceu. Defina um novo prazo para liberar o acesso.', 4800);
             } else if (command === 'end_sessions') {
                 notify(result.mensagem || 'Sessões encerradas e login liberado.', 4800);
             } else if (command === 'reset_progress') {
                 notify(result.mensagem || 'Progresso de estudo redefinido.', 5200);
+            } else if (command === 'set_contributor') {
+                notify(result.mensagem || 'Reconhecimento de colaborador atualizado.', 5000);
             } else {
                 notify(command === 'reset_history'
                     ? 'Histórico e ranking resetados. XP e patente preservados.'
@@ -341,6 +355,25 @@ async function handleUserCommand(button) {
         await refreshManagedUsers();
     } catch (error) {
         notify(error.message, 4200);
+    }
+}
+
+async function openContributorHistory(id) {
+    const user = findUser(id);
+    if (!user || !isSupreme()) return;
+    one('#contributorHistoryTitle').textContent = `Colaboração — ${user.nome}`;
+    one('#contributorHistoryList').innerHTML = '<div class="admin-empty-state">Carregando histórico…</div>';
+    openAdminModal('contributorHistoryModal');
+    try {
+        const payload = await requestJson(`admin-users?colaborador_historico=${encodeURIComponent(id)}`);
+        const items = payload.historico || [];
+        one('#contributorHistoryList').innerHTML = items.length ? items.map((item) => `<article class="contributor-history-item">
+            <span class="admin-status-pill ${item.acao === 'concedido' ? 'status-ativo' : 'status-desativado'}">${item.acao === 'concedido' ? 'Concedido' : 'Removido'}</span>
+            <strong>${Number(item.xp_concedido || 0).toLocaleString('pt-BR')} XP</strong>
+            <small>${safeText(formatDateTime(item.criado_em))} · ${safeText(item.usuarios?.nome || 'Desenvolvedor')}</small>
+        </article>`).join('') : '<div class="admin-empty-state">Nenhum reconhecimento registrado.</div>';
+    } catch (error) {
+        one('#contributorHistoryList').innerHTML = `<div class="admin-empty-state">${safeText(error.message)}</div>`;
     }
 }
 

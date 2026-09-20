@@ -29,6 +29,8 @@ create table if not exists public.usuarios (
   ,xp_total bigint not null default 0 check (xp_total >= 0)
   ,xp_bonus_plano integer not null default 0 check (xp_bonus_plano between 0 and 2500)
   ,xp_migrado_em timestamptz
+  ,colaborador boolean not null default false
+  ,colaborador_desde timestamptz
 );
 
 create table if not exists public.disciplinas (
@@ -179,21 +181,22 @@ select
   u.usuario,
   u.perfil,
   u.vip,
-  u.premium,
-  u.plano_atual,
   u.xp_total,
   count(distinct r.sessao_id)::bigint as sessoes,
   count(r.id)::bigint as respondidas,
   count(r.id) filter (where r.acertou)::bigint as acertos,
   case when count(r.id) > 0
     then round((count(r.id) filter (where r.acertou))::numeric / count(r.id)::numeric * 100)::integer
-    else 0 end as percentual
+    else 0 end as percentual,
+  u.premium,
+  u.plano_atual,
+  u.colaborador
 from public.usuarios u
 left join public.respostas r
   on r.usuario_id = u.id
  and r.pulada = false
  and r.resposta_marcada is not null
-group by u.id, u.nome, u.usuario, u.perfil, u.vip, u.premium, u.plano_atual, u.xp_total;
+group by u.id, u.nome, u.usuario, u.perfil, u.vip, u.xp_total, u.premium, u.plano_atual, u.colaborador;
 
 -- v4.3: substituição transacional de disciplina.
 create or replace function public.substituir_disciplina_completa(
@@ -333,6 +336,19 @@ create index if not exists premios_usuario_pendentes_idx on public.premios_usuar
 alter table public.premios_usuario enable row level security;
 revoke all on public.premios_usuario from public, anon, authenticated;
 grant select, insert, update on public.premios_usuario to service_role;
+
+create table if not exists public.colaboracoes_usuario (
+  id uuid primary key default gen_random_uuid(),
+  usuario_id uuid not null references public.usuarios(id) on delete cascade,
+  acao text not null check (acao in ('concedido','removido')),
+  xp_concedido integer not null default 0 check (xp_concedido between 0 and 100000),
+  criado_por_admin_id uuid references public.usuarios(id) on delete set null,
+  criado_em timestamptz not null default now()
+);
+create index if not exists colaboracoes_usuario_historico_idx on public.colaboracoes_usuario(usuario_id,criado_em desc);
+alter table public.colaboracoes_usuario enable row level security;
+revoke all on public.colaboracoes_usuario from public,anon,authenticated;
+grant select,insert on public.colaboracoes_usuario to service_role;
 
 create or replace function public.confirmar_pagamento_pix(
   p_pagamento_id uuid, p_mercado_pago_payment_id text, p_status text,

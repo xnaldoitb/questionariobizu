@@ -1,6 +1,6 @@
 import { requestJson } from '../foundation/request.js';
 import { one, safeText, notify } from '../foundation/selectors.js';
-import { openCommunityChat, openCommunitySupport, openXpRulesTopic } from './community.js';
+import { openCollaboratorsTopic, openCommunityChat, openCommunitySupport, openXpRulesTopic } from './community.js';
 
 const REFRESH_MS = 45_000;
 let initialized = false;
@@ -94,6 +94,7 @@ async function markNotification(item) {
     else if (item.acao === 'missoes') await openMissions();
     else if (item.acao === 'pagamentos') one('#accountPlansBtn')?.click();
     else if (item.acao === 'patente') one('#profileAvatar')?.click();
+    else if (item.acao === 'colaborador') await openCollaboratorsTopic();
 }
 
 async function markAll() {

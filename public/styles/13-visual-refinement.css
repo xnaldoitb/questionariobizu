@@ -61,3 +61,8 @@
 @media (max-width:380px) {
     .login-help-actions { grid-template-columns:1fr; }
 }
+
+.contributor-history-list { display:grid; gap:7px; margin-top:10px; max-height:min(420px,55vh); overflow-y:auto; }
+.contributor-history-item { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:4px 9px; padding:10px; background:var(--canvas-soft); border:1px solid var(--line); border-radius:9px; }
+.contributor-history-item strong { justify-self:end; color:var(--text-accent); font:800 11px var(--type-ui); }
+.contributor-history-item small { grid-column:1/-1; color:var(--text-muted); font:600 8px var(--type-ui); }
