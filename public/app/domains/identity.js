@@ -4,6 +4,21 @@ import { appState } from '../foundation/model.js';
 
 let signupStartedAt = Date.now();
 let volatileDeviceToken = null;
+const SUPPORT_WHATSAPP = '5593992048088';
+
+function whatsappHelpUrl(kind) {
+    const registration = String(one('#loginUser')?.value || '').replace(/\D/g, '').slice(0, 12);
+    const registrationText = registration ? ` Meu AL SD PM Nº é ${registration}.` : '';
+    const message = kind === 'password'
+        ? `Olá! Preciso recuperar minha senha no Questionário Bizu.${registrationText}`
+        : `Olá! Preciso de suporte no Questionário Bizu.${registrationText}`;
+    return `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(message)}`;
+}
+
+function refreshWhatsappHelpLinks() {
+    one('#recoverPasswordWhatsapp')?.setAttribute('href', whatsappHelpUrl('password'));
+    one('#loginSupportWhatsapp')?.setAttribute('href', whatsappHelpUrl('support'));
+}
 
 function clientDeviceToken() {
     const storageKey = 'questionario_bizu_device';
@@ -42,6 +57,10 @@ export function showIdentityMode(mode) {
 export function bindIdentityEvents(onAuthenticated) {
     one('#showLogin').addEventListener('click', () => showIdentityMode('login'));
     one('#showSignup').addEventListener('click', () => showIdentityMode('signup'));
+    one('#loginUser').addEventListener('input', refreshWhatsappHelpLinks);
+    one('#recoverPasswordWhatsapp').addEventListener('click', refreshWhatsappHelpLinks);
+    one('#loginSupportWhatsapp').addEventListener('click', refreshWhatsappHelpLinks);
+    refreshWhatsappHelpLinks();
 
     one('#signupWhatsapp').addEventListener('input', (event) => {
         const digits = event.target.value.replace(/\D/g, '').replace(/^55/, '').slice(0, 11);

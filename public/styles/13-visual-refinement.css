@@ -12,3 +12,52 @@
 .app-update-notice { position:fixed; z-index:500; right:16px; bottom:16px; display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:12px; width:min(520px,calc(100vw - 32px)); padding:12px 14px; color:var(--text-main); background:var(--panel-surface); border:1px solid var(--line); border-left:4px solid var(--signal); border-radius:12px; box-shadow:var(--card-shadow); }
 .app-update-notice div { display:grid; gap:2px; }.app-update-notice strong { font:750 11px var(--type-ui); }.app-update-notice span { color:var(--text-muted); font:500 9px var(--type-ui); }.update-later { padding:6px; color:var(--text-muted); background:none; border:0; cursor:pointer; font:600 8px var(--type-ui); }
 @media(max-width:520px){.app-update-notice{grid-template-columns:1fr auto;}.app-update-notice div{grid-column:1/-1;}.app-update-notice .update-later{grid-column:2;grid-row:2;}}
+/* Ajuda de acesso pelo WhatsApp — compacta e sem expor senhas. */
+.login-help-actions {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+    margin-top:8px;
+}
+.login-help-link {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    min-width:0;
+    min-height:36px;
+    padding:7px 9px;
+    color:var(--text-main);
+    background:var(--canvas-soft);
+    border:1px solid var(--line);
+    border-radius:8px;
+    font:700 9px/1.2 var(--type-ui);
+    text-align:center;
+    text-decoration:none;
+}
+.login-help-link:hover,.login-help-link:focus-visible {
+    color:var(--text-accent);
+    background:var(--panel-surface);
+    border-color:var(--text-accent);
+}
+.login-help-symbol {
+    display:grid;
+    flex:0 0 21px;
+    width:21px;
+    height:21px;
+    place-items:center;
+    color:#fff;
+    background:#1f7a52;
+    border-radius:50%;
+    font:800 12px/1 var(--type-ui);
+}
+.login-help-note {
+    display:block;
+    margin-top:7px;
+    color:var(--text-muted);
+    font:500 8px/1.35 var(--type-ui);
+    text-align:center;
+}
+@media (max-width:380px) {
+    .login-help-actions { grid-template-columns:1fr; }
+}
