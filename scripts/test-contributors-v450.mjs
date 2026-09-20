@@ -8,7 +8,7 @@ const files = [
 ];
 await Promise.all(files.map((file) => access(new URL(file, root))));
 
-const [route, badges, community, adminUi, adminView, ranking, chat, presence, auth, login, rewards, migration, schema, worker, rewardCss, badgeCss, rankingCss] = await Promise.all([
+const [route, badges, community, adminUi, adminView, ranking, chat, presence, auth, login, rewards, migration, schema, worker, rewardCss, badgeCss, rankingCss, patentsUi] = await Promise.all([
     readFile(new URL('server/routes/admin-users.mjs', root), 'utf8'),
     readFile(new URL('public/app/foundation/badges.js', root), 'utf8'),
     readFile(new URL('public/app/domains/community.js', root), 'utf8'),
@@ -26,6 +26,7 @@ const [route, badges, community, adminUi, adminView, ranking, chat, presence, au
     readFile(new URL('public/styles/09-trial-access.css', root), 'utf8'),
     readFile(new URL('public/styles/07-pmpa-moderno-minimalista.css', root), 'utf8'),
     readFile(new URL('public/styles/14-ranking-patents.css', root), 'utf8'),
+    readFile(new URL('public/app/domains/patents.js', root), 'utf8'),
 ]);
 
 assert(route.includes("action === 'set_contributor'"));
@@ -42,8 +43,13 @@ assert(route.includes('params.colaborador_historico'));
 assert(badges.includes('contributor-insignia'));
 assert(badges.includes('/assets/icons/colaborador-bizu.webp'));
 assert(!badges.includes('<b>COLABORADOR</b>'));
-assert(badgeCss.includes('clip-path: polygon('));
-assert(badgeCss.includes('width: 38px'));
+assert(badges.includes('data-contributor-detail'));
+assert(badges.includes('role="button" tabindex="0"'));
+assert(patentsUi.includes("event.target.closest('[data-contributor-detail]')"));
+assert(patentsUi.includes('renderContributorModal'));
+assert(patentsUi.includes('Colaborador BIZU'));
+assert(!badgeCss.includes('clip-path: polygon('));
+assert(badgeCss.includes('width: 24px'));
 assert(rankingCss.includes('.account-insignia.contributor-insignia'));
 assert(community.includes("const COLLABORATOR_TOPIC_ID = 'mural-colaboradores'"));
 assert(community.includes('Mural de Colaboradores'));

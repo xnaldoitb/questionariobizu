@@ -15,10 +15,10 @@ assert.equal(startOfLocalDay(new Date('2026-09-08T14:37:15.000Z')), '2026-09-08T
 assert.equal(startOfLocalWeek(new Date('2026-09-08T14:37:15.000Z')), '2026-09-07T03:00:00.000Z');
 assert.deepEqual([0, 1, 2, 8].map(sequenceMissionTarget), [10, 20, 30, 90]);
 assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map(roundMissionTarget), [3, 6, 9, 12, 15, 18, 18]);
-assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(25, stage)), [25, 50, 75, 100]);
-assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map((stage) => progressiveMissionReward(40, stage, 6)), [40, 80, 120, 160, 200, 240, 240]);
+assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(50, stage)), [50, 100, 150, 200]);
+assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map((stage) => progressiveMissionReward(80, stage, 6)), [80, 160, 240, 320, 400, 480, 480]);
 assert.deepEqual([0, 1, 2, 3].map(validAnswersMissionTarget), [20, 40, 60, 80]);
-assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(60, stage)), [60, 120, 180, 240]);
+assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(120, stage)), [120, 240, 360, 480]);
 
 const [migration, retroactive, historyProgress, xp, responder, sessions, adminUsers, adminUsersUi, notifications, missions, router, topbar, dashboard, quiz, fragments, progression, community, ranking, patent, index, worker] = await Promise.all([
     readFile('supabase/migration-v4.44.1-xp-missoes-notificacoes.sql', 'utf8'),
@@ -51,13 +51,13 @@ assert(retroactive.includes('on conflict (usuario_id, chave) do nothing'));
 assert(retroactive.includes('etapa * 25') && retroactive.includes('etapa * 40') && retroactive.includes('etapa * 60'));
 assert(retroactive.includes('recompensa_progressiva_corrigida') && retroactive.includes('set xp_total = u.xp_total + t.pontos'));
 for (const marker of ['redefinir_progresso_usuario', "e.tipo <> 'plano'", 'xp_total = v_bonus', 'eventos_removidos']) assert(historyProgress.includes(marker));
-for (const marker of ["'primeiro_acerto', 10", "'correcao', 4", "'revisao', 3", "'dominio', 150", "'sessao', 20", "'precisao', 60", "'precisao', 30"]) assert(xp.includes(marker));
+for (const marker of ["'primeiro_acerto', 20", "'correcao', 8", "'revisao', 6", "'dominio', 300", "'sessao', 40", "'precisao', 120", "'precisao', 60"]) assert(xp.includes(marker));
 for (const marker of ['sequencia-progressiva', 'ronda-progressiva', 'ritmo-progressivo', 'precisao-diaria', 'excelencia-diaria', 'constancia-7', 'centena-semanal', 'explorador-semanal']) assert(xp.includes(marker));
 for (const marker of ['roundTargets = [3, 6, 9, 12, 15, 18]', 'sequenceMissionTarget', 'roundMissionTarget', 'progressiveMissionReward', 'pontos_premiados', 'startOfLocalWeek']) assert(xp.includes(marker));
 assert(xp.includes('details: { meta: roundTarget, disciplinas: disciplines }'));
 assert(!xp.includes('details: { meta: roundTarget, disciplinas }'));
 assert(xp.includes('missao:ritmo-${rhythmTarget}:${day}') && xp.includes('respostas_validas: dailyAnswers'));
-assert(xp.includes('progressiveMissionReward(60, rhythmStages)'));
+assert(xp.includes('progressiveMissionReward(120, rhythmStages)'));
 assert(responder.includes('awardAnswerXp') && responder.includes('chapterId: q.capitulo_id'));
 assert(sessions.includes('awardSessionXp'));
 assert(sessions.includes('xp_preservado: true'));
@@ -83,10 +83,10 @@ assert(xp.includes('modo_institucional') && xp.includes('Notificação da missã
 assert(community.includes("XP_RULES_TOPIC_ID = 'regras-xp'") && community.includes('XP necessário para cada patente'));
 assert(community.includes('Premium concede <strong>500 XP</strong>'));
 assert(community.includes('10, 20, 30…') && community.includes('3, 6, 9, 12, 15 e 18'));
-assert(community.includes('20, 40, 60… questões válidas') && community.includes('60, 120, 180… XP'));
+assert(community.includes('20, 40, 60… questões válidas') && community.includes('120, 240, 360… XP'));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
 assert(xp.includes("rpc('metricas_missoes_v448'") && xp.includes("rpc('metricas_dominio_capitulo_v448'"));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.50.3'));
-assert(worker.includes('questionario-bizu-v4.50.3') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.50.5'));
+assert(worker.includes('questionario-bizu-v4.50.5') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, métricas agregadas e notificações v4.48 validados.');

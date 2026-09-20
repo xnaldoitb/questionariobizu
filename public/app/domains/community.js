@@ -362,28 +362,28 @@ async function openTopic(id) {
             <h3>XP, missões e progressão</h3>
             <small>Questionário Bizu · tópico fixo</small>
         </header>
-        <p class="topic-main-content">O XP mede sua evolução de estudo e define sua patente. A colocação do ranking continua sendo determinada pelos acertos; por isso, bônus e missões ajudam na patente sem alterar artificialmente o resultado competitivo.</p>
+        <p class="topic-main-content">O XP mede sua evolução de estudo e define sua patente. As recompensas futuras foram ampliadas para uma progressão mais dinâmica, sem alterar o saldo, a patente ou a posição atual de nenhum usuário. A colocação do ranking continua sendo determinada pelos acertos.</p>
         <div class="xp-rules-grid">
-            <article><strong>+10 XP</strong><span>Primeiro acerto em cada questão</span></article>
-            <article><strong>+3 XP</strong><span>Revisão correta após pelo menos 24 horas</span></article>
-            <article><strong>+4 XP</strong><span>Corrigir uma questão errada pela primeira vez</span></article>
-            <article><strong>+20 XP</strong><span>Finalizar um simulado com 20 ou mais respostas</span></article>
-            <article><strong>+30 / +60 XP</strong><span>Alcançar 80% / 90% em um simulado</span></article>
-            <article><strong>+150 XP</strong><span>Dominar um capítulo: 30 questões e 80% de acertos</span></article>
+            <article><strong>+20 XP</strong><span>Primeiro acerto em cada questão</span></article>
+            <article><strong>+6 XP</strong><span>Revisão correta após pelo menos 24 horas</span></article>
+            <article><strong>+8 XP</strong><span>Corrigir uma questão errada pela primeira vez</span></article>
+            <article><strong>+40 XP</strong><span>Finalizar um simulado com 20 ou mais respostas</span></article>
+            <article><strong>+60 / +120 XP</strong><span>Alcançar 80% / 90% em um simulado</span></article>
+            <article><strong>+300 XP</strong><span>Dominar um capítulo: 30 questões e 80% de acertos</span></article>
         </div>
         <h4 class="xp-topic-subtitle">Missões diárias visíveis</h4>
         <div class="xp-rules-grid">
-            <article><strong>25, 50, 75… XP</strong><span><b>Sequência certeira:</b> 10, 20, 30… acertos seguidos. A meta cresce em 10 e a recompensa em 25 XP por etapa; ambas reiniciam diariamente.</span></article>
-            <article><strong>40 a 240 XP</strong><span><b>Ronda de disciplinas:</b> metas de 3, 6, 9, 12, 15 e 18. A recompensa progride para 40, 80, 120, 160, 200 e 240 XP; reinicia diariamente.</span></article>
-            <article><strong>60, 120, 180… XP</strong><span><b>Ritmo diário:</b> responder 20, 40, 60… questões válidas. A recompensa vale o triplo da meta e ambas reiniciam diariamente.</span></article>
-            <article><strong>+30 XP</strong><span><b>Precisão diária:</b> obter 80% de acertos em pelo menos 10 questões no dia.</span></article>
-            <article><strong>+60 XP</strong><span><b>Excelência diária:</b> obter 90% de acertos em pelo menos 20 questões no dia.</span></article>
+            <article><strong>50, 100, 150… XP</strong><span><b>Sequência certeira:</b> 10, 20, 30… acertos seguidos. A meta cresce em 10 e a recompensa em 50 XP por etapa; ambas reiniciam diariamente.</span></article>
+            <article><strong>80 a 480 XP</strong><span><b>Ronda de disciplinas:</b> metas de 3, 6, 9, 12, 15 e 18. A recompensa progride para 80, 160, 240, 320, 400 e 480 XP; reinicia diariamente.</span></article>
+            <article><strong>120, 240, 360… XP</strong><span><b>Ritmo diário:</b> responder 20, 40, 60… questões válidas. A recompensa vale seis vezes a meta e ambas reiniciam diariamente.</span></article>
+            <article><strong>+60 XP</strong><span><b>Precisão diária:</b> obter 80% de acertos em pelo menos 10 questões no dia.</span></article>
+            <article><strong>+120 XP</strong><span><b>Excelência diária:</b> obter 90% de acertos em pelo menos 20 questões no dia.</span></article>
         </div>
         <h4 class="xp-topic-subtitle">Missões semanais visíveis</h4>
         <div class="xp-rules-grid">
-            <article><strong>+200 XP</strong><span><b>Constância semanal:</b> estudar por 7 dias consecutivos.</span></article>
-            <article><strong>+150 XP</strong><span><b>Centena da semana:</b> responder 100 questões válidas entre segunda e domingo.</span></article>
-            <article><strong>+100 XP</strong><span><b>Explorador semanal:</b> estudar 5 capítulos diferentes na semana.</span></article>
+            <article><strong>+400 XP</strong><span><b>Constância semanal:</b> estudar por 7 dias consecutivos.</span></article>
+            <article><strong>+300 XP</strong><span><b>Centena da semana:</b> responder 100 questões válidas entre segunda e domingo.</span></article>
+            <article><strong>+200 XP</strong><span><b>Explorador semanal:</b> estudar 5 capítulos diferentes na semana.</span></article>
         </div>
         <p class="topic-main-content">As missões podem ser realizadas em qualquer ordem. Questões puladas não contam. Cada etapa concede XP uma única vez; as diárias reiniciam no começo do novo dia e as metas semanais renovam na segunda-feira.</p>
         <h4 class="xp-topic-subtitle">Bônus único por plano</h4>

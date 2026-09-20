@@ -68,8 +68,8 @@ const LEGACY_DEFINITIONS = [
     [32000, 'Herói do Conhecimento', 'hero', 5],
 ];
 
-// Os limites originais eram baseados em acertos. A partir da v4.44 cada marco
-// vale dez vezes mais e passa a representar XP, sem rebaixar usuários antigos.
+// Os marcos permanecem estáveis para não reposicionar automaticamente quem já
+// conquistou uma patente. A aceleração ocorre nos novos ganhos de XP.
 const DEFINITIONS = LEGACY_DEFINITIONS.map(([min, name, family, grade]) => [min * 10, name, family, grade]);
 
 export const PATENTS = DEFINITIONS.map(([min, name, family, grade], level) => ({

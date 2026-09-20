@@ -30,7 +30,7 @@ export function accountBadges(entry = {}) {
     }
 
     if (entry?.colaborador) {
-        badges.push('<span class="account-insignia contributor-insignia" title="Colaborador BIZU" aria-label="Colaborador BIZU"><img src="/assets/icons/colaborador-bizu.webp" alt=""></span>');
+        badges.push('<span class="account-insignia contributor-insignia" data-contributor-detail role="button" tabindex="0" title="Ver reconhecimento de Colaborador BIZU" aria-label="Ver reconhecimento de Colaborador BIZU"><img src="/assets/icons/colaborador-bizu.webp" alt=""></span>');
     }
 
     return badges.join(' ');

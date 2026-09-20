@@ -18,36 +18,43 @@
    após os estilos compactos para impedir que perfil, comunidade e ranking o
    reduzam novamente ao tamanho das demais insígnias. */
 .account-insignia.contributor-insignia {
-    width:38px !important;
-    min-width:38px !important;
-    height:38px !important;
-    min-height:38px !important;
+    width:24px !important;
+    min-width:24px !important;
+    height:24px !important;
+    min-height:0 !important;
     max-width:none !important;
     padding:0 !important;
     border:0 !important;
     background:transparent !important;
     box-shadow:none !important;
     overflow:visible;
+    line-height:0;
+    cursor:pointer;
+}
+
+.account-insignia.contributor-insignia:focus-visible {
+    outline:2px solid var(--signal-soft);
+    outline-offset:2px;
 }
 
 .account-insignia.contributor-insignia img {
-    width:38px !important;
-    height:38px !important;
+    width:24px !important;
+    height:24px !important;
     border-radius:0 !important;
     object-fit:contain;
 }
 
 @media (max-width:680px) {
     .account-insignia.contributor-insignia {
-        width:40px !important;
-        min-width:40px !important;
-        height:40px !important;
-        min-height:40px !important;
+        width:22px !important;
+        min-width:22px !important;
+        height:22px !important;
+        min-height:0 !important;
     }
 
     .account-insignia.contributor-insignia img {
-        width:40px !important;
-        height:40px !important;
+        width:22px !important;
+        height:22px !important;
     }
 }
 
@@ -213,6 +220,10 @@
 :root[data-theme="light"] .patent-modal-close { color:#fff; background:#b52135; border-color:#fff; box-shadow:0 3px 0 #7f1525,0 6px 16px rgb(7 20 42 / 25%); }
 .patent-modal-icon { display: grid; place-items: center; min-height: 88px; margin-bottom: 4px; }
 .patent-modal-icon .patent-insignia { width: 104px; height: 104px; filter: drop-shadow(0 8px 10px rgb(4 18 42 / 25%)); }
+.contributor-modal-emblem { display:grid; place-items:center; width:88px; height:88px; }
+.contributor-modal-emblem img { display:block; width:88px; height:88px; object-fit:contain; filter:drop-shadow(0 7px 8px rgb(4 18 42 / 24%)); }
+.patent-modal-card.is-contributor { max-width:390px; }
+.patent-modal-card.is-contributor .patent-modal-description { max-width:320px; margin-bottom:18px; }
 .patent-modal-kicker { justify-content: center; margin: 2px 0 7px; }
 .patent-modal-card h2 { margin: 0; color: var(--text-accent); font: 800 25px/1.15 var(--type-heading); }
 .patent-modal-description { min-height: 38px; margin: 9px auto 15px; color: var(--text-muted); font-size: 13px; line-height: 1.45; }

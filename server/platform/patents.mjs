@@ -27,8 +27,8 @@ const LEGACY_PATENTS = [
     [32000, 'Herói do Conhecimento'],
 ];
 
-// O novo sistema usa XP. Multiplicar os marcos antigos por 10 preserva a
-// patente conquistada por quem já estudava antes da versão 4.44.
+// O sistema usa XP. Os marcos permanecem estáveis para não reposicionar
+// automaticamente usuários que já conquistaram suas patentes.
 export const PATENTS = LEGACY_PATENTS.map(([min, name], level) => ({ min: min * 10, name, level }));
 
 export function patentForHits(value) {

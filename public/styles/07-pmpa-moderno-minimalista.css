@@ -653,17 +653,19 @@ html[data-theme="dark"] .vip-insignia {
     background: transparent;
     box-shadow: none;
     padding: 0;
-    min-width: 38px;
-    min-height: 38px;
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    min-height: 0;
+    line-height: 0;
     overflow: visible;
 }
 .contributor-insignia img {
     display: block;
-    width: 38px;
-    height: 38px;
+    width: 24px;
+    height: 24px;
     border-radius: 0;
     object-fit: contain;
-    clip-path: polygon(50% 0, 91% 17%, 87% 72%, 50% 100%, 13% 72%, 9% 17%);
     filter: drop-shadow(0 2px 3px rgba(92, 57, 5, .28));
 }
 
@@ -704,8 +706,8 @@ html[data-theme="dark"] .contributor-insignia {
 }
 
 @media (max-width:680px) {
-    .contributor-insignia { width:40px; min-width:40px; height:40px; min-height:40px; padding:0; }
-    .contributor-insignia img { width:40px; height:40px; }
+    .contributor-insignia { width:22px; min-width:22px; height:22px; min-height:0; padding:0; }
+    .contributor-insignia img { width:22px; height:22px; }
 }
 
 .admin-user-card:has(.supreme-insignia) {

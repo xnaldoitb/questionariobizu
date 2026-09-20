@@ -15,6 +15,10 @@ function renderPatentModal({ hits = 0, papirao = false, developer = false, admin
     const progress = patentProgress(hits);
     const modal = one('#patentModal');
     if (!modal) return;
+    modal.classList.remove('is-contributor');
+    one('.patent-modal-stats', modal)?.classList.remove('hidden');
+    one('#patentProgressBar')?.parentElement?.classList.remove('hidden');
+    one('#patentModalNext')?.classList.remove('hidden');
 
     one('#patentModalKicker').textContent = developer || admin
         ? 'PATENTE INSTITUCIONAL'
@@ -52,6 +56,25 @@ function renderPatentModal({ hits = 0, papirao = false, developer = false, admin
     one('#patentContinue')?.focus();
 }
 
+function renderContributorModal() {
+    const modal = one('#patentModal');
+    if (!modal) return;
+    notificationOpen = false;
+    modal.classList.remove('is-achievement', 'is-papirao');
+    modal.classList.add('is-contributor');
+    one('#patentModalKicker').textContent = 'RECONHECIMENTO INSTITUCIONAL';
+    one('#patentModalTitle').textContent = 'Colaborador BIZU';
+    one('#patentModalIcon').innerHTML = '<span class="contributor-modal-emblem"><img src="/assets/icons/colaborador-bizu.webp" alt="Escudo de Colaborador BIZU"></span>';
+    one('#patentModalDescription').textContent = 'Reconhecimento permanente concedido a quem contribuiu diretamente para o crescimento e a melhoria do Questionário Bizu.';
+    one('.patent-modal-stats', modal)?.classList.add('hidden');
+    one('#patentProgressBar')?.parentElement?.classList.add('hidden');
+    one('#patentModalNext')?.classList.add('hidden');
+    one('#patentContinue').textContent = 'Fechar';
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    one('#patentContinue')?.focus();
+}
+
 function closePatentModal() {
     const acknowledge = notificationOpen;
     notificationOpen = false;
@@ -73,8 +96,22 @@ function openPatentFromButton(button) {
 
 export function bindPatentEvents() {
     document.addEventListener('click', (event) => {
+        const contributor = event.target.closest('[data-contributor-detail]');
+        if (contributor) {
+            event.preventDefault();
+            event.stopPropagation();
+            renderContributorModal();
+            return;
+        }
         const trigger = event.target.closest('[data-patent-detail]');
         if (trigger) openPatentFromButton(trigger);
+    });
+    document.addEventListener('keydown', (event) => {
+        if (!['Enter', ' '].includes(event.key)) return;
+        const contributor = event.target.closest('[data-contributor-detail]');
+        if (!contributor) return;
+        event.preventDefault();
+        renderContributorModal();
     });
     one('#patentClose')?.addEventListener('click', closePatentModal);
     one('#patentContinue')?.addEventListener('click', closePatentModal);
