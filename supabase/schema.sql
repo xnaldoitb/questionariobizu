@@ -475,6 +475,13 @@ create table if not exists public.topico_respostas (
   autor_id uuid not null references public.usuarios(id) on delete cascade, conteudo text not null,
   criado_em timestamptz not null default now()
 );
+create table if not exists public.topico_reacoes (
+  topico_id bigint not null references public.topicos_comunidade(id) on delete cascade,
+  usuario_id uuid not null references public.usuarios(id) on delete cascade,
+  reacao text not null check(reacao in ('gostei','nao_gostei')),
+  criado_em timestamptz not null default now(), atualizado_em timestamptz not null default now(),
+  primary key(topico_id,usuario_id)
+);
 insert into public.chat_salas(id,nome,tipo,sistema,ativa) values('00000000-0000-4000-8000-000000000001','Geral','publica',true,true)
 on conflict(id) do update set nome='Geral',tipo='publica',sistema=true,ativa=true;
 alter table public.chat_salas enable row level security;
@@ -484,8 +491,9 @@ alter table public.suporte_conversas enable row level security;
 alter table public.suporte_mensagens enable row level security;
 alter table public.topicos_comunidade enable row level security;
 alter table public.topico_respostas enable row level security;
-revoke all on public.chat_salas,public.chat_sala_membros,public.chat_mensagens,public.suporte_conversas,public.suporte_mensagens,public.topicos_comunidade,public.topico_respostas from public,anon,authenticated;
-grant select,insert,update,delete on public.chat_salas,public.chat_sala_membros,public.chat_mensagens,public.suporte_conversas,public.suporte_mensagens,public.topicos_comunidade,public.topico_respostas to service_role;
+alter table public.topico_reacoes enable row level security;
+revoke all on public.chat_salas,public.chat_sala_membros,public.chat_mensagens,public.suporte_conversas,public.suporte_mensagens,public.topicos_comunidade,public.topico_respostas,public.topico_reacoes from public,anon,authenticated;
+grant select,insert,update,delete on public.chat_salas,public.chat_sala_membros,public.chat_mensagens,public.suporte_conversas,public.suporte_mensagens,public.topicos_comunidade,public.topico_respostas,public.topico_reacoes to service_role;
 
 -- v4.44: XP independente, missões e central de notificações.
 create table if not exists public.xp_eventos (

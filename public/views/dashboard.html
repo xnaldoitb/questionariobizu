@@ -234,11 +234,17 @@
                 <button class="modal-close" id="topicsClose" type="button" aria-label="Fechar tópicos">×</button>
             </header>
             <div class="topics-body">
+                <div class="topic-toolbar" id="topicToolbar">
+                    <label class="topic-search"><span aria-hidden="true">⌕</span><input id="topicSearch" type="search" maxlength="70" placeholder="Pesquisar tópicos" autocomplete="off"></label>
+                    <select id="topicFilter" aria-label="Filtrar tópicos por categoria"><option value="todos">Todas as categorias</option><option value="duvida">Dúvidas</option><option value="discussao">Discussões</option><option value="estudo">Estudos</option><option value="aviso">Avisos</option><option value="meus">Meus tópicos</option></select>
+                    <small id="topicSummary" aria-live="polite"></small>
+                </div>
                 <form class="topic-create hidden" id="topicForm">
+                    <h3 id="topicFormTitle">Novo tópico</h3>
                     <input id="topicTitleInput" maxlength="90" placeholder="Título do tópico" required>
                     <select id="topicCategory"><option value="duvida">Dúvida</option><option value="discussao">Discussão</option><option value="estudo">Estudo</option><option value="aviso" id="topicNoticeOption">Aviso</option></select>
                     <textarea id="topicContentInput" maxlength="2400" rows="4" placeholder="Descreva sua dúvida ou assunto…" required></textarea>
-                    <div class="topic-form-actions"><button class="ui-button quiet-action" id="topicCancel" type="button">Cancelar</button><button class="ui-button main-action" type="submit">Publicar</button></div>
+                    <div class="topic-form-actions"><button class="ui-button quiet-action" id="topicCancel" type="button">Cancelar</button><button class="ui-button main-action" id="topicSubmit" type="submit">Publicar</button></div>
                 </form>
                 <div class="topic-list" id="topicList"></div>
                 <article class="topic-detail hidden" id="topicDetail">

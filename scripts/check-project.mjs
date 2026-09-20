@@ -100,6 +100,7 @@ const requiredFiles = [
     'supabase/migration-v4.47.1-fila-reconciliacao.sql',
     'supabase/migration-v4.48.0-otimizacao-escalabilidade.sql',
     'supabase/migration-v4.48.1-suporte-otimizado.sql',
+    'supabase/migration-v4.49-topicos-completos.sql',
 ];
 
 for (const file of requiredFiles) {
@@ -553,8 +554,8 @@ for (const marker of ['metricas_missoes_v448', 'metricas_dominio_capitulo_v448',
 for (const marker of ['listar_suporte_conversas_v4481', 'join lateral', 'suporte_mensagens_conversa_recente_idx', 'to service_role']) {
     if (!migration4481.includes(marker)) throw new Error(`Suporte otimizado v4.48.1 incompleto: ${marker}`);
 }
-if (!index.includes('manifest.webmanifest?v=4.48.2') || !serviceWorker.includes('questionario-bizu-v4.48.2')) {
-    throw new Error('Versão e cache PWA v4.48.2 não estão sincronizados.');
+if (!index.includes('manifest.webmanifest?v=4.49.0') || !serviceWorker.includes('questionario-bizu-v4.49.0')) {
+    throw new Error('Versão e cache PWA v4.49.0 não estão sincronizados.');
 }
 if (!fragments.includes('mountAdminInterface') || !mainModule.includes("import('./domains/management.js')")) {
     throw new Error('Carregamento sob demanda do painel administrativo v4.48 incompleto.');
@@ -571,4 +572,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.48.2: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.49.0: verificações estruturais concluídas.');

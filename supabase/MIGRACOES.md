@@ -1,14 +1,15 @@
 # Migrações do Supabase
 
-## Banco de produção atualmente na v4.48.0
+## Atualização para v4.49.0
 
-Execute somente:
+Execute, nesta ordem, apenas o que ainda não tiver sido aplicado:
 
 ```text
 migration-v4.48.1-suporte-otimizado.sql
+migration-v4.49-topicos-completos.sql
 ```
 
-O script adiciona um índice e uma função de listagem do suporte. Ele não remove conversas nem mensagens.
+A v4.48.1 otimiza a listagem do suporte. A v4.49 cria as reações de gostei/não gostei dos tópicos. Nenhuma delas remove conversas, mensagens, tópicos ou respostas existentes.
 
 Se o banco ainda estiver na v4.47.1, execute primeiro `migration-v4.48.0-otimizacao-escalabilidade.sql` e depois a v4.48.1.
 

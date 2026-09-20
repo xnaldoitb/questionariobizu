@@ -30,6 +30,9 @@ let supportDirectory = [];
 let supportDirectoryRefreshedAt = 0;
 let supportRequestSequence = 0;
 let activeTopicId = null;
+let activeTopic = null;
+let topicItems = [];
+let editingTopicId = null;
 
 function formatTime(value, includeDate = false) {
     const date = new Date(value);
@@ -251,37 +254,76 @@ async function submitSupport(event) {
 
 const categoryNames = { duvida: 'Dúvida', discussao: 'Discussão', estudo: 'Estudo', aviso: 'Aviso' };
 
+function setTopicView(view) {
+    one('#topicToolbar')?.classList.toggle('hidden', view !== 'list');
+    one('#topicList')?.classList.toggle('hidden', view !== 'list');
+    one('#topicForm')?.classList.toggle('hidden', view !== 'form');
+    one('#topicDetail')?.classList.toggle('hidden', view !== 'detail');
+}
+
+function resetTopicForm() {
+    editingTopicId = null;
+    one('#topicForm')?.reset();
+    if (one('#topicFormTitle')) one('#topicFormTitle').textContent = 'Novo tópico';
+    if (one('#topicSubmit')) one('#topicSubmit').textContent = 'Publicar';
+}
+
+function startTopicEdit(topic) {
+    if (!topic?.pode_gerenciar) return;
+    editingTopicId = String(topic.id);
+    one('#topicTitleInput').value = topic.titulo;
+    one('#topicCategory').value = topic.categoria;
+    one('#topicContentInput').value = topic.conteudo;
+    one('#topicFormTitle').textContent = 'Editar tópico';
+    one('#topicSubmit').textContent = 'Salvar alterações';
+    setTopicView('form');
+    one('#topicTitleInput').focus();
+}
+
 function renderTopics(items) {
     const list = one('#topicList');
     list.classList.remove('hidden');
+    const search = one('#topicSearch')?.value.trim().toLocaleLowerCase('pt-BR') || '';
+    const category = one('#topicFilter')?.value || 'todos';
+    const filtered = items.filter((topic) => {
+        if (category === 'meus' && !topic.proprio) return false;
+        if (!['todos', 'meus'].includes(category) && topic.categoria !== category) return false;
+        if (!search) return true;
+        return `${topic.titulo} ${topic.conteudo} ${topic.usuarios?.nome || ''}`.toLocaleLowerCase('pt-BR').includes(search);
+    });
+    const summary = one('#topicSummary');
+    if (summary) summary.textContent = `${filtered.length} ${filtered.length === 1 ? 'tópico encontrado' : 'tópicos encontrados'}`;
     const xpGuide = `<button class="topic-card system-topic-card xp-system-topic" type="button" data-topic-id="${XP_RULES_TOPIC_ID}">
         <span class="topic-category category-aviso">Guia oficial</span>
         <strong>XP, missões e progressão</strong><p>Veja como ganhar XP, os bônus de assinatura e quanto é necessário para cada patente.</p>
-        <small>Questionário Bizu · tópico fixo</small>
+        <small>Questionário Bizu · tópico fixo</small><span class="topic-card-stats">Guia</span>
     </button>`;
     const patentGuide = `<button class="topic-card system-topic-card" type="button" data-topic-id="${PATENT_GUIDE_TOPIC_ID}">
         <span class="topic-category category-aviso">Guia oficial</span>
         <strong>Patentes do Ranking</strong><p>Conheça todas as insígnias e o significado de cada patente.</p>
-        <small>Questionário Bizu · tópico fixo</small>
+        <small>Questionário Bizu · tópico fixo</small><span class="topic-card-stats">Guia</span>
     </button>`;
-    const userTopics = items.map((topic) => `<button class="topic-card" type="button" data-topic-id="${topic.id}">
+    const userTopics = filtered.map((topic) => `<button class="topic-card" type="button" data-topic-id="${topic.id}">
         <span class="topic-category category-${topic.categoria}">${categoryNames[topic.categoria] || 'Tópico'}</span>
         <strong>${safeText(topic.titulo)}</strong><p>${safeText(topic.conteudo)}</p>
         <small>${safeText(topic.usuarios?.nome || 'Usuário')} · ${safeText(formatTime(topic.atualizado_em, true))}${topic.fechado ? ' · Encerrado' : ''}</small>
+        <span class="topic-card-stats"><span title="Respostas">◌ ${topic.respostas || 0}</span><span title="Gostei">♡ ${topic.gostei || 0}</span><span title="Não gostei">▽ ${topic.nao_gostei || 0}</span></span>
     </button>`).join('');
-    list.innerHTML = xpGuide + patentGuide + (userTopics || '<div class="chat-empty">Nenhum outro tópico ainda.</div>');
+    const guides = category === 'todos' && !search ? xpGuide + patentGuide : '';
+    list.innerHTML = guides + (userTopics || '<div class="chat-empty">Nenhum tópico encontrado.</div>');
 }
 
 async function loadTopics() {
     const payload = await requestJson('topicos');
-    renderTopics(payload.topicos || []);
+    topicItems = payload.topicos || [];
+    renderTopics(topicItems);
 }
 
 async function openTopic(id) {
     if (String(id) === XP_RULES_TOPIC_ID) {
         activeTopicId = XP_RULES_TOPIC_ID;
-        one('#topicList').classList.add('hidden');
-        one('#topicForm').classList.add('hidden');
+        activeTopic = null;
+        setTopicView('detail');
         const rows = PATENTS.map((patent) => `<tr>
             <td>${patentInsigniaMarkup(patent.min, { compact: true, decorative: true })}</td>
             <td><strong>${safeText(patent.name)}</strong></td>
@@ -323,13 +365,12 @@ async function openTopic(id) {
             <thead><tr><th>Insígnia</th><th>Patente</th><th>XP mínimo</th></tr></thead><tbody>${rows}</tbody>
         </table></div>`;
         one('#topicReplyForm').classList.add('hidden');
-        one('#topicDetail').classList.remove('hidden');
         return;
     }
     if (String(id) === PATENT_GUIDE_TOPIC_ID) {
         activeTopicId = PATENT_GUIDE_TOPIC_ID;
-        one('#topicList').classList.add('hidden');
-        one('#topicForm').classList.add('hidden');
+        activeTopic = null;
+        setTopicView('detail');
         const adminRow = `<tr class="patent-guide-special patent-guide-admin">
             <td>${patentInsigniaMarkup(0, { compact: true, decorative: true, admin: true })}</td>
             <td><strong>${ADMIN_PATENT.name}</strong><small>${ADMIN_PATENT.symbol}</small></td>
@@ -373,26 +414,43 @@ async function openTopic(id) {
             </table>
         </div>`;
         one('#topicReplyForm').classList.add('hidden');
-        one('#topicDetail').classList.remove('hidden');
         return;
     }
     const payload = await requestJson(`topicos?id=${encodeURIComponent(id)}`);
     const topic = payload.topico;
     if (!topic) return notify('Tópico não encontrado.');
     activeTopicId = String(topic.id);
-    one('#topicList').classList.add('hidden');
-    one('#topicForm').classList.add('hidden');
+    activeTopic = topic;
+    setTopicView('detail');
     const replies = (payload.respostas || []).map((reply) => `<article class="topic-answer"><strong>${safeText(reply.usuarios?.nome || 'Usuário')}</strong><p>${safeText(reply.conteudo).replace(/\n/g, '<br>')}</p><small>${safeText(formatTime(reply.criado_em, true))}</small></article>`).join('');
-    one('#topicDetailContent').innerHTML = `<header class="topic-detail-head"><span class="topic-category category-${topic.categoria}">${categoryNames[topic.categoria]}</span><h3>${safeText(topic.titulo)}</h3><small>${safeText(topic.usuarios?.nome || 'Usuário')} · ${safeText(formatTime(topic.criado_em, true))}</small></header><p class="topic-main-content">${safeText(topic.conteudo).replace(/\n/g, '<br>')}</p><div class="topic-answers">${replies || '<div class="chat-empty">Ainda não há respostas.</div>'}</div>`;
+    const manage = topic.pode_gerenciar ? `<div class="topic-manage-actions">
+        <button type="button" data-topic-action="editar">Editar</button>
+        <button type="button" data-topic-action="fechar">${topic.fechado ? 'Reabrir' : 'Encerrar'}</button>
+        <button class="danger" type="button" data-topic-action="excluir">Excluir</button>
+    </div>` : '';
+    one('#topicDetailContent').innerHTML = `<header class="topic-detail-head">
+        <div class="topic-detail-labels"><span class="topic-category category-${topic.categoria}">${categoryNames[topic.categoria]}</span>${topic.fechado ? '<span class="topic-closed">Encerrado</span>' : ''}</div>
+        <h3>${safeText(topic.titulo)}</h3>
+        <small>${safeText(topic.usuarios?.nome || 'Usuário')} · ${safeText(formatTime(topic.criado_em, true))}</small>
+        ${manage}
+    </header>
+    <p class="topic-main-content">${safeText(topic.conteudo).replace(/\n/g, '<br>')}</p>
+    <div class="topic-reactions" aria-label="Reações ao tópico">
+        <button type="button" data-topic-reaction="gostei" class="${topic.minha_reacao === 'gostei' ? 'is-active' : ''}" aria-pressed="${topic.minha_reacao === 'gostei'}"><span aria-hidden="true">♡</span> Gostei <b>${topic.gostei || 0}</b></button>
+        <button type="button" data-topic-reaction="nao_gostei" class="${topic.minha_reacao === 'nao_gostei' ? 'is-active negative' : ''}" aria-pressed="${topic.minha_reacao === 'nao_gostei'}"><span aria-hidden="true">▽</span> Não gostei <b>${topic.nao_gostei || 0}</b></button>
+        <small>${topic.respostas || 0} ${topic.respostas === 1 ? 'resposta' : 'respostas'}</small>
+    </div>
+    <div class="topic-answers">${replies || '<div class="chat-empty">Ainda não há respostas.</div>'}</div>`;
     one('#topicReplyForm').classList.toggle('hidden', Boolean(topic.fechado));
-    one('#topicDetail').classList.remove('hidden');
 }
 
 async function openTopics() {
     openModal('topicsModal');
     one('#topicNoticeOption').disabled = appState.user?.perfil !== 'supremo';
-    one('#topicDetail').classList.add('hidden');
-    one('#topicForm').classList.add('hidden');
+    activeTopic = null;
+    activeTopicId = null;
+    resetTopicForm();
+    setTopicView('list');
     await loadTopics().catch((error) => notify(error.message));
 }
 
@@ -404,13 +462,18 @@ export async function openXpRulesTopic() {
 async function submitTopic(event) {
     event.preventDefault();
     try {
-        const result = await requestJson('topicos', { method: 'POST', body: JSON.stringify({
-            action: 'criar', titulo: one('#topicTitleInput').value, categoria: one('#topicCategory').value, conteudo: one('#topicContentInput').value,
-        }) });
-        event.currentTarget.reset();
-        one('#topicForm').classList.add('hidden');
+        const body = {
+            titulo: one('#topicTitleInput').value,
+            categoria: one('#topicCategory').value,
+            conteudo: one('#topicContentInput').value,
+        };
+        const result = editingTopicId
+            ? await requestJson('topicos', { method: 'PUT', body: JSON.stringify({ ...body, action: 'editar', id: editingTopicId }) })
+            : await requestJson('topicos', { method: 'POST', body: JSON.stringify({ ...body, action: 'criar' }) });
+        const targetId = editingTopicId || result.topico_id;
+        resetTopicForm();
         await loadTopics();
-        await openTopic(result.topico_id);
+        await openTopic(targetId);
     } catch (error) { notify(error.message); }
 }
 
@@ -421,6 +484,37 @@ async function submitTopicReply(event) {
         one('#topicReplyInput').value = '';
         await openTopic(activeTopicId);
     } catch (error) { notify(error.message); }
+}
+
+async function reactToTopic(reacao) {
+    if (!activeTopicId || !['gostei', 'nao_gostei'].includes(reacao)) return;
+    try {
+        await requestJson('topicos', { method: 'POST', body: JSON.stringify({ action: 'reagir', topico_id: activeTopicId, reacao }) });
+        await openTopic(activeTopicId);
+    } catch (error) { notify(error.message); }
+}
+
+async function manageTopic(action) {
+    if (!activeTopic?.pode_gerenciar) return;
+    if (action === 'editar') return startTopicEdit(activeTopic);
+    if (action === 'excluir') {
+        if (!window.confirm('Excluir este tópico e todas as respostas? Esta ação não pode ser desfeita.')) return;
+        try {
+            await requestJson('topicos', { method: 'DELETE', body: JSON.stringify({ id: activeTopic.id }) });
+            activeTopic = null;
+            activeTopicId = null;
+            await loadTopics();
+            setTopicView('list');
+            notify('Tópico excluído.');
+        } catch (error) { notify(error.message); }
+        return;
+    }
+    if (action === 'fechar') {
+        try {
+            await requestJson('topicos', { method: 'PUT', body: JSON.stringify({ id: activeTopic.id, fechado: !activeTopic.fechado }) });
+            await openTopic(activeTopic.id);
+        } catch (error) { notify(error.message); }
+    }
 }
 
 function bindCommunityUi() {
@@ -449,10 +543,18 @@ function bindCommunityUi() {
     });
     one('#topicForm')?.addEventListener('submit', submitTopic);
     one('#topicReplyForm')?.addEventListener('submit', submitTopicReply);
-    one('#newTopicBtn')?.addEventListener('click', () => { one('#topicDetail').classList.add('hidden'); one('#topicList').classList.add('hidden'); one('#topicForm').classList.remove('hidden'); one('#topicTitleInput').focus(); });
-    one('#topicCancel')?.addEventListener('click', () => { one('#topicForm').classList.add('hidden'); one('#topicList').classList.remove('hidden'); });
-    one('#topicBack')?.addEventListener('click', () => { one('#topicDetail').classList.add('hidden'); one('#topicList').classList.remove('hidden'); activeTopicId = null; });
+    one('#newTopicBtn')?.addEventListener('click', () => { resetTopicForm(); setTopicView('form'); one('#topicTitleInput').focus(); });
+    one('#topicCancel')?.addEventListener('click', () => { resetTopicForm(); setTopicView(activeTopic ? 'detail' : 'list'); });
+    one('#topicBack')?.addEventListener('click', async () => { activeTopic = null; activeTopicId = null; await loadTopics().catch((error) => notify(error.message)); setTopicView('list'); });
+    one('#topicSearch')?.addEventListener('input', () => renderTopics(topicItems));
+    one('#topicFilter')?.addEventListener('change', () => renderTopics(topicItems));
     one('#topicList')?.addEventListener('click', (event) => { const button = event.target.closest('[data-topic-id]'); if (button) openTopic(button.dataset.topicId).catch((error) => notify(error.message)); });
+    one('#topicDetailContent')?.addEventListener('click', (event) => {
+        const reaction = event.target.closest('[data-topic-reaction]');
+        if (reaction) return reactToTopic(reaction.dataset.topicReaction);
+        const action = event.target.closest('[data-topic-action]');
+        if (action) manageTopic(action.dataset.topicAction);
+    });
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && activeModal) closeModal(activeModal); });
 }
 
