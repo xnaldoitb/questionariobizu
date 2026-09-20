@@ -8,7 +8,7 @@ const files = [
 ];
 await Promise.all(files.map((file) => access(new URL(file, root))));
 
-const [route, badges, community, adminUi, adminView, ranking, chat, presence, auth, login, rewards, migration, schema, worker] = await Promise.all([
+const [route, badges, community, adminUi, adminView, ranking, chat, presence, auth, login, rewards, migration, schema, worker, rewardCss, badgeCss, rankingCss] = await Promise.all([
     readFile(new URL('server/routes/admin-users.mjs', root), 'utf8'),
     readFile(new URL('public/app/foundation/badges.js', root), 'utf8'),
     readFile(new URL('public/app/domains/community.js', root), 'utf8'),
@@ -23,6 +23,9 @@ const [route, badges, community, adminUi, adminView, ranking, chat, presence, au
     readFile(new URL('supabase/migration-v4.50-colaboradores.sql', root), 'utf8'),
     readFile(new URL('supabase/schema.sql', root), 'utf8'),
     readFile(new URL('public/service-worker.js', root), 'utf8'),
+    readFile(new URL('public/styles/09-trial-access.css', root), 'utf8'),
+    readFile(new URL('public/styles/07-pmpa-moderno-minimalista.css', root), 'utf8'),
+    readFile(new URL('public/styles/14-ranking-patents.css', root), 'utf8'),
 ]);
 
 assert(route.includes("action === 'set_contributor'"));
@@ -38,11 +41,17 @@ assert(adminView.includes('id="contributorHistoryModal"'));
 assert(route.includes('params.colaborador_historico'));
 assert(badges.includes('contributor-insignia'));
 assert(badges.includes('/assets/icons/colaborador-bizu.webp'));
+assert(!badges.includes('<b>COLABORADOR</b>'));
+assert(badgeCss.includes('clip-path: polygon('));
+assert(badgeCss.includes('width: 38px'));
+assert(rankingCss.includes('.account-insignia.contributor-insignia'));
 assert(community.includes("const COLLABORATOR_TOPIC_ID = 'mural-colaboradores'"));
 assert(community.includes('Mural de Colaboradores'));
 assert(community.includes('2.000 XP'));
 for (const source of [ranking, chat, presence, auth, login]) assert(source.includes('colaborador'));
 assert(rewards.includes("data.premio.plano === 'colaborador'"));
+assert(rewardCss.includes('#rewardModal.is-contributor-reward .reward-medal img'));
+assert(rewardCss.includes('width:70px !important'));
 assert(migration.includes('create table if not exists public.colaboracoes_usuario'));
 assert(migration.includes('u.colaborador'));
 assert(migration.indexOf('u.xp_total') < migration.indexOf('u.premium'));

@@ -649,13 +649,23 @@ html[data-theme="dark"] .vip-insignia {
 }
 
 .contributor-insignia {
-    border: 1px solid rgba(177, 119, 13, .42);
-    background: linear-gradient(135deg, #fff8d8, #e7bd55);
-    color: #65430a;
-    box-shadow: 0 1px 4px rgba(126, 80, 5, .18);
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    min-width: 38px;
+    min-height: 38px;
+    overflow: visible;
 }
-.contributor-insignia img { width:16px; height:16px; border-radius:50%; object-fit:cover; }
-.contributor-insignia b { font:inherit; }
+.contributor-insignia img {
+    display: block;
+    width: 38px;
+    height: 38px;
+    border-radius: 0;
+    object-fit: contain;
+    clip-path: polygon(50% 0, 91% 17%, 87% 72%, 50% 100%, 13% 72%, 9% 17%);
+    filter: drop-shadow(0 2px 3px rgba(92, 57, 5, .28));
+}
 
 html[data-theme="dark"] .premium-insignia {
     border-color: rgba(126, 166, 207, .36);
@@ -688,15 +698,14 @@ html[data-theme="dark"] .account-insignia.vip-insignia {
 }
 
 html[data-theme="dark"] .contributor-insignia {
-    border-color: rgba(244, 202, 99, .5);
-    background: linear-gradient(135deg, #3d3013, #765817);
-    color: #ffe59a;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 @media (max-width:680px) {
-    .contributor-insignia { width:22px; min-width:22px; height:22px; padding:2px; }
-    .contributor-insignia img { width:17px; height:17px; }
-    .contributor-insignia b { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+    .contributor-insignia { width:40px; min-width:40px; height:40px; min-height:40px; padding:0; }
+    .contributor-insignia img { width:40px; height:40px; }
 }
 
 .admin-user-card:has(.supreme-insignia) {

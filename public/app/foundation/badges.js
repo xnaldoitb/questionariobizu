@@ -30,7 +30,7 @@ export function accountBadges(entry = {}) {
     }
 
     if (entry?.colaborador) {
-        badges.push('<span class="account-insignia contributor-insignia" title="Colaborador BIZU" aria-label="Colaborador BIZU"><img src="/assets/icons/colaborador-bizu.webp" alt=""> <b>COLABORADOR</b></span>');
+        badges.push('<span class="account-insignia contributor-insignia" title="Colaborador BIZU" aria-label="Colaborador BIZU"><img src="/assets/icons/colaborador-bizu.webp" alt=""></span>');
     }
 
     return badges.join(' ');

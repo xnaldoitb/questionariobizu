@@ -14,6 +14,43 @@
     cursor: pointer;
 }
 
+/* O selo de colaborador é um escudo, não uma pílula de texto. Esta regra fica
+   após os estilos compactos para impedir que perfil, comunidade e ranking o
+   reduzam novamente ao tamanho das demais insígnias. */
+.account-insignia.contributor-insignia {
+    width:38px !important;
+    min-width:38px !important;
+    height:38px !important;
+    min-height:38px !important;
+    max-width:none !important;
+    padding:0 !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    overflow:visible;
+}
+
+.account-insignia.contributor-insignia img {
+    width:38px !important;
+    height:38px !important;
+    border-radius:0 !important;
+    object-fit:contain;
+}
+
+@media (max-width:680px) {
+    .account-insignia.contributor-insignia {
+        width:40px !important;
+        min-width:40px !important;
+        height:40px !important;
+        min-height:40px !important;
+    }
+
+    .account-insignia.contributor-insignia img {
+        width:40px !important;
+        height:40px !important;
+    }
+}
+
 .patent-button,
 .profile-patent-button {
     display: inline-grid;

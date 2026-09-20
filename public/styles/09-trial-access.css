@@ -148,8 +148,36 @@ html[data-theme="dark"] .payment-plan-tier.tier-vip { color: #ffe69a; background
 }
 .reward-close { position: absolute; z-index: 3; top: 10px; right: 10px; color: var(--text-main); background: var(--canvas-soft); border-color: var(--line); }
 .reward-medal { position: relative; z-index: 2; display: grid; place-items: center; width: 68px; height: 68px; margin: 1px auto 13px; color: #fff7cf; border: 5px solid #f2cf67; border-radius: 50%; background: linear-gradient(145deg, #bd7416, #f0b82e); box-shadow: 0 10px 28px rgba(157, 104, 18, .28); animation: reward-medal-pulse .75s .2s both; }
-.reward-modal.is-contributor-reward .reward-medal { width:96px; height:96px; padding:0; overflow:hidden; border-width:3px; border-radius:20px; background:#fff; }
-.reward-modal.is-contributor-reward .reward-medal img { display:block; width:100%; height:100%; object-fit:cover; }
+#rewardModal.is-contributor-reward .reward-medal {
+    box-sizing:border-box;
+    width:78px;
+    min-width:78px;
+    max-width:78px;
+    height:78px;
+    min-height:78px;
+    max-height:78px;
+    padding:3px;
+    margin:0 auto 12px;
+    overflow:hidden;
+    border-width:2px;
+    border-radius:16px;
+    background:#fff;
+}
+#rewardModal.is-contributor-reward .reward-medal img {
+    display:block;
+    width:70px !important;
+    max-width:70px !important;
+    height:70px !important;
+    max-height:70px !important;
+    margin:0 !important;
+    object-fit:contain;
+    border-radius:12px;
+}
+#rewardModal.is-contributor-reward .reward-message { position:relative; z-index:2; margin-top:7px; }
+@media (max-width:420px) {
+    #rewardModal.is-contributor-reward .reward-medal { width:68px; min-width:68px; max-width:68px; height:68px; min-height:68px; max-height:68px; }
+    #rewardModal.is-contributor-reward .reward-medal img { width:60px !important; max-width:60px !important; height:60px !important; max-height:60px !important; }
+}
 .reward-medal::before, .reward-medal::after { content: ""; position: absolute; bottom: -24px; width: 17px; height: 28px; z-index: -1; background: #a52835; }
 .reward-medal::before { left: 9px; transform: rotate(10deg); }
 .reward-medal::after { right: 9px; transform: rotate(-10deg); }

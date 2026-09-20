@@ -1,6 +1,6 @@
 # Migrações do Supabase
 
-## Atualização para v4.50.1
+## Atualização para v4.50.3
 
 Execute, nesta ordem, apenas o que ainda não tiver sido aplicado:
 
