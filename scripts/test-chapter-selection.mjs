@@ -102,4 +102,16 @@ assert.equal((await call()).statusCode,403);
 actor = null;
 assert.equal((await call()).statusCode,401);
 delete globalThis.document;
+
+const [studySource, answerRouteSource] = await Promise.all([
+    readFile(new URL('../public/app/domains/study.js', import.meta.url), 'utf8'),
+    readFile(new URL('../server/routes/responder.mjs', import.meta.url), 'utf8'),
+]);
+for (const marker of ['skippedQuestionIndexes', 'skippedReturnIndex', 'returningToSkipped', "textContent = 'VOLTAR'", 'MANTER SEM RESPOSTA', 'Retomar simulado']) {
+    assert(studySource.includes(marker));
+}
+assert(studySource.includes('skippedQuestionIndexes.delete(appState.quiz.current)'));
+assert(studySource.includes('.filter((index) => index < appState.quiz.current)'));
+assert(answerRouteSource.includes('const answeringSkipped'));
+assert(answerRouteSource.includes("from('respostas').update(answerRecord)"));
 console.log('Capítulos: seleção múltipla, Todos, validação, paginação, revisão e acesso passaram.');

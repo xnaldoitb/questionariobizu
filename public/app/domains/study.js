@@ -8,6 +8,9 @@ import { chapterSelectionIsValid, selectedChapterIds } from './chapter-selection
 
 let selectedAnswerIndex = null;
 let eliminatedAnswerIndexes = new Set();
+let skippedQuestionIndexes = new Set();
+let skippedReturnIndex = null;
+let returningToSkipped = false;
 
 function resetStudyProgress() {
     appState.quiz.current = 0;
@@ -16,11 +19,15 @@ function resetStudyProgress() {
         correct: 0,
         skipped: 0,
     };
+    skippedQuestionIndexes = new Set();
+    skippedReturnIndex = null;
+    returningToSkipped = false;
 }
 
 export function bindStudyEvents() {
     one('#startBtn').addEventListener('click', startStudySession);
     one('#skipBtn').addEventListener('click', skipCurrentQuestion);
+    one('#previousSkippedBtn').addEventListener('click', returnToPreviousSkippedQuestion);
     one('#confirmAnswerBtn').addEventListener('click', confirmSelectedAnswer);
     one('#nextBtn').addEventListener('click', advanceQuestion);
 
@@ -145,8 +152,9 @@ function renderCurrentQuestion() {
     );
 
     one('#questionChapter').textContent = chapter?.nome || '';
-    one('#questionNumber').textContent =
-        `Questão ${appState.quiz.current + 1} de ${appState.quiz.questions.length}`;
+    one('#questionNumber').textContent = returningToSkipped
+        ? `Questão pulada · ${skippedQuestionIndexes.size} ${skippedQuestionIndexes.size === 1 ? 'pendente' : 'pendentes'}`
+        : `Questão ${appState.quiz.current + 1} de ${appState.quiz.questions.length}`;
     one('#questionText').textContent = question.enunciado;
     one('#resolution').classList.add('hidden');
     const trueFalseQuestion = question.tipo === 'certo_errado' || question.alternativas.length === 2;
@@ -191,10 +199,17 @@ function renderCurrentQuestion() {
     confirmButton.disabled = true;
     confirmButton.textContent = 'Confirmar resposta';
     one('#skipBtn').disabled = false;
+    one('#skipBtn').textContent = returningToSkipped ? 'MANTER SEM RESPOSTA' : 'Pular';
+    const previousSkippedButton = one('#previousSkippedBtn');
+    const canReturnToSkipped = !returningToSkipped
+        && [...skippedQuestionIndexes].some((index) => index < appState.quiz.current);
+    previousSkippedButton.classList.toggle('hidden', !canReturnToSkipped);
+    previousSkippedButton.disabled = !canReturnToSkipped;
+    previousSkippedButton.textContent = 'VOLTAR';
     one('#nextBtn').disabled = true;
-    one('#nextBtn').textContent = appState.quiz.current === appState.quiz.questions.length - 1
-        ? 'Finalizar →'
-        : 'Próxima →';
+    one('#nextBtn').textContent = returningToSkipped
+        ? 'Retomar simulado →'
+        : (appState.quiz.current === appState.quiz.questions.length - 1 ? 'Finalizar →' : 'Próxima →');
 
     renderStudyProgress();
 }
@@ -267,6 +282,8 @@ async function submitAnswer(answerIndex) {
             }));
         }
 
+        const wasSkipped = skippedQuestionIndexes.delete(appState.quiz.current);
+        if (wasSkipped) appState.quiz.stats.skipped = Math.max(0, appState.quiz.stats.skipped - 1);
         appState.quiz.stats.answered += 1;
         if (data.acertou) appState.quiz.stats.correct += 1;
 
@@ -297,6 +314,7 @@ async function submitAnswer(answerIndex) {
         });
 
         one('#skipBtn').disabled = true;
+        one('#previousSkippedBtn').disabled = true;
         confirmButton.textContent = 'Resposta confirmada ✓';
 
         const answerFeedback = one('#answerFeedback');
@@ -325,6 +343,11 @@ async function submitAnswer(answerIndex) {
 async function skipCurrentQuestion() {
     if (appState.quiz.locked) return;
 
+    if (returningToSkipped) {
+        advanceQuestion();
+        return;
+    }
+
     appState.quiz.locked = true;
 
     try {
@@ -340,7 +363,10 @@ async function skipCurrentQuestion() {
             }),
         });
 
-        appState.quiz.stats.skipped += 1;
+        if (!skippedQuestionIndexes.has(appState.quiz.current)) {
+            skippedQuestionIndexes.add(appState.quiz.current);
+            appState.quiz.stats.skipped += 1;
+        }
         advanceQuestion();
     } catch (error) {
         appState.quiz.locked = false;
@@ -352,7 +378,27 @@ async function skipCurrentQuestion() {
     }
 }
 
+function returnToPreviousSkippedQuestion() {
+    if (appState.quiz.locked || returningToSkipped) return;
+    const previousSkipped = [...skippedQuestionIndexes]
+        .filter((index) => index < appState.quiz.current)
+        .sort((left, right) => right - left)[0];
+    if (!Number.isInteger(previousSkipped)) return;
+    skippedReturnIndex = appState.quiz.current;
+    returningToSkipped = true;
+    appState.quiz.current = previousSkipped;
+    renderCurrentQuestion();
+}
+
 function advanceQuestion() {
+    if (returningToSkipped) {
+        appState.quiz.current = skippedReturnIndex;
+        skippedReturnIndex = null;
+        returningToSkipped = false;
+        renderCurrentQuestion();
+        return;
+    }
+
     if (appState.quiz.current < appState.quiz.questions.length - 1) {
         appState.quiz.current += 1;
         renderCurrentQuestion();
@@ -363,11 +409,14 @@ function advanceQuestion() {
 }
 
 function renderStudyProgress() {
-    const completed = ((appState.quiz.current + 1) / appState.quiz.questions.length) * 100;
+    const completed = returningToSkipped
+        ? ((Number(skippedReturnIndex) + 1) / appState.quiz.questions.length) * 100
+        : ((appState.quiz.current + 1) / appState.quiz.questions.length) * 100;
 
     one('#quizProgressBar').style.width = `${completed}%`;
-    one('#progressText').textContent =
-        `${appState.quiz.current + 1} / ${appState.quiz.questions.length}`;
+    one('#progressText').textContent = returningToSkipped
+        ? `Revisando pulada · depois retorna à questão ${Number(skippedReturnIndex) + 1}`
+        : `${appState.quiz.current + 1} / ${appState.quiz.questions.length}`;
     one('#scoreText').textContent = `${appState.quiz.stats.correct} acertos`;
 }
 

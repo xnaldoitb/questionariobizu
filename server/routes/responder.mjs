@@ -52,7 +52,8 @@ export const handler = async (event) => {
   if (!pulada && (!Number.isInteger(answer) || answer < 0 || answer >= q.alternativas.length)) {
     return json(400, { erro: 'Resposta marcada inválida.' });
   }
-  if (existing.data) {
+  const answeringSkipped = Boolean(existing.data?.pulada && !pulada);
+  if (existing.data && !answeringSkipped) {
     const sameSubmission = Boolean(existing.data.pulada) === Boolean(pulada)
       && (pulada || Number(existing.data.resposta_marcada) === answer);
     if (!sameSubmission) {
@@ -74,7 +75,17 @@ export const handler = async (event) => {
     .limit(100);
   if (previousError) return json(500, { erro: 'Não foi possível calcular o progresso de XP.' });
   const acertou = !pulada && Number(resposta_marcada) === q.resposta_correta;
-  const saved = await db().from('respostas').insert({ sessao_id, usuario_id: user.id, questao_id, resposta_marcada: pulada ? null : answer, acertou, pulada });
+  const answerRecord = {
+    resposta_marcada: pulada ? null : answer,
+    acertou,
+    pulada,
+    respondida_em: new Date().toISOString(),
+  };
+  const saved = answeringSkipped
+    ? await db().from('respostas').update(answerRecord).eq('id', existing.data.id).eq('usuario_id', user.id)
+    : await db().from('respostas').insert({
+        sessao_id, usuario_id: user.id, questao_id, ...answerRecord,
+      });
   if (saved.error) return json(saved.error.code === '23505' ? 409 : 500, {
     erro: saved.error.code === '23505'
       ? 'Esta questão já foi respondida neste simulado.'
