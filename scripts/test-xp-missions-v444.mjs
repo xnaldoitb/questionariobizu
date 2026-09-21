@@ -15,10 +15,10 @@ assert.equal(startOfLocalDay(new Date('2026-09-08T14:37:15.000Z')), '2026-09-08T
 assert.equal(startOfLocalWeek(new Date('2026-09-08T14:37:15.000Z')), '2026-09-07T03:00:00.000Z');
 assert.deepEqual([0, 1, 2, 8].map(sequenceMissionTarget), [10, 20, 30, 90]);
 assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map(roundMissionTarget), [3, 6, 9, 12, 15, 18, 18]);
-assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(250, stage)), [250, 500, 750, 1000]);
-assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map((stage) => progressiveMissionReward(400, stage, 6)), [400, 800, 1200, 1600, 2000, 2400, 2400]);
+assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(75, stage)), [75, 150, 225, 300]);
+assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map((stage) => progressiveMissionReward(120, stage, 6)), [120, 240, 360, 480, 600, 720, 720]);
 assert.deepEqual([0, 1, 2, 3].map(validAnswersMissionTarget), [20, 40, 60, 80]);
-assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(600, stage)), [600, 1200, 1800, 2400]);
+assert.deepEqual([0, 1, 2, 3].map((stage) => progressiveMissionReward(180, stage)), [180, 360, 540, 720]);
 
 const [migration, retroactive, historyProgress, xp, responder, sessions, adminUsers, adminUsersUi, notifications, missions, router, topbar, dashboard, quiz, fragments, progression, community, ranking, patent, index, worker, rapidXpMigration] = await Promise.all([
     readFile('supabase/migration-v4.44.1-xp-missoes-notificacoes.sql', 'utf8'),
@@ -52,14 +52,14 @@ assert(retroactive.includes('on conflict (usuario_id, chave) do nothing'));
 assert(retroactive.includes('etapa * 25') && retroactive.includes('etapa * 40') && retroactive.includes('etapa * 60'));
 assert(retroactive.includes('recompensa_progressiva_corrigida') && retroactive.includes('set xp_total = u.xp_total + t.pontos'));
 for (const marker of ['redefinir_progresso_usuario', "e.tipo <> 'plano'", 'xp_total = v_bonus', 'eventos_removidos']) assert(historyProgress.includes(marker));
-for (const marker of ["'resposta_valida', 25", "'resposta_correta', 50", "'primeiro_acerto', 100", "'correcao', 50", "'revisao', 30", "'dominio', 2000", "'sessao', 250", "'precisao', 800", "'precisao', 400"]) assert(xp.includes(marker));
+for (const marker of ["'resposta_valida', 10", "'resposta_correta', 15", "'primeiro_acerto', 25", "'correcao', 15", "'revisao', 10", "'dominio', 750", "'sessao', 100", "'precisao', 300", "'precisao', 150"]) assert(xp.includes(marker));
 for (const marker of ['sequencia-progressiva', 'ronda-progressiva', 'ritmo-progressivo', 'precisao-diaria', 'excelencia-diaria', 'constancia-7', 'centena-semanal', 'explorador-semanal']) assert(xp.includes(marker));
 for (const marker of ['roundTargets = [3, 6, 9, 12, 15, 18]', 'sequenceMissionTarget', 'roundMissionTarget', 'progressiveMissionReward', 'pontos_premiados', 'startOfLocalWeek']) assert(xp.includes(marker));
 assert(xp.includes('details: { meta: roundTarget, disciplinas: disciplines }'));
 assert(!xp.includes('details: { meta: roundTarget, disciplinas }'));
 assert(xp.includes('missao:ritmo-${rhythmTarget}:${day}') && xp.includes('respostas_validas: dailyAnswers'));
-assert(xp.includes('progressiveMissionReward(600, rhythmStages)'));
-assert(xp.includes("rpc('conceder_xp_questao_limitado'") && xp.includes('DAILY_QUESTION_XP_LIMIT = 10_000'));
+assert(xp.includes('progressiveMissionReward(180, rhythmStages)'));
+assert(xp.includes("rpc('conceder_xp_questao_limitado'") && xp.includes('DAILY_QUESTION_XP_LIMIT = 5_000'));
 assert(responder.includes('awardAnswerXp') && responder.includes('chapterId: q.capitulo_id') && responder.includes('if (!pulada)'));
 assert(sessions.includes('awardSessionXp'));
 assert(sessions.includes('xp_preservado: true'));
@@ -85,11 +85,11 @@ assert(xp.includes('modo_institucional') && xp.includes('Notificação da missã
 assert(community.includes("XP_RULES_TOPIC_ID = 'regras-xp'") && community.includes('XP necessário para cada patente'));
 assert(community.includes('Premium concede <strong>500 XP</strong>'));
 assert(community.includes('10, 20, 30…') && community.includes('3, 6, 9, 12, 15 e 18'));
-assert(community.includes('20, 40, 60… questões válidas') && community.includes('600, 1.200, 1.800… XP'));
-for (const marker of ['conceder_xp_questao_limitado', 'for update', "America/Belem", 'p_limite_diario integer default 10000', 'on conflict (usuario_id, chave) do nothing']) assert(rapidXpMigration.includes(marker));
+assert(community.includes('20, 40, 60… questões válidas') && community.includes('180, 360, 540… XP'));
+for (const marker of ['conceder_xp_questao_limitado', 'for update', "America/Belem", 'p_limite_diario integer default 5000', 'on conflict (usuario_id, chave) do nothing']) assert(rapidXpMigration.includes(marker));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
 assert(xp.includes("rpc('metricas_missoes_v448'") && xp.includes("rpc('metricas_dominio_capitulo_v448'"));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.51.2'));
-assert(worker.includes('questionario-bizu-v4.51.2') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.51.3'));
+assert(worker.includes('questionario-bizu-v4.51.3') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, métricas agregadas e notificações v4.48 validados.');

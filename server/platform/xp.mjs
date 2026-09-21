@@ -3,7 +3,7 @@ import { patentStatus } from './patents.mjs';
 import { createNotification } from './notifications.mjs';
 
 const DAY_MS = 86_400_000;
-const DAILY_QUESTION_XP_LIMIT = 10_000;
+const DAILY_QUESTION_XP_LIMIT = 5_000;
 
 export function localDay(value = new Date()) {
     const parts = new Intl.DateTimeFormat('en-CA', {
@@ -253,7 +253,7 @@ export async function missionStatus(userId, { award = false, institutional = fal
     let sequenceTarget = sequenceMissionTarget(sequenceStages);
     let sequenceAwardedPoints = 0;
     if (sequence >= sequenceTarget) {
-        const points = progressiveMissionReward(250, sequenceStages);
+        const points = progressiveMissionReward(75, sequenceStages);
         const applied = await grantMission({
             id: 'sequencia-progressiva', key: `${sequencePrefix}${sequenceTarget}`,
             title: `Sequência certeira ${sequenceTarget}`, points,
@@ -270,7 +270,7 @@ export async function missionStatus(userId, { award = false, institutional = fal
     let roundTarget = roundMissionTarget(roundStages);
     let roundAwardedPoints = 0;
     if (roundStages < roundTargets.length && disciplines >= roundTarget) {
-        const points = progressiveMissionReward(400, roundStages, roundTargets.length);
+        const points = progressiveMissionReward(120, roundStages, roundTargets.length);
         const applied = await grantMission({
             id: 'ronda-progressiva', key: `${roundPrefix}${roundTarget}`,
             title: `Ronda de ${roundTarget} disciplinas`, points,
@@ -287,7 +287,7 @@ export async function missionStatus(userId, { award = false, institutional = fal
     let rhythmTarget = validAnswersMissionTarget(rhythmStages);
     let rhythmAwardedPoints = 0;
     if (dailyAnswers >= rhythmTarget) {
-        const points = progressiveMissionReward(600, rhythmStages);
+        const points = progressiveMissionReward(180, rhythmStages);
         const applied = await grantMission({
             id: 'ritmo-progressivo', key: `missao:ritmo-${rhythmTarget}:${day}`,
             title: `Ritmo diário ${rhythmTarget}`, points,
@@ -303,13 +303,13 @@ export async function missionStatus(userId, { award = false, institutional = fal
         {
             id: 'precisao-diaria', key: `missao:precisao-80:${day}`, titulo: 'Precisão diária',
             descricao: 'Mantenha pelo menos 80% de acertos em 10 questões no dia.', atual: Math.min(dailyAccuracy, 80), meta: 80,
-            unidade: `% · ${Math.min(dailyAnswers, 10)}/10 questões`, pontos: 300, ready: dailyAnswers >= 10 && dailyAccuracy >= 80,
+            unidade: `% · ${Math.min(dailyAnswers, 10)}/10 questões`, pontos: 90, ready: dailyAnswers >= 10 && dailyAccuracy >= 80,
             progresso: Math.min(100, Math.round(Math.min(dailyAnswers / 10, dailyAccuracy / 80) * 100)),
         },
         {
             id: 'excelencia-diaria', key: `missao:excelencia-90:${day}`, titulo: 'Excelência diária',
             descricao: 'Mantenha pelo menos 90% de acertos em 20 questões no dia.', atual: Math.min(dailyAccuracy, 90), meta: 90,
-            unidade: `% · ${Math.min(dailyAnswers, 20)}/20 questões`, pontos: 600, ready: dailyAnswers >= 20 && dailyAccuracy >= 90,
+            unidade: `% · ${Math.min(dailyAnswers, 20)}/20 questões`, pontos: 180, ready: dailyAnswers >= 20 && dailyAccuracy >= 90,
             progresso: Math.min(100, Math.round(Math.min(dailyAnswers / 20, dailyAccuracy / 90) * 100)),
         },
     ];
@@ -322,17 +322,17 @@ export async function missionStatus(userId, { award = false, institutional = fal
         {
             id: 'constancia-7', key: `missao:constancia-7:${streakStart}`, titulo: 'Constância semanal',
             descricao: 'Estude em 7 dias consecutivos. Conta um avanço por dia.', atual: Math.min(streakDays, 7), meta: 7,
-            unidade: 'dias seguidos', pontos: 2000, ready: streakDays >= 7,
+            unidade: 'dias seguidos', pontos: 600, ready: streakDays >= 7,
         },
         {
             id: 'centena-semanal', key: `missao:centena-100:${week}`, titulo: 'Centena da semana',
             descricao: 'Responda 100 questões válidas entre segunda e domingo.', atual: Math.min(weeklyAnswers, 100), meta: 100,
-            unidade: 'questões na semana', pontos: 1500, ready: weeklyAnswers >= 100,
+            unidade: 'questões na semana', pontos: 450, ready: weeklyAnswers >= 100,
         },
         {
             id: 'explorador-semanal', key: `missao:explorador-5:${week}`, titulo: 'Explorador semanal',
             descricao: 'Estude 5 capítulos diferentes durante a semana.', atual: Math.min(weeklyChapters, 5), meta: 5,
-            unidade: 'capítulos na semana', pontos: 1000, ready: weeklyChapters >= 5,
+            unidade: 'capítulos na semana', pontos: 300, ready: weeklyChapters >= 5,
         },
     ];
     for (const mission of weeklyDefinitions) {
@@ -344,7 +344,7 @@ export async function missionStatus(userId, { award = false, institutional = fal
             id: 'sequencia-progressiva', grupo: 'Diárias', titulo: 'Sequência certeira',
             descricao: `Próxima etapa: ${sequenceTarget} acertos seguidos. Um erro reinicia somente a sequência atual.`,
             atual: Math.min(sequence, sequenceTarget), meta: sequenceTarget, unidade: 'acertos seguidos',
-            pontos: progressiveMissionReward(250, sequenceStages), pontos_premiados: sequenceAwardedPoints,
+            pontos: progressiveMissionReward(75, sequenceStages), pontos_premiados: sequenceAwardedPoints,
             concluida: false, premiada: newlyAwarded.has('sequencia-progressiva'), etapas_concluidas: sequenceStages,
         },
         {
@@ -353,14 +353,14 @@ export async function missionStatus(userId, { award = false, institutional = fal
                 ? 'Todas as 6 etapas de hoje foram concluídas. A missão volta para 3 amanhã.'
                 : `Próxima etapa: estudar ${roundTarget} disciplinas diferentes hoje.`,
             atual: Math.min(disciplines, roundTarget), meta: roundTarget, unidade: 'disciplinas hoje',
-            pontos: progressiveMissionReward(400, roundStages, roundTargets.length), pontos_premiados: roundAwardedPoints,
+            pontos: progressiveMissionReward(120, roundStages, roundTargets.length), pontos_premiados: roundAwardedPoints,
             concluida: roundStages >= roundTargets.length, premiada: newlyAwarded.has('ronda-progressiva'), etapas_concluidas: roundStages,
         },
         {
             id: 'ritmo-progressivo', grupo: 'Diárias', titulo: 'Ritmo diário',
             descricao: `Próxima etapa: responder ${rhythmTarget} questões válidas hoje. Questões puladas não contam.`,
             atual: Math.min(dailyAnswers, rhythmTarget), meta: rhythmTarget, unidade: 'questões válidas hoje',
-            pontos: progressiveMissionReward(600, rhythmStages), pontos_premiados: rhythmAwardedPoints,
+            pontos: progressiveMissionReward(180, rhythmStages), pontos_premiados: rhythmAwardedPoints,
             concluida: false, premiada: newlyAwarded.has('ritmo-progressivo'), etapas_concluidas: rhythmStages,
         },
         ...dailyDefinitions.map(({ key, ready, ...mission }) => ({
@@ -420,14 +420,14 @@ async function awardChapterMastery(userId, chapterId) {
         correct = rows.filter((row) => row.acertou).length;
     }
     if (questionCount < 30 || correct / questionCount < 0.8) return null;
-    const result = await awardXp(userId, `dominio-capitulo:${chapterId}`, 'dominio', 2000, {
+    const result = await awardXp(userId, `dominio-capitulo:${chapterId}`, 'dominio', 750, {
         capitulo_id: chapterId, questoes: questionCount, acertos: correct,
     });
     if (result.applied) await createNotification({
         usuario_id: userId,
         tipo: 'missao',
         titulo: 'Domínio de capítulo',
-        mensagem: 'Você dominou um capítulo com pelo menos 30 questões e 80% de acertos: +2.000 XP.',
+        mensagem: 'Você dominou um capítulo com pelo menos 30 questões e 80% de acertos: +750 XP.',
         acao: 'missoes',
         chave: `notificacao:dominio:${chapterId}`,
     });
@@ -437,24 +437,24 @@ async function awardChapterMastery(userId, chapterId) {
 export async function awardAnswerXp({ userId, sessionId, questionId, chapterId, correct, previous = [] }) {
     const awarded = [];
     awarded.push(await awardLimitedQuestionXp(
-        userId, `resposta-valida:${sessionId}:${questionId}`, 'resposta_valida', 25,
+        userId, `resposta-valida:${sessionId}:${questionId}`, 'resposta_valida', 10,
         { sessao_id: sessionId, questao_id: questionId },
     ));
     if (correct) {
         awarded.push(await awardLimitedQuestionXp(
-            userId, `resposta-correta:${sessionId}:${questionId}`, 'resposta_correta', 50,
+            userId, `resposta-correta:${sessionId}:${questionId}`, 'resposta_correta', 15,
             { sessao_id: sessionId, questao_id: questionId },
         ));
         const previousCorrect = previous.filter((row) => row.acertou && !row.pulada);
         if (!previousCorrect.length) {
-            awarded.push(await awardLimitedQuestionXp(userId, `primeiro-acerto:${questionId}`, 'primeiro_acerto', 100, { questao_id: questionId }));
+            awarded.push(await awardLimitedQuestionXp(userId, `primeiro-acerto:${questionId}`, 'primeiro_acerto', 25, { questao_id: questionId }));
             if (previous.some((row) => !row.acertou && !row.pulada)) {
-                awarded.push(await awardLimitedQuestionXp(userId, `correcao:${questionId}`, 'correcao', 50, { questao_id: questionId }));
+                awarded.push(await awardLimitedQuestionXp(userId, `correcao:${questionId}`, 'correcao', 15, { questao_id: questionId }));
             }
         } else {
             const latest = new Date(previousCorrect[0].respondida_em).getTime();
             if (Number.isFinite(latest) && Date.now() - latest >= DAY_MS) {
-                awarded.push(await awardLimitedQuestionXp(userId, `revisao:${questionId}:${localDay()}`, 'revisao', 30, { questao_id: questionId }));
+                awarded.push(await awardLimitedQuestionXp(userId, `revisao:${questionId}:${localDay()}`, 'revisao', 10, { questao_id: questionId }));
             }
         }
     }
@@ -473,10 +473,10 @@ export async function awardAnswerXp({ userId, sessionId, questionId, chapterId, 
 export async function awardSessionXp(userId, session) {
     const awards = [];
     if (Number(session.respondidas || 0) >= 20) {
-        awards.push(await awardXp(userId, `sessao-completa:${session.id}`, 'sessao', 250, { sessao_id: session.id }));
+        awards.push(await awardXp(userId, `sessao-completa:${session.id}`, 'sessao', 100, { sessao_id: session.id }));
     }
     const percentage = Number(session.percentual || 0);
-    if (percentage >= 90) awards.push(await awardXp(userId, `sessao-precisao:${session.id}`, 'precisao', 800, { percentual: percentage }));
-    else if (percentage >= 80) awards.push(await awardXp(userId, `sessao-precisao:${session.id}`, 'precisao', 400, { percentual: percentage }));
+    if (percentage >= 90) awards.push(await awardXp(userId, `sessao-precisao:${session.id}`, 'precisao', 300, { percentual: percentage }));
+    else if (percentage >= 80) awards.push(await awardXp(userId, `sessao-precisao:${session.id}`, 'precisao', 150, { percentual: percentage }));
     return awards.filter((item) => item.applied).reduce((sum, item) => sum + item.points, 0);
 }

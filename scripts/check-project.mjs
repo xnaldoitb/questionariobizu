@@ -554,14 +554,14 @@ for (const marker of ["lower(coalesce(status, 'pendente'))", "'approved'", 'excl
 for (const marker of ['metricas_missoes_v448', 'metricas_dominio_capitulo_v448', 'resumo_ranking_usuario_v448', 'dia_ordenado.posicao', 'primeira_falha.posicao', 'America/Belem', 'to service_role']) {
     if (!migration448.includes(marker)) throw new Error(`Otimização v4.48 incompleta: ${marker}`);
 }
-for (const marker of ['conceder_xp_questao_limitado', 'for update', 'p_limite_diario integer default 10000', 'America/Belem', 'to service_role']) {
+for (const marker of ['conceder_xp_questao_limitado', 'for update', 'p_limite_diario integer default 5000', 'America/Belem', 'to service_role']) {
     if (!migration451.includes(marker)) throw new Error(`Progressão rápida v4.51 incompleta: ${marker}`);
 }
 for (const marker of ['listar_suporte_conversas_v4481', 'join lateral', 'suporte_mensagens_conversa_recente_idx', 'to service_role']) {
     if (!migration4481.includes(marker)) throw new Error(`Suporte otimizado v4.48.1 incompleto: ${marker}`);
 }
-if (!index.includes('manifest.webmanifest?v=4.51.2') || !serviceWorker.includes('questionario-bizu-v4.51.2')) {
-    throw new Error('Versão e cache PWA v4.51.2 não estão sincronizados.');
+if (!index.includes('manifest.webmanifest?v=4.51.3') || !serviceWorker.includes('questionario-bizu-v4.51.3')) {
+    throw new Error('Versão e cache PWA v4.51.3 não estão sincronizados.');
 }
 if (!fragments.includes('mountAdminInterface') || !mainModule.includes("import('./domains/management.js')")) {
     throw new Error('Carregamento sob demanda do painel administrativo v4.48 incompleto.');
@@ -578,4 +578,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.51.2: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.51.3: verificações estruturais concluídas.');

@@ -8,7 +8,7 @@ create or replace function public.conceder_xp_questao_limitado(
   p_tipo text,
   p_pontos integer,
   p_detalhes jsonb default '{}'::jsonb,
-  p_limite_diario integer default 10000
+  p_limite_diario integer default 5000
 ) returns table(aplicado boolean, novo_xp_total bigint, pontos_aplicados integer)
 language plpgsql
 security definer

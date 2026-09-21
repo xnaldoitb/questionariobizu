@@ -364,30 +364,30 @@ async function openTopic(id) {
         </header>
         <p class="topic-main-content">O XP mede sua evolução de estudo e define sua patente. O modo de progressão rápida amplia somente os ganhos futuros, sem alterar o saldo, a patente ou a posição atual de nenhum usuário. A colocação do ranking continua sendo determinada pelos acertos.</p>
         <div class="xp-rules-grid">
-            <article><strong>+25 XP</strong><span>Toda resposta válida, correta ou incorreta</span></article>
-            <article><strong>+50 XP</strong><span>Bônus adicional por resposta correta</span></article>
-            <article><strong>+100 XP</strong><span>Bônus adicional pelo primeiro acerto da questão</span></article>
-            <article><strong>+50 XP</strong><span>Corrigir uma questão errada pela primeira vez</span></article>
-            <article><strong>+30 XP</strong><span>Revisão correta após pelo menos 24 horas</span></article>
-            <article><strong>+250 XP</strong><span>Finalizar um simulado com 20 ou mais respostas</span></article>
-            <article><strong>+400 / +800 XP</strong><span>Alcançar 80% / 90% em um simulado</span></article>
-            <article><strong>+2.000 XP</strong><span>Dominar um capítulo: 30 questões e 80% de acertos</span></article>
+            <article><strong>+10 XP</strong><span>Toda resposta válida, correta ou incorreta</span></article>
+            <article><strong>+15 XP</strong><span>Bônus adicional por resposta correta</span></article>
+            <article><strong>+25 XP</strong><span>Bônus adicional pelo primeiro acerto da questão</span></article>
+            <article><strong>+15 XP</strong><span>Corrigir uma questão errada pela primeira vez</span></article>
+            <article><strong>+10 XP</strong><span>Revisão correta após pelo menos 24 horas</span></article>
+            <article><strong>+100 XP</strong><span>Finalizar um simulado com 20 ou mais respostas</span></article>
+            <article><strong>+150 / +300 XP</strong><span>Alcançar 80% / 90% em um simulado</span></article>
+            <article><strong>+750 XP</strong><span>Dominar um capítulo: 30 questões e 80% de acertos</span></article>
         </div>
         <h4 class="xp-topic-subtitle">Missões diárias visíveis</h4>
         <div class="xp-rules-grid">
-            <article><strong>250, 500, 750… XP</strong><span><b>Sequência certeira:</b> 10, 20, 30… acertos seguidos. A meta cresce em 10 e a recompensa em 250 XP por etapa; ambas reiniciam diariamente.</span></article>
-            <article><strong>400 a 2.400 XP</strong><span><b>Ronda de disciplinas:</b> metas de 3, 6, 9, 12, 15 e 18. A recompensa progride até 2.400 XP; reinicia diariamente.</span></article>
-            <article><strong>600, 1.200, 1.800… XP</strong><span><b>Ritmo diário:</b> responder 20, 40, 60… questões válidas; reinicia diariamente.</span></article>
-            <article><strong>+300 XP</strong><span><b>Precisão diária:</b> obter 80% de acertos em pelo menos 10 questões no dia.</span></article>
-            <article><strong>+600 XP</strong><span><b>Excelência diária:</b> obter 90% de acertos em pelo menos 20 questões no dia.</span></article>
+            <article><strong>75, 150, 225… XP</strong><span><b>Sequência certeira:</b> 10, 20, 30… acertos seguidos. A meta cresce em 10 e a recompensa em 75 XP por etapa; ambas reiniciam diariamente.</span></article>
+            <article><strong>120 a 720 XP</strong><span><b>Ronda de disciplinas:</b> metas de 3, 6, 9, 12, 15 e 18. A recompensa progride até 720 XP; reinicia diariamente.</span></article>
+            <article><strong>180, 360, 540… XP</strong><span><b>Ritmo diário:</b> responder 20, 40, 60… questões válidas; reinicia diariamente.</span></article>
+            <article><strong>+90 XP</strong><span><b>Precisão diária:</b> obter 80% de acertos em pelo menos 10 questões no dia.</span></article>
+            <article><strong>+180 XP</strong><span><b>Excelência diária:</b> obter 90% de acertos em pelo menos 20 questões no dia.</span></article>
         </div>
         <h4 class="xp-topic-subtitle">Missões semanais visíveis</h4>
         <div class="xp-rules-grid">
-            <article><strong>+2.000 XP</strong><span><b>Constância semanal:</b> estudar por 7 dias consecutivos.</span></article>
-            <article><strong>+1.500 XP</strong><span><b>Centena da semana:</b> responder 100 questões válidas entre segunda e domingo.</span></article>
-            <article><strong>+1.000 XP</strong><span><b>Explorador semanal:</b> estudar 5 capítulos diferentes na semana.</span></article>
+            <article><strong>+600 XP</strong><span><b>Constância semanal:</b> estudar por 7 dias consecutivos.</span></article>
+            <article><strong>+450 XP</strong><span><b>Centena da semana:</b> responder 100 questões válidas entre segunda e domingo.</span></article>
+            <article><strong>+300 XP</strong><span><b>Explorador semanal:</b> estudar 5 capítulos diferentes na semana.</span></article>
         </div>
-        <p class="topic-main-content">As missões podem ser realizadas em qualquer ordem. Questões puladas não contam. O XP direto de respostas possui limite de <strong>10.000 XP por dia</strong>; missões, simulados, domínio, planos e premiações não entram nesse limite. Cada etapa concede XP uma única vez; as diárias reiniciam no começo do novo dia e as metas semanais renovam na segunda-feira.</p>
+        <p class="topic-main-content">As missões podem ser realizadas em qualquer ordem. Questões puladas não contam. O XP direto de respostas possui limite de <strong>5.000 XP por dia</strong>; missões, simulados, domínio, planos e premiações não entram nesse limite. Cada etapa concede XP uma única vez; as diárias reiniciam no começo do novo dia e as metas semanais renovam na segunda-feira.</p>
         <h4 class="xp-topic-subtitle">Bônus único por plano</h4>
         <p class="topic-main-content">Premium concede <strong>500 XP</strong>, Plus concede <strong>1.200 XP</strong> e VIP concede <strong>2.500 XP</strong>. Em um upgrade, o usuário recebe somente a diferença; renovar o mesmo plano não repete o bônus.</p>
         <h4 class="xp-topic-subtitle">XP necessário para cada patente</h4>
