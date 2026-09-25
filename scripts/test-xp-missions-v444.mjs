@@ -89,7 +89,7 @@ assert(community.includes('20, 40, 60… questões válidas') && community.inclu
 for (const marker of ['conceder_xp_questao_limitado', 'for update', "America/Belem", 'p_limite_diario integer default 5000', 'on conflict (usuario_id, chave) do nothing']) assert(rapidXpMigration.includes(marker));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
 assert(xp.includes("rpc('metricas_missoes_v448'") && xp.includes("rpc('metricas_dominio_capitulo_v448'"));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.51.3'));
-assert(worker.includes('questionario-bizu-v4.51.3') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.52.2'));
+assert(worker.includes('questionario-bizu-v4.52.2') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, métricas agregadas e notificações v4.48 validados.');

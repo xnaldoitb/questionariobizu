@@ -2,6 +2,7 @@ const coreFragments = [
     'auth.html',
     'topbar.html',
     'dashboard.html',
+    'hymns.html',
     'quiz.html',
     'result.html',
     'history.html',

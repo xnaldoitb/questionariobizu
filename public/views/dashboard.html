@@ -119,6 +119,45 @@
         </label>
     </div>
 
+    <section class="hymns-dashboard-section" aria-labelledby="hymnsDashboardTitle">
+        <div class="hymns-dashboard-heading">
+            <div>
+                <p class="section-kicker"><span class="kicker-mark"></span> sala de canto</p>
+                <h2 id="hymnsDashboardTitle">Hinos e canções</h2>
+                <p>Escolha um hino para abrir a letra, o áudio disponível e os treinos de memorização.</p>
+            </div>
+            <span class="hymns-dashboard-count">17 hinos</span>
+        </div>
+        <div class="hymn-filter">
+            <span id="hymnFilterLabel">Hino</span>
+            <button id="hymnPicker" class="study-filter-trigger" type="button"
+                aria-labelledby="hymnFilterLabel hymnSelectionSummary"
+                aria-haspopup="dialog" aria-controls="hymnModal">
+                <span class="study-filter-icon hymn-picker-icon" aria-hidden="true">♫</span>
+                <span class="study-filter-copy">
+                    <strong id="hymnSelectionSummary">Selecionar hino</strong>
+                    <small id="hymnSelectionMeta">17 hinos e canções disponíveis</small>
+                </span>
+                <span class="study-filter-arrow" aria-hidden="true">›</span>
+            </button>
+        </div>
+    </section>
+
+    <div class="modal-overlay study-filter-overlay hidden" id="hymnModal" role="dialog" aria-modal="true" aria-labelledby="hymnModalTitle">
+        <section class="report-modal study-filter-modal hymn-selector-modal">
+            <header class="study-filter-modal-header">
+                <span class="study-modal-heading-icon hymn-modal-icon" aria-hidden="true">♫</span>
+                <div><small>Sala de canto</small><h2 id="hymnModalTitle">Escolha o hino</h2></div>
+                <button class="study-modal-close" id="hymnModalClose" type="button" aria-label="Fechar seleção de hino">×</button>
+            </header>
+            <div class="study-filter-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+                <input id="hymnSearch" type="search" placeholder="Pesquisar hino" aria-label="Pesquisar hino" autocomplete="off">
+            </div>
+            <div class="discipline-option-list hymn-option-list" id="hymnOptions" role="listbox" aria-label="Hinos e canções"></div>
+        </section>
+    </div>
+
     <div class="modal-overlay study-filter-overlay hidden" id="subjectModal" role="dialog" aria-modal="true" aria-labelledby="subjectModalTitle">
         <section class="report-modal study-filter-modal">
             <header class="study-filter-modal-header">

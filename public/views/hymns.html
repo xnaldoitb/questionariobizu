@@ -1,0 +1,32 @@
+<section id="hymnsView" class="hidden hymns-screen" aria-labelledby="hymnsTitle">
+    <div id="hymnDetail">
+        <button class="hymn-back" id="hymnBack" type="button">← Escolher outro hino</button>
+        <header class="hymn-heading">
+            <div>
+                <p class="section-kicker"><span class="kicker-mark"></span> sala de canto</p>
+                <h1 id="hymnTitle">Hino</h1>
+                <p id="hymnAuthor"></p>
+                <small id="hymnOrigin"></small>
+            </div>
+        </header>
+
+        <div class="hymn-audio-panel panel hidden" id="hymnAudioPanel">
+            <div class="hymn-audio-title"><strong>Áudio oficial</strong><span id="hymnAudioStatus">Pronto para tocar</span></div>
+            <audio id="hymnAudio" controls preload="metadata"></audio>
+            <div class="hymn-audio-actions" aria-label="Controles adicionais do áudio">
+                <button type="button" data-audio-back>↶ 10s</button>
+                <button type="button" data-audio-rate="0.75">0,75x</button>
+                <button type="button" data-audio-rate="1" class="active">1x</button>
+                <button type="button" data-audio-rate="1.25">1,25x</button>
+            </div>
+        </div>
+
+        <nav class="hymn-modes" aria-label="Modos de estudo">
+            <button type="button" data-hymn-mode="letra" class="active">Letra</button>
+            <button type="button" data-hymn-mode="completar">Completar</button>
+            <button type="button" data-hymn-mode="ordem">Ordem</button>
+        </nav>
+
+        <div id="hymnWorkspace" class="hymn-workspace"></div>
+    </div>
+</section>

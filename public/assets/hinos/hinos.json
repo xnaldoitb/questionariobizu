@@ -1,0 +1,822 @@
+{
+  "hinos": [
+    {
+      "slug": "hino-a-fontoura",
+      "titulo": "Hino à Fontoura",
+      "autoria": "Letra: e Música: 2º TEN PM Patrick dos Santos Sousa Campos e CB PM Josivane do Carmo Campos Sousa · Arranjos e Instrumentação: CB PM Frankson Barroso Silva, CB PM Luís Vinícius Moraes Silva e CB PM Leonardo Lopes da Silva",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": "I",
+          "versos": [
+            "Quando a guerra em Canudos ecoou",
+            "Tropas paraenses combateram",
+            "Contra Antonio Conselheiro venceram",
+            "Com coragem, lealdade e destemor"
+          ]
+        },
+        {
+          "tipo": "coro",
+          "rotulo": "Coro",
+          "versos": [
+            "Salve, Fontoura!",
+            "Herói varonil!",
+            "Com ousadia, o comando assumiu",
+            "Saudemos com ardor",
+            "Exaltemos seu valor",
+            "Aquele que, com glória, o Pará coroou"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
+            "Com garbo e postura marchou",
+            "À frente o pavilhão tremulou",
+            "Avante seguiu e venceu",
+            "A bandeira paraense engradeceu"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "III",
+          "versos": [
+            "No combate vitorioso triunfou",
+            "Seu nome na história consagrou",
+            "Por sua audácia e altivez se fez tornar",
+            "O Patrono da Polícia Militar"
+          ]
+        }
+      ],
+      "totalVersos": 18,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": "/assets/hinos/hino-a-fontoura.mp3"
+    },
+    {
+      "slug": "hino-do-soldado-do-fogo",
+      "titulo": "Hino do Soldado do Fogo",
+      "autoria": "Letra: Ten. Sergio Luiz de Matos · Música: Cap. Antônio Pinto Junior",
+      "origem": "Letra oficial conferida pelo instrutor do CFAP",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": "I",
+          "versos": [
+            "Contra as chamas em lutas ingentes",
+            "Sob o nobre alvirrubro pendão",
+            "Dos soldados do fogo valentes",
+            "É, na paz, a sagrada missão"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "E se um dia houver sangue em batalha",
+            "Desfraldando a auriverde bandeira",
+            "Nossos peitos são férrea muralha",
+            "Contra a audaz agressão estrangeira"
+          ]
+        },
+        {
+          "tipo": "coro",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Missão dupla o dever nos aponta",
+            "Vida alheia e riquezas salvar",
+            "E, na guerra, punindo uma afronta",
+            "Com valor pela Pátria lutar"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
+            "Aurifulvo clarão gigantesco",
+            "Labaredas flamejam no ar",
+            "Num incêndio horroroso, dantesco",
+            "A cidade parece queimar"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Mas não temem da morte os Bombeiros",
+            "Quando ecoa d'alarme o sinal",
+            "Ordenando voarem ligeiros",
+            "A vencer o vulcão infernal"
+          ]
+        },
+        {
+          "tipo": "coro",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Missão dupla o dever nos aponta",
+            "Vida alheia, riquezas salvar",
+            "E, na guerra, punindo uma afronta",
+            "Com valor pela Pátria lutar"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "III",
+          "versos": [
+            "Rija luta aos heróis aviventa",
+            "Inflamando em seu peito o valor",
+            "Para frente que importa a tormenta",
+            "Dura marcha de sóis ou rigor?"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Nem um passo daremos atrás",
+            "Repelindo inimigos canhões",
+            "Voluntários da morte na paz",
+            "São na guerra indomáveis leões"
+          ]
+        },
+        {
+          "tipo": "coro",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Missão dupla o dever nos aponta",
+            "Vida alheia, riquezas salvar",
+            "E, na guerra, punindo uma afronta",
+            "Com valor pela Pátria lutar"
+          ]
+        }
+      ],
+      "audio": "/assets/hinos/hino-do-soldado-do-fogo.mp3"
+    },
+    {
+      "slug": "cancao-do-cfap",
+      "titulo": "Canção do CFAP",
+      "autoria": "Letra: Maj. BM José Ribamar Matos · Música: Cap PM R/R Belarmino · Arranjo: Sgt Pantoja",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "O CFAP é a escola sã em seu papel",
+            "Sua missão é preparar o bom policial",
+            "Ser camarada, ser altivo e leal a lutar",
+            "Pela paz ser constante e fiel",
+            "Para o bem do Brasil o CFAP cumprirá",
+            "A missão de servir e o dever de ensinar",
+            "E defenderá nesse rincão o nosso Brasil e o Pará",
+            "O CFAP é a escola sã em seu papel",
+            "Sua missão é preparar o bom policial",
+            "Ser camarada, ser altivo e leal a lutar",
+            "Pela paz ser constante e fiel!"
+          ]
+        }
+      ],
+      "totalVersos": 11,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": "/assets/hinos/cancao-do-cfap.mp3"
+    },
+    {
+      "slug": "cancao-da-policia-militar-do-para",
+      "titulo": "Canção da Polícia Militar do Pará",
+      "autoria": "Letra: José Resende filho · Música: Manuel Belarmino Da Costa",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Altaneira Polícia Militar",
+            "Cobre de louro o teu nome tradicional",
+            "Para a glória do Brasil",
+            "Terra santa e imortal",
+            "Teus soldados heroicos e destemidos",
+            "Quer na paz ou na guerra feroz,",
+            "O Brasil, o Pará, hão de honrar,",
+            "O teu nome exaltar,",
+            "E a luta cessará,",
+            "Teu pavilhão mais uma vez tremulará",
+            "O teu nome está gravado na história,",
+            "E ligado ao de um bravo e grande herói,",
+            "Que em Canudos cobriu-se de mil glórias",
+            "Salve Fontoura, o precursor da vitória!"
+          ]
+        }
+      ],
+      "totalVersos": 14,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "hino-nacional-brasileiro",
+      "titulo": "Hino Nacional Brasileiro",
+      "autoria": "Letra: Joaquim Osório Duque Estrada · Música: Francisco Manoel da Silva",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Ouviram do Ipiranga às margens plácidas",
+            "De um povo heroico o brado retumbante,",
+            "E o sol da liberdade, em raios fúlgidos,",
+            "Brilhou no céu da Pátria nesse instante.",
+            "Se o penhor dessa igualdade",
+            "Conseguintes conquistar com braço forte,",
+            "Em teu seio, ó Liberdade,",
+            "Desafia o nosso peito a própria morte!",
+            "Ó Pátria amada,",
+            "Idolatrada,",
+            "Salve! Salve!",
+            "Brasil, um sonho intenso, um raio vívido",
+            "De amor e de esperança à terra desce,",
+            "Se em teu formoso céu, risonho e límpido,",
+            "A imagem do cruzeiro resplandece.",
+            "Gigante pela própria natureza,",
+            "És belo, és forte, impávido colosso,",
+            "E o teu futuro espelha essa grandeza.",
+            "Terra adorada,",
+            "Entre outras mil.",
+            "És tu Brasil.",
+            "Ó Pátria amada!",
+            "Dos filhos deste Solo és mãe gentil,",
+            "Pátria amada,",
+            "Brasil",
+            "Deitado eternamente em berço esplêndido,",
+            "Ao som do mar e à luz do céu profundo,",
+            "Fulguras, ó Brasil, florão da América,",
+            "Iluminando ao sol do Novo Mundo!",
+            "Do que a terra mais garrida",
+            "Teus risonhos, lindos campos têm mais flores",
+            "“Nossos bosques têm mais vida”",
+            "“Nossa Vida” no teu seio “mais amores”",
+            "Ó Pátria amada,",
+            "Idolatrada,",
+            "Salve! Salve!",
+            "Brasil, de amor eterno seja símbolo",
+            "O lábaro que ostentas estrelado,",
+            "E diga verde louro desta flâmula",
+            "Paz no futuro e glória no passado",
+            "Mas se ergues da justiça a clava forte,",
+            "Verás que um filho teu não foge à luta",
+            "Nem teme, que te adora, a própria morte.",
+            "Terra adorada,",
+            "Entre outras mil.",
+            "És tu Brasil.",
+            "Ó Pátria amada!",
+            "Dos filhos deste Solo és mãe gentil,",
+            "Pátria amada,",
+            "Brasil!"
+          ]
+        }
+      ],
+      "totalVersos": 50,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "cancao-do-soldado",
+      "titulo": "Canção do Soldado",
+      "autoria": "Letra:Alberto Augusto Martins · Música: T. de Magalhães.",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Nós somos da Pátria a guarda",
+            "Fieis soldados,",
+            "Por ela amados,",
+            "Nas cores da nossa farda,",
+            "Rebrilha a glória,",
+            "Fulge a vitória,",
+            "Em nosso valor se encerra,",
+            "Toda a esperança",
+            "Que um povo alcança",
+            "No peito em que ela impera",
+            "Rebrilha a glória,",
+            "Fulge a vitória.",
+            "A paz queremos com fervor,",
+            "A guerra só nos causa dor,",
+            "Porem, se a Pátria amada",
+            "For um dia ultrajada,",
+            "Lutaremos com fervor (bis)",
+            "Come é sublime,",
+            "Saber amar",
+            "Com a alma adorar,",
+            "A terra onde se nasce,",
+            "Amor febril,",
+            "Pelo Brasil,",
+            "No coração",
+            "Nosso que passe",
+            "E quando a nação querida,",
+            "Frente ao inimigo,",
+            "Correr perigo,",
+            "Se dermos por ela a vida",
+            "Rebrilha a glória,",
+            "Fulge a vitória.",
+            "Assim ao Brasil faremos",
+            "Oferta igual",
+            "De amor filial.",
+            "E a ti, Pátria, salvaremos!",
+            "Rebrilha a glória,",
+            "Fulge a vitória.",
+            "A paz queremos com fervor,",
+            "A guerra só nos causa dor,",
+            "Porem, se a Pátria amada",
+            "For um dia ultrajada,",
+            "Lutaremos com fervor (bis)"
+          ]
+        }
+      ],
+      "totalVersos": 42,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "cancao-fibra-de-heroi",
+      "titulo": "Canção Fibra de Herói",
+      "autoria": "",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Se a Pátria querida",
+            "For envolvida pelo perigo",
+            "Na paz ou na guerra",
+            "Defende a terra contra inimigo",
+            "Com ânimo forte",
+            "Se for preciso enfrento a morte",
+            "Afronta se lavra",
+            "Com fibra de herói",
+            "De gente brava",
+            "Bandeira do Brasil",
+            "Ninguém te manchará",
+            "Teu povo varonil",
+            "Isso não consentirá",
+            "Bandeira idolatrada",
+            "Altiva a tremular",
+            "Onde a liberdade é mais uma estrela a brilhar."
+          ]
+        }
+      ],
+      "totalVersos": 16,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "cancao-do-20-bpm-pmpa",
+      "titulo": "Canção do 20º BPM PMPA",
+      "autoria": "",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Avante com bravura a vencer",
+            "O nosso lema “é servir e proteger”",
+            "Aguerridos com louvor e dedicação",
+            "Somos policiais do 20º batalhão",
+            "A comunidade, sempre assistida",
+            "Mesmo com o risco da própria vida",
+            "No combate do dia a dia",
+            "Vencendo com maestria",
+            "Valorosa Polícia de Fontoura",
+            "Nosso brado daremos com bravura",
+            "20º Batalhão!",
+            "20º Batalhão!"
+          ]
+        }
+      ],
+      "totalVersos": 12,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "hino-do-aviador",
+      "titulo": "Hino do Aviador",
+      "autoria": "Letra: Armando Serra de Meneses Música: João",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Nascimento",
+            "Vamos filhos altivos dos ares",
+            "Nosso vôo ousado alçar,",
+            "Sobre campos cidades e mares,",
+            "Vamos nuvens e céus enfrentar.",
+            "D'Astro-Rei desafiamos os cimos,",
+            "Bandeirantes audazes do azul.",
+            "Às estrelas, de noite, subimos,",
+            "Para orar ao Cruzeiro do Sul"
+          ]
+        },
+        {
+          "tipo": "coro",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Contato! Companheiros!",
+            "Ao vento, sobranceiros,",
+            "Lancemos o roncar",
+            "Da hélice a girar.",
+            "Contato! Companheiros!",
+            "Ao vento, sobranceiros,",
+            "Lancemos o roncar",
+            "Da hélice a girar",
+            "Mas se explode o corisco no espaço",
+            "Com a metralha, na guerra, a rugir",
+            "Cavaleiros do século do aço",
+            "Não nos faz o perigo fugir",
+            "Não importa a tocaia da morte",
+            "Pois que a Pátria, dos céus no altar",
+            "Sempre erguemos de ânimo forte",
+            "O holocausto da vida, a voar",
+            "Estribilho (…)"
+          ]
+        }
+      ],
+      "totalVersos": 26,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "cancao-do-2-bpm-pmpa",
+      "titulo": "Canção do 2º BPM/PMPA",
+      "autoria": "Letra e Música do CAP PM RR Belarmino Costa",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": "I",
+          "versos": [
+            "Altaneiros marchamos à frente",
+            "Pela Pátria o amor tendo em mente",
+            "Na cadência do rufo a bater",
+            "Cumpriremos o nosso dever",
+            "Sempre alerta se a Pátria chamar",
+            "Nosso brado de Guerra daremos",
+            "Batalhão Tiradentes seremos",
+            "E a vitória com luta alcançar"
+          ]
+        },
+        {
+          "tipo": "coro",
+          "rotulo": "Estribilho",
+          "versos": [
+            "No combate feroz saberemos bem honrar",
+            "A tradição, o bom exemplo a imitar",
+            "Dos heróis que com bravura",
+            "Engradeceram com ternura",
+            "O Pará da Amazônia querida",
+            "Terra livre e soberana",
+            "Nosso peito se inflama",
+            "És tu polícia (Salve! Salve!) desta terra estremecida."
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
+            "Oh heróica Milícia aguerrida",
+            "Teu passado e a luta garantia",
+            "Demonstrando em luta renhida"
+          ]
+        }
+      ],
+      "totalVersos": 19,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "hino-do-para",
+      "titulo": "Hino do Pará",
+      "autoria": "Letra: Gama Malcher · Música: Arthur Porto",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Salve ó terra de ricas florestas,",
+            "Fecundadas ao sol do Equador,",
+            "Teu destino é viver entre festas,",
+            "Do progresso, da paz e do amor,",
+            "Salve ó terra de ricas florestas,",
+            "Fecundadas ao sol do Equador,",
+            "O Pará quanto orgulho ser filho,",
+            "De um colosso tão belo e tão forte,",
+            "Juncaremos de flores seu trilho,",
+            "Do Brasil sentinela do Norte,",
+            "E a deixar de manter esse brilho,",
+            "Preferimos mil vezes a morte.",
+            "Salve ó terra de rios gigantes,",
+            "D’Amazônia princesa louçã,",
+            "Tudo em ti são encantos vibrantes,",
+            "Desde a indústria à rudeza pagã,",
+            "Salve ó terra de rios gigantes,",
+            "Da Amazônia princesa louçã.",
+            "O Pará quanto orgulho ser filho,",
+            "De um colosso tão belo e tão forte,",
+            "Juncaremos de flores seu trilho,",
+            "Do Brasil sentinela do Norte,",
+            "E a deixar de manter esse brilho,",
+            "Preferimos mil vezes a morte."
+          ]
+        }
+      ],
+      "totalVersos": 24,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "hino-a-bandeira",
+      "titulo": "Hino à Bandeira",
+      "autoria": "Letra: Olavo Bilac · Música: Francisco Braga",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Salve! Lindo Pendão da esperança",
+            "Salve! Símbolo augusto da Paz",
+            "Tua nobre presença à lembrança",
+            "A grandeza da Pátria, nos traz!",
+            "Recebe o afeto que se encerra",
+            "Em nosso peito varonil",
+            "Querido símbolo da terra,",
+            "Da amada terra do Brasil!",
+            "Em teu seio formoso, retratas",
+            "Este céu de puríssimo azul,",
+            "A verdura sem par destas matas",
+            "E o esplendor do cruzeiro do sul",
+            "Recebe o .........",
+            "Contemplando o teu vulto sagrado,",
+            "Compreendemos o nosso dever!",
+            "E o Brasil por seus filhos amados",
+            "Poderoso e feliz há de ser!",
+            "Recebe o ............",
+            "Sobre a imensa Nação Brasileira,",
+            "Nos momentos de festa e de dor,",
+            "Paira sempre, a sagrada Bandeira,",
+            "Pavilhão da Justiça e do amor.",
+            "Recebe o afeto que se encerra",
+            "Em nosso peito varonil,",
+            "Querido símbolo da terra,",
+            "Da amada terra do Brasil."
+          ]
+        }
+      ],
+      "totalVersos": 26,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "cancao-cisne-branco",
+      "titulo": "Canção Cisne Branco",
+      "autoria": "Letra: Benedito de Maceso · Música: Antônio do Espirito Santo",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Qual cisne branco que, em noite de lua,",
+            "Vai deslizando num lago azul,",
+            "O meu navio também flutua",
+            "Nos verdes mares, de norte a sul.",
+            "Linda galera que, em noite apagada,",
+            "Vai navegando num mar imenso,",
+            "Nos traz saudades da terra amada",
+            "Da Pátria minha em que tanto penso.",
+            "Qual linda garça",
+            "Que aí vai cruzando os ares,",
+            "Vai navegando",
+            "Sob um belo céu de anil,",
+            "Minha galera",
+            "Também vai cruzando os mares;",
+            "Os verdes mares,",
+            "Os mares verdes do Brasil!",
+            "Quanta alegria nos traz a volta",
+            "À nossa Pátria do coração,",
+            "Dada por finda nossa derrota,",
+            "Termos cumprido nossa missão."
+          ]
+        }
+      ],
+      "totalVersos": 20,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "cancao-da-cavalaria",
+      "titulo": "Canção da Cavalaria",
+      "autoria": "Letra: Teófilo Ottoni da Fonseca · Música: Teófilo Ottoni da Fonseca",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Arma ligeira que transpõe os montes,",
+            "Caudais profundos, com ardor e glória,",
+            "Estrela guia em negros horizontes,",
+            "Pelo caminho da luta e da vitória.",
+            "Cavalaria, Cavalaria,",
+            "Tu és na guerra a nossa estrela guia.",
+            "Arma de tradição que o peito embala,",
+            "Cuja história é de luz e de fulgor,",
+            "Pelo choque, na carga, ela avassala,",
+            "E, ao inimigo, impõe o seu valor.",
+            "Cavalaria, Cavalaria,",
+            "Tu és na guerra a nossa estrela guia.",
+            "Montado sobre o dorso deste amigo:",
+            "O cavalo que, altivo, nos conduz,",
+            "Levamo-lo, também, para o perigo,",
+            "Para lutar conosco sob a cruz.",
+            "Cavalaria, Cavalaria,",
+            "Tu és na guerra a nossa estrela guia.",
+            "De Andrade Neves o Osório, legendário,",
+            "E outros heróis que honram a nossa história,",
+            "Evocamos o valor extraordinário",
+            "Pelo Brasil a nossa maior glória!",
+            "Cavalaria, Cavalaria,",
+            "Tu és na guerra a nossa estrela guia."
+          ]
+        }
+      ],
+      "totalVersos": 24,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "cancao-da-infantaria",
+      "titulo": "Canção da Infantaria",
+      "autoria": "",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Nós somos estes infantes",
+            "Cujos peitos amantes",
+            "Nunca temem lutar",
+            "Vivemos, morremos,",
+            "Para o Brasil nos consagrar!",
+            "Nós, peitos nunca vencidos",
+            "De valor destemidos,",
+            "No fragor da disputa,",
+            "Mostremos,",
+            "Que em nossa Pátria temos,",
+            "Valor imenso",
+            "No intenso da luta",
+            "És a nobre infantaria, Das armas da rainha,",
+            "Por ti daria. A vida minha",
+            "E a glória prometida,",
+            "Nos campos de Batalha. Esta contigo",
+            "Ante o inimigo, pelo fogo da metralha!",
+            "És a eterna majestade,",
+            "Nas linhas combatentes",
+            "És a entidade, dos mais valentes,",
+            "Quando o toque da vitória",
+            "Marca a nossa alegria,",
+            "Eu cantarei",
+            "Eu gritarei!",
+            "És a nobre Infantaria!",
+            "Brasil, te darei com amor,",
+            "Toda a seiva e vigor",
+            "Que em meu peito se encerra,",
+            "Fuzil! Servil!",
+            "Meu nobre amigo para guerra!",
+            "Oh! Meu amada pendão, sagrado pavilhão,",
+            "Que a glória conduz!",
+            "Com luz",
+            "Sublime",
+            "Amor se exprime",
+            "Se do alto me falas,",
+            "Todo roto por balas!"
+          ]
+        }
+      ],
+      "totalVersos": 37,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "cancao-do-bpchoque-pmpa",
+      "titulo": "Canção do BPChoque/PMPA",
+      "autoria": "",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Dia e noite numa eterna vigilância, o BPCHOQUE estará",
+            "Sob o manto da justiça com firmeza e prontidão",
+            "Dando a comunidade segurança e proteção",
+            "Sou do Batalhão de Choque!",
+            "Batalhão que nada teme",
+            "Sou um povo usando farda no tumulto",
+            "Ou na guarda protegendo nosso chão!",
+            "Nossa farda é tão sagrada que aceitamos sem temer",
+            "Até mesmo sacrifício de lutar até morrer",
+            "Pois acima de nós todos estará nosso dever!",
+            "Sou do Batalhão de Choque!",
+            "Batalhão que nada teme",
+            "Sou um povo usando farda no tumulto",
+            "Ou na guarda protegendo nosso chão!",
+            "Na constância do ideal de cumprir qualquer missão",
+            "Sempre pronto pra lutar,",
+            "Pois sou bravo choqueano da Polícia Militar!",
+            "Sou do Batalhão de Choque!",
+            "(...)",
+            "E o Pará nas armas confiança",
+            "Tua história brilhando seduz",
+            "Que escrevestes com letras douradas",
+            "Rumo certo com fé te conduz",
+            "O futuro sacrossanto das jornadas"
+          ]
+        }
+      ],
+      "totalVersos": 24,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    },
+    {
+      "slug": "cancao-do-expedicionario",
+      "titulo": "Canção do Expedicionário",
+      "autoria": "",
+      "secoes": [
+        {
+          "tipo": "estrofe",
+          "rotulo": null,
+          "versos": [
+            "Você sabe de onde eu venho?",
+            "Venho do morro do engenho,",
+            "Das selvas, dos cafezais",
+            "Da boa terra do coco,",
+            "Da choupana onde um é pouco,",
+            "Dois é bom três é demais,",
+            "Venho das praias sedosas,",
+            "Das montanhas alterosas,",
+            "Do pampa, do seringal,",
+            "Das margens crespas dos rios",
+            "Dos verdes mares bravios",
+            "Da minha terra natal.",
+            "(ESTRIBILHO)",
+            "Por mais terra que eu percorra",
+            "Não permita Deus que eu morra,",
+            "Sem que volte para lá.",
+            "Sem que leve por divisa",
+            "Esse V que simboliza",
+            "A vitória que virá:",
+            "Nossa vitória final,",
+            "Que é a mira do meu fuzil,",
+            "A ração do meu bornal,",
+            "A água do meu cantil,",
+            "As asas do meu ideal,",
+            "A glória do meu Brasil.",
+            "Eu venho da minha terra,",
+            "Da casa branca da serra",
+            "E do luar do meu sertão;",
+            "Venho da minha Maria",
+            "Cujo nome principia",
+            "Na palma da minha mão,",
+            "Braços mornos de Moema,",
+            "Lábios de mel de Iracema",
+            "Estendidos para mim.",
+            "Ó minha terra querida",
+            "Da Senhora Aparecida",
+            "E do Senhor do Bonfim!",
+            "(ESTRIBILHO)",
+            "Você sabe de onde eu venho ?",
+            "E de uma Pátria que eu tenho",
+            "No bôjo do meu violão;",
+            "Que de viver em meu peito",
+            "Foi até tomando jeito",
+            "De um enorme coração.",
+            "Deixei lá atrás meu terreno,",
+            "Meu limão, meu limoeiro,",
+            "Meu pé de jacaranda,",
+            "Minha casa pequenina",
+            "Lá no alto da colina,",
+            "Onde canta o sabiá.",
+            "(ESTRIBILHO)",
+            "Venho do além desse monte",
+            "Que ainda azula o horizonte,",
+            "Onde o nosso amor nasceu;",
+            "Do rancho que tinha ao lado",
+            "Um coqueiro que, coitado,",
+            "De saudade já morreu.",
+            "Venho do verde mais belo,",
+            "Do mais dourado amarelo,",
+            "Do azul mais cheio de luz,",
+            "Cheio de estrelas prateadas",
+            "Que se ajoelham deslumbradas,",
+            "Fazendo o sinal da Cruz!",
+            "(ESTRIBILHO)"
+          ]
+        }
+      ],
+      "totalVersos": 64,
+      "origem": "Manual do Aluno do CFAP, Anexo II",
+      "audio": null
+    }
+  ]
+}

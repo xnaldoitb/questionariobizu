@@ -1,16 +1,17 @@
-const CACHE_NAME = 'questionario-bizu-v4.51.3';
+const CACHE_NAME = 'questionario-bizu-v4.52.2';
 const APP_SHELL = [
     '/',
     '/index.html',
-    '/manifest.webmanifest?v=4.51.3',
+    '/manifest.webmanifest?v=4.52.2',
     '/assets/icons/icon-192-v448.png',
     '/assets/icons/icon-512-v448.png',
     '/assets/icons/icon-maskable-512-v448.png',
-    '/assets/logo-questionario-bizu.svg?v=4.51.3',
-    '/assets/icons/questionario-bizu-icon.svg?v=4.51.3',
+    '/assets/logo-questionario-bizu.svg?v=4.52.2',
+    '/assets/icons/questionario-bizu-icon.svg?v=4.52.2',
     '/assets/icons/coroa-papirao.svg',
     '/assets/icons/colaborador-bizu.webp',
     '/app/main.js',
+    '/app/domains/hymns.js',
     '/styles/01-foundation.css',
     '/styles/02-base.css',
     '/styles/03-layout.css',
@@ -26,14 +27,17 @@ const APP_SHELL = [
     '/styles/13-visual-refinement.css',
     '/styles/14-ranking-patents.css',
     '/styles/15-progression-notifications.css',
+    '/styles/16-hymns.css',
     '/views/auth.html',
     '/views/topbar.html',
     '/views/dashboard.html',
+    '/views/hymns.html',
     '/views/quiz.html',
     '/views/result.html',
     '/views/history.html',
     '/views/ranking.html',
-    '/views/payment.html'
+    '/views/payment.html',
+    '/assets/hinos/hinos.json'
 ];
 
 self.addEventListener('install', (event) => {

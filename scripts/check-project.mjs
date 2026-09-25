@@ -5,6 +5,7 @@ const requiredFiles = [
     'public/views/auth.html',
     'public/views/topbar.html',
     'public/views/dashboard.html',
+    'public/views/hymns.html',
     'public/views/quiz.html',
     'public/views/admin.html',
     'public/views/payment.html',
@@ -13,6 +14,7 @@ const requiredFiles = [
     'public/app/foundation/badges.js',
     'public/app/foundation/pwa.js',
     'public/app/domains/study.js',
+    'public/app/domains/hymns.js',
     'public/app/domains/management.js',
     'public/app/domains/community.js',
     'public/app/domains/access.js',
@@ -41,6 +43,11 @@ const requiredFiles = [
     'public/styles/13-visual-refinement.css',
     'public/styles/14-ranking-patents.css',
     'public/styles/15-progression-notifications.css',
+    'public/styles/16-hymns.css',
+    'public/assets/hinos/hinos.json',
+    'public/assets/hinos/hino-a-fontoura.mp3',
+    'public/assets/hinos/hino-do-soldado-do-fogo.mp3',
+    'public/assets/hinos/cancao-do-cfap.mp3',
     'api/[...route].js',
     'server/platform/auth.mjs',
     'server/platform/access-validity.mjs',
@@ -560,8 +567,8 @@ for (const marker of ['conceder_xp_questao_limitado', 'for update', 'p_limite_di
 for (const marker of ['listar_suporte_conversas_v4481', 'join lateral', 'suporte_mensagens_conversa_recente_idx', 'to service_role']) {
     if (!migration4481.includes(marker)) throw new Error(`Suporte otimizado v4.48.1 incompleto: ${marker}`);
 }
-if (!index.includes('manifest.webmanifest?v=4.51.3') || !serviceWorker.includes('questionario-bizu-v4.51.3')) {
-    throw new Error('Versão e cache PWA v4.51.3 não estão sincronizados.');
+if (!index.includes('manifest.webmanifest?v=4.52.2') || !serviceWorker.includes('questionario-bizu-v4.52.2')) {
+    throw new Error('Versão e cache PWA v4.52.2 não estão sincronizados.');
 }
 if (!fragments.includes('mountAdminInterface') || !mainModule.includes("import('./domains/management.js')")) {
     throw new Error('Carregamento sob demanda do painel administrativo v4.48 incompleto.');
@@ -578,4 +585,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.51.3: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.52.2: verificações estruturais concluídas.');

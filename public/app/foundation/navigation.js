@@ -1,9 +1,10 @@
 import { one, all } from './selectors.js';
 
-const screens = ['dashboard', 'quizView', 'resultView', 'adminView'];
+const screens = ['dashboard', 'hymnsView', 'quizView', 'resultView', 'adminView'];
 
 const navigationTarget = {
     dashboard: 'navQuiz',
+    hymnsView: 'navQuiz',
     adminView: 'navAdmin'
 };
 
