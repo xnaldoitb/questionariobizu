@@ -1,6 +1,6 @@
 # Migrações do Supabase
 
-## Atualização para v4.52.3
+## Atualização para v4.52.6
 
 A sala de canto da v4.52 é totalmente local e não exige nova migração no Supabase.
 

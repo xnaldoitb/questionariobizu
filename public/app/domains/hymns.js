@@ -8,11 +8,11 @@ const STOP_WORDS = new Set([
 ]);
 
 const LEVELS = [
-    { label: 'Ler', help: 'A letra inteira, exatamente como está no material de origem.' },
-    { label: 'Clarear', help: 'Um quarto das palavras some. Revele somente quando travar.' },
-    { label: 'Apagar', help: 'Metade das palavras some para exigir mais da memória.' },
-    { label: 'Iniciais', help: 'Só a primeira letra de cada palavra permanece.' },
-    { label: 'De cabeça', help: 'Folha em branco. Cante inteiro antes de conferir.' }
+    { label: 'Nível 1', help: 'A letra inteira, exatamente como está no material de origem.' },
+    { label: 'Nível 2', help: 'Pelo menos uma palavra de cada verso some. Toque na lacuna somente quando travar.' },
+    { label: 'Nível 3', help: 'Duas ou mais palavras de cada verso somem, chegando à metade nas linhas maiores.' },
+    { label: 'Nível 4', help: 'Só a primeira letra de cada palavra permanece.' },
+    { label: 'Nível 5', help: 'Folha em branco. Cante o hino inteiro antes de conferir.' }
 ];
 
 let hymns = [];
@@ -216,24 +216,36 @@ function switchMode(mode) {
     if (mode === 'ordem') startOrderMode();
 }
 
-function shouldHide(word, sectionIndex, verseIndex, wordIndex) {
-    if (!isEligibleWord(word)) return false;
-    const score = hash(`${currentHymn.slug}:${memoryRound}:${sectionIndex}:${verseIndex}:${wordIndex}`) % 100;
-    return score < (memoryLevel === 1 ? 25 : 50);
+function hiddenIndexes(words, sectionIndex, verseIndex) {
+    if (memoryLevel < 1 || memoryLevel > 2) return new Set();
+    const eligible = words
+        .map((word, index) => ({ word, index }))
+        .filter(({ word }) => isEligibleWord(word));
+    if (!eligible.length) return new Set();
+
+    const minimum = memoryLevel === 1 ? 1 : 2;
+    const proportion = memoryLevel === 1 ? 0.25 : 0.5;
+    const amount = Math.min(eligible.length, Math.max(minimum, Math.round(eligible.length * proportion)));
+    const selected = shuffled(eligible, `${currentHymn.slug}:${memoryRound}:${sectionIndex}:${verseIndex}`).slice(0, amount);
+    return new Set(selected.map(({ index }) => index));
 }
 
-function wordMarkup(word, sectionIndex, verseIndex, wordIndex) {
+function wordMarkup(word, sectionIndex, verseIndex, wordIndex, hidden) {
     const key = `${sectionIndex}:${verseIndex}:${wordIndex}`;
-    if (revealed.has(key) || !shouldHide(word, sectionIndex, verseIndex, wordIndex)) return safeText(word);
+    if (revealed.has(key) || !hidden) return safeText(word);
     return `<button class="hymn-word-hidden" type="button" data-reveal-word="${key}" aria-label="Tocar para revelar">${safeText(word)}</button>`;
 }
 
 function verseMarkup(verse, sectionIndex, verseIndex) {
     const words = verse.split(/\s+/);
     if (memoryLevel === 3) {
-        return words.map((word) => `<span class="hymn-word-initial">${safeText(word.charAt(0))}</span>`).join('');
+        return words.map((word) => {
+            const initial = word.replace(/\p{L}[\p{L}\p{N}]*/gu, (token) => token.charAt(0));
+            return `<span class="hymn-word-initial">${safeText(initial)}</span>`;
+        }).join(' ');
     }
-    return words.map((word, wordIndex) => wordMarkup(word, sectionIndex, verseIndex, wordIndex)).join(' ');
+    const hidden = hiddenIndexes(words, sectionIndex, verseIndex);
+    return words.map((word, wordIndex) => wordMarkup(word, sectionIndex, verseIndex, wordIndex, hidden.has(wordIndex))).join(' ');
 }
 
 function lyricsSectionsMarkup() {
@@ -254,12 +266,13 @@ function renderLyricsMode() {
     workspace.innerHTML = `
         <section class="panel hymn-study-panel">
             <div class="hymn-study-head">
-                <strong>Escada da memória</strong>
+                <strong>Nível da Memória</strong>
                 <span>${memoryLevel > 0 && memoryLevel < 4 ? `${peeks} ${peeks === 1 ? 'espiada' : 'espiadas'}` : ''}</span>
             </div>
             <div class="hymn-memory-levels">
                 ${LEVELS.map((level, index) => `
-                    <button type="button" data-memory-level="${index}" class="${memoryLevel === index ? 'active' : ''}">
+                    <button type="button" data-memory-level="${index}" aria-pressed="${memoryLevel === index}"
+                        class="${memoryLevel === index ? 'active' : ''} ${memoryLevel > index ? 'is-complete' : ''}">
                         <span>${index + 1}</span><small>${safeText(level.label)}</small>
                     </button>
                 `).join('')}
@@ -330,6 +343,11 @@ function answerComplete(button) {
     const question = completeQuestions[completeIndex];
     const correct = cleanWord(button.dataset.completeAnswer) === cleanWord(question.word);
     if (correct) completeHits += 1;
+    const completedVerse = question.words.map((word, index) => index === question.wordIndex
+        ? `<span class="hymn-complete-revealed">${safeText(word)}</span>`
+        : safeText(word)).join(' ');
+    const verse = one('.hymn-complete-verse');
+    if (verse) verse.innerHTML = completedVerse;
     for (const option of document.querySelectorAll('[data-complete-answer]')) {
         const isCorrect = cleanWord(option.dataset.completeAnswer) === cleanWord(question.word);
         option.classList.toggle('correct', isCorrect);
@@ -337,10 +355,11 @@ function answerComplete(button) {
         option.disabled = true;
     }
     window.setTimeout(() => {
+        if (currentMode !== 'completar') return;
         completeIndex += 1;
         completeLocked = false;
         renderCompleteQuestion();
-    }, 700);
+    }, 1500);
 }
 
 function startOrderMode(sectionIndex = 0) {
