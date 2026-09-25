@@ -1,8 +1,8 @@
 # Migrações do Supabase
 
-## Atualização para v4.52.6
+## Atualização para v4.53
 
-A sala de canto da v4.52 é totalmente local e não exige nova migração no Supabase.
+Execute `migration-v4.53-hinos-administraveis.sql` no SQL Editor do Supabase. Depois, abra **Administração → Hinos e canções** e use **Importar 17 hinos atuais** uma única vez.
 
 ### Atualização anterior: progressão v4.51
 

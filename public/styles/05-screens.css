@@ -1391,3 +1391,34 @@ body.modal-open {
 .danger-action-critical {
     border-color: var(--danger);
 }
+.admin-hymn-editor { padding: clamp(16px, 3vw, 24px); }
+.admin-hymn-editor form { display: grid; gap: 16px; }
+.admin-hymn-lyrics { min-height: 280px; resize: vertical; font: 500 14px/1.65 var(--type-body); }
+.admin-hymn-audio-grid { align-items: end; }
+.admin-hymn-audio-preview {
+    display: flex; align-items: center; gap: 12px; padding: 12px;
+    background: var(--canvas-soft); border: 1px solid var(--line); border-radius: 9px;
+}
+.admin-hymn-audio-preview.hidden { display: none; }
+.admin-hymn-audio-preview audio { width: min(100%, 540px); height: 42px; }
+.admin-hymn-search { width: min(100%, 420px); margin-bottom: 12px; }
+.admin-hymn-list { display: grid; gap: 8px; }
+.admin-hymn-row {
+    display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center;
+    gap: 12px; padding: 12px; background: var(--panel-surface); border: 1px solid var(--line); border-radius: 9px;
+}
+.admin-hymn-row.is-inactive { opacity: .66; }
+.admin-hymn-note {
+    display: grid; width: 38px; height: 38px; place-items: center; color: var(--text-on-primary);
+    background: var(--navy-strong); border-radius: 8px; font-size: 19px;
+}
+.admin-hymn-row-copy { display: grid; min-width: 0; gap: 3px; }
+.admin-hymn-row-copy strong { color: var(--text-main); font: 700 13px var(--type-heading); }
+.admin-hymn-row-copy small, .admin-hymn-row-copy span { color: var(--text-muted); font-size: 10px; }
+
+@media (max-width: 700px) {
+    .admin-hymn-row { grid-template-columns: 34px minmax(0, 1fr); }
+    .admin-hymn-row .data-actions { grid-column: 1 / -1; }
+    .admin-hymn-audio-preview { align-items: stretch; flex-direction: column; }
+    .admin-hymn-lyrics { min-height: 230px; }
+}

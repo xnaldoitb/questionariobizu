@@ -626,3 +626,22 @@ begin
 end; $$;
 create trigger usuarios_bonus_plano_xp_insert after insert on public.usuarios for each row execute function public.sincronizar_bonus_plano_xp();
 create trigger usuarios_bonus_plano_xp_update after update of vip,premium,plano_atual,perfil on public.usuarios for each row execute function public.sincronizar_bonus_plano_xp();
+-- Acervo administrável de hinos e canções.
+create table if not exists public.hinos (
+  slug text primary key,
+  titulo text not null,
+  autoria text,
+  origem text,
+  secoes jsonb not null default '[]'::jsonb,
+  audio text,
+  ordem integer not null default 0,
+  ativo boolean not null default true,
+  criado_em timestamptz not null default now(),
+  atualizado_em timestamptz not null default now(),
+  constraint hinos_slug_formato check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
+  constraint hinos_secoes_array check (jsonb_typeof(secoes) = 'array')
+);
+create index if not exists hinos_ativo_ordem_idx on public.hinos (ativo, ordem, titulo);
+alter table public.hinos enable row level security;
+revoke all on public.hinos from public, anon, authenticated;
+grant select, insert, update, delete on public.hinos to service_role;

@@ -12,6 +12,7 @@
         <button class="ui-button quiet-action admin-tab" data-admin="usersPanel" type="button">Usuários</button>
         <button class="ui-button quiet-action admin-tab" data-admin="paymentsPanel" type="button">Planos e pagamentos</button>
         <button class="ui-button quiet-action admin-tab supreme-only" data-admin="contentPanel" type="button">Conteúdo</button>
+        <button class="ui-button quiet-action admin-tab supreme-only" data-admin="hymnsPanel" type="button">Hinos e canções</button>
         <button class="ui-button quiet-action admin-tab supreme-only" data-admin="questionsPanel" type="button">Questões</button>
         <button class="ui-button quiet-action admin-tab supreme-only" data-admin="transferPanel" type="button">Importar / Exportar</button>
         <button class="ui-button quiet-action admin-tab supreme-only danger-tab" data-admin="maintenancePanel" type="button">Manutenção</button>
@@ -57,6 +58,7 @@
                 <button class="ui-button main-action" data-admin-jump="usersPanel" type="button">Gerenciar usuários</button>
                 <button class="ui-button quiet-action" data-admin-jump="paymentsPanel" type="button">Planos e pagamentos</button>
                 <button class="ui-button quiet-action supreme-only" data-admin-jump="questionsPanel" type="button">Banco de questões</button>
+                <button class="ui-button quiet-action supreme-only" data-admin-jump="hymnsPanel" type="button">Hinos e canções</button>
                 <button class="ui-button quiet-action supreme-only" data-admin-jump="transferPanel" type="button">Importar / Exportar</button>
             </div>
         </div>
@@ -233,6 +235,55 @@
                 <button class="ui-button quiet-action" id="refreshCatalogAdmin" type="button">Atualizar</button>
             </div>
             <div id="catalogAdminList"></div>
+        </div>
+    </section>
+
+    <section class="admin-panel hidden" id="hymnsPanel">
+        <div class="panel admin-hymn-editor">
+            <div class="panel-head">
+                <div>
+                    <h3 id="adminHymnFormTitle">Adicionar nova canção</h3>
+                    <p class="muted">Cadastre a letra por partes, defina a ordem e envie um áudio de até 20 MB.</p>
+                </div>
+                <button class="ui-button quiet-action" id="adminHymnClear" type="button">Nova canção</button>
+            </div>
+            <form id="adminHymnForm">
+                <input id="adminHymnOriginalSlug" type="hidden"/>
+                <div class="admin-form-grid">
+                    <label>Título<input id="adminHymnTitle" maxlength="160" required/></label>
+                    <label>Identificador<input id="adminHymnSlug" maxlength="90" placeholder="gerado pelo título"/></label>
+                    <label>Autoria<input id="adminHymnAuthor" maxlength="200" placeholder="Opcional"/></label>
+                    <label>Origem<input id="adminHymnOrigin" maxlength="240" placeholder="Opcional"/></label>
+                    <label>Ordem<input id="adminHymnOrder" type="number" value="0"/></label>
+                    <label class="admin-vip-toggle"><input id="adminHymnActive" type="checkbox" checked/><span><strong>Canção ativa</strong><small>Disponível para os alunos.</small></span></label>
+                </div>
+                <label>Letra da canção
+                    <textarea class="admin-hymn-lyrics" id="adminHymnLyrics" required placeholder="[1]&#10;Primeiro verso&#10;Segundo verso&#10;&#10;[Coro]&#10;Primeiro verso do coro"></textarea>
+                    <small class="field-help">Use uma linha para cada verso. Separe as partes com uma linha vazia e identifique-as como [1], [2] ou [Coro].</small>
+                </label>
+                <div class="admin-form-grid admin-hymn-audio-grid">
+                    <label>Enviar áudio<input id="adminHymnAudioFile" type="file" accept="audio/mpeg,audio/mp3,audio/mp4,audio/ogg,audio/wav"/></label>
+                    <label>Ou informar endereço do áudio<input id="adminHymnAudioUrl" type="url" placeholder="https://..."/></label>
+                </div>
+                <div class="admin-hymn-audio-preview hidden" id="adminHymnAudioPreview"><audio id="adminHymnAudioPlayer" controls preload="metadata"></audio><button class="ui-button quiet-action mini danger" id="adminHymnRemoveAudio" type="button">Remover áudio</button></div>
+                <div class="admin-form-submit">
+                    <button class="ui-button main-action" id="adminHymnSave" type="submit">Salvar canção</button>
+                    <span class="muted" id="adminHymnStatus" role="status"></span>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel wide admin-list-panel">
+            <div class="panel-head">
+                <div><h3>Acervo de hinos e canções</h3><p class="muted">Edite, ative, desative ou exclua itens do acervo.</p></div>
+                <div class="data-actions">
+                    <button class="ui-button quiet-action" id="adminHymnImportDefaults" type="button">Importar 17 hinos atuais</button>
+                    <button class="ui-button quiet-action" id="adminHymnRefresh" type="button">Atualizar</button>
+                </div>
+            </div>
+            <label class="admin-filter-field admin-hymn-search">Pesquisar<input id="adminHymnSearch" type="search" placeholder="Título ou autoria" autocomplete="off"/></label>
+            <div class="admin-list-meta" id="adminHymnMeta">Carregando acervo…</div>
+            <div class="admin-hymn-list" id="adminHymnList"></div>
         </div>
     </section>
 

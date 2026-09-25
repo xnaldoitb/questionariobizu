@@ -94,9 +94,16 @@ function sectionLabel(section, index) {
 
 async function loadHymns() {
     if (hymns.length) return hymns;
-    const response = await fetch('/assets/hinos/hinos.json', { cache: 'no-store' });
-    if (!response.ok) throw new Error('Não foi possível carregar os hinos.');
-    const payload = await response.json();
+    let payload;
+    try {
+        const managed = await fetch('/api/hinos', { credentials: 'include', cache: 'no-store' });
+        if (managed.ok) payload = await managed.json();
+    } catch {}
+    if (!Array.isArray(payload?.hinos) || !payload.hinos.length) {
+        const response = await fetch('/assets/hinos/hinos.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Não foi possível carregar os hinos.');
+        payload = await response.json();
+    }
     hymns = Array.isArray(payload.hinos) ? payload.hinos : [];
     return hymns;
 }
@@ -108,6 +115,7 @@ function searchable(value) {
 function renderSelector() {
     const options = one('#hymnOptions');
     if (!options) return;
+    if (!currentHymn) one('#hymnSelectionMeta').textContent = `${hymns.length} hinos e canções disponíveis`;
     options.innerHTML = hymns.map((hymn) => {
         const sections = hymn.secoes.length > 1 ? ` · ${hymn.secoes.length} partes` : '';
         return `
@@ -475,6 +483,12 @@ export async function openHymns() {
 }
 
 export function bindHymnEvents() {
+    document.addEventListener('hymns:changed', () => {
+        hymns = [];
+        currentHymn = null;
+        one('#hymnSelectionSummary').textContent = 'Selecionar hino';
+        one('#hymnSelectionMeta').textContent = 'Acervo atualizado';
+    });
     one('#hymnPicker')?.addEventListener('click', openSelector);
     one('#hymnModalClose')?.addEventListener('click', closeSelector);
     one('#hymnOptions')?.addEventListener('click', (event) => {
