@@ -120,26 +120,28 @@
     </div>
 
     <section class="hymns-dashboard-section" aria-labelledby="hymnsDashboardTitle">
-        <div class="hymns-dashboard-heading">
+        <div class="study-intro compact-study-intro hymns-study-intro">
             <div>
                 <p class="section-kicker"><span class="kicker-mark"></span> sala de canto</p>
-                <h2 id="hymnsDashboardTitle">Hinos e canções</h2>
-                <p>Escolha um hino para abrir a letra, o áudio disponível e os treinos de memorização.</p>
+                <p id="hymnsDashboardTitle">Escolha um hino para estudar a letra, ouvir o áudio disponível e treinar a memorização.</p>
             </div>
-            <span class="hymns-dashboard-count">17 hinos</span>
         </div>
-        <div class="hymn-filter">
-            <span id="hymnFilterLabel">Hino</span>
-            <button id="hymnPicker" class="study-filter-trigger" type="button"
-                aria-labelledby="hymnFilterLabel hymnSelectionSummary"
-                aria-haspopup="dialog" aria-controls="hymnModal">
-                <span class="study-filter-icon hymn-picker-icon" aria-hidden="true">♫</span>
-                <span class="study-filter-copy">
-                    <strong id="hymnSelectionSummary">Selecionar hino</strong>
-                    <small id="hymnSelectionMeta">17 hinos e canções disponíveis</small>
-                </span>
-                <span class="study-filter-arrow" aria-hidden="true">›</span>
-            </button>
+        <div class="panel study-panel hymns-study-panel">
+            <div class="filters-grid hymn-filters-grid">
+                <div class="discipline-filter hymn-filter">
+                    <span id="hymnFilterLabel">Hino</span>
+                    <button id="hymnPicker" class="study-filter-trigger" type="button"
+                        aria-labelledby="hymnFilterLabel hymnSelectionSummary"
+                        aria-haspopup="dialog" aria-controls="hymnModal">
+                        <span class="study-filter-icon hymn-picker-icon" aria-hidden="true">♫</span>
+                        <span class="study-filter-copy">
+                            <strong id="hymnSelectionSummary">Selecionar hino</strong>
+                            <small id="hymnSelectionMeta">17 hinos e canções disponíveis</small>
+                        </span>
+                        <span class="study-filter-arrow" aria-hidden="true">›</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
 

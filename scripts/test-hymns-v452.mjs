@@ -19,6 +19,7 @@ assert(module.includes('Escada da memória') && module.includes('recordeCompleta
 assert(navigation.includes("'hymnsView'") && fragments.includes("'hymns.html'"));
 assert(!topbar.includes('id="navHymns"'), 'Hinos não deve aparecer no menu principal.');
 assert(dashboard.includes('id="hymnPicker"') && dashboard.includes('id="hymnModal"') && dashboard.includes('id="hymnOptions"'), 'A Sala de Canto deve ter seletor e janela abaixo das disciplinas.');
+assert(dashboard.includes('panel study-panel hymns-study-panel') && dashboard.includes('discipline-filter hymn-filter'), 'A Sala de Canto deve repetir o padrão visual da seleção de disciplinas.');
 assert(!dashboard.includes('id="openHymnsBtn"'), 'O antigo cartão de acesso não deve permanecer.');
 assert(module.includes('function renderSelector()') && module.includes("openScreen('dashboard')"), 'O seletor de hinos deve abrir no painel.');
 assert(worker.includes('/assets/hinos/hinos.json') && worker.includes('/styles/16-hymns.css'));
@@ -28,4 +29,4 @@ for (const hino of data.hinos.filter((item) => item.audio)) {
     assert(info.size > 100_000, `Áudio inválido: ${hino.audio}`);
 }
 
-console.log('Sala de canto v4.52.2: 17 hinos, treinos e áudios verificados.');
+console.log('Sala de canto v4.52.3: 17 hinos, treinos e áudios verificados.');

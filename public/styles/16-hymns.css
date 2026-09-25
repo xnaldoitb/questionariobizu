@@ -10,52 +10,16 @@
 
 .hymns-dashboard-section {
     display: grid;
-    gap: 13px;
-    margin-top: 22px;
-    padding-top: 22px;
-    border-top: 1px solid var(--line);
+    gap: 0;
+    margin-top: 24px;
 }
 
-.hymns-dashboard-heading {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 18px;
-}
-
-.hymns-dashboard-heading h2 {
-    margin: 4px 0 5px;
-    color: var(--text-main);
-    font: 750 20px var(--type-heading);
-}
-
-.hymns-dashboard-heading p:last-child {
-    max-width: 650px;
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 13px;
-    line-height: 1.55;
-}
-
-.hymns-dashboard-count {
-    flex: 0 0 auto;
-    padding: 6px 9px;
-    color: var(--text-accent);
-    background: var(--canvas-soft);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    font: 600 10px var(--type-mono);
-    text-transform: uppercase;
-}
+.hymns-study-intro { margin-top: 0; }
+.hymns-study-panel { margin-top: 0; }
+.hymn-filters-grid { grid-template-columns: minmax(0, 1fr); }
 
 .hymn-filter {
-    display: grid;
-    gap: 7px;
-    width: min(100%, 520px);
-    color: var(--text-muted);
-    font: 600 11.5px var(--type-ui);
-    letter-spacing: .03em;
-    text-transform: uppercase;
+    width: 100%;
 }
 
 .hymn-picker-icon,
