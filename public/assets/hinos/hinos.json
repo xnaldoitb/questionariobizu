@@ -65,13 +65,7 @@
             "Contra as chamas em lutas ingentes",
             "Sob o nobre alvirrubro pendão",
             "Dos soldados do fogo valentes",
-            "É, na paz, a sagrada missão"
-          ]
-        },
-        {
-          "tipo": "estrofe",
-          "rotulo": null,
-          "versos": [
+            "É, na paz, a sagrada missão",
             "E se um dia houver sangue em batalha",
             "Desfraldando a auriverde bandeira",
             "Nossos peitos são férrea muralha",
@@ -79,7 +73,7 @@
           ]
         },
         {
-          "tipo": "coro",
+          "tipo": "estribilho",
           "rotulo": "Estribilho",
           "versos": [
             "Missão dupla o dever nos aponta",
@@ -95,13 +89,7 @@
             "Aurifulvo clarão gigantesco",
             "Labaredas flamejam no ar",
             "Num incêndio horroroso, dantesco",
-            "A cidade parece queimar"
-          ]
-        },
-        {
-          "tipo": "estrofe",
-          "rotulo": null,
-          "versos": [
+            "A cidade parece queimar",
             "Mas não temem da morte os Bombeiros",
             "Quando ecoa d'alarme o sinal",
             "Ordenando voarem ligeiros",
@@ -109,7 +97,7 @@
           ]
         },
         {
-          "tipo": "coro",
+          "tipo": "estribilho",
           "rotulo": "Estribilho",
           "versos": [
             "Missão dupla o dever nos aponta",
@@ -125,13 +113,7 @@
             "Rija luta aos heróis aviventa",
             "Inflamando em seu peito o valor",
             "Para frente que importa a tormenta",
-            "Dura marcha de sóis ou rigor?"
-          ]
-        },
-        {
-          "tipo": "estrofe",
-          "rotulo": null,
-          "versos": [
+            "Dura marcha de sóis ou rigor?",
             "Nem um passo daremos atrás",
             "Repelindo inimigos canhões",
             "Voluntários da morte na paz",
@@ -139,7 +121,7 @@
           ]
         },
         {
-          "tipo": "coro",
+          "tipo": "estribilho",
           "rotulo": "Estribilho",
           "versos": [
             "Missão dupla o dever nos aponta",
@@ -157,16 +139,28 @@
       "autoria": "Letra: Maj. BM José Ribamar Matos · Música: Cap PM R/R Belarmino · Arranjo: Sgt Pantoja",
       "secoes": [
         {
-          "tipo": "estrofe",
-          "rotulo": null,
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
           "versos": [
             "O CFAP é a escola sã em seu papel",
             "Sua missão é preparar o bom policial",
             "Ser camarada, ser altivo e leal a lutar",
-            "Pela paz ser constante e fiel",
+            "Pela paz ser constante e fiel"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "I",
+          "versos": [
             "Para o bem do Brasil o CFAP cumprirá",
             "A missão de servir e o dever de ensinar",
-            "E defenderá nesse rincão o nosso Brasil e o Pará",
+            "E defenderá nesse rincão o nosso Brasil e o Pará"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "O CFAP é a escola sã em seu papel",
             "Sua missão é preparar o bom policial",
             "Ser camarada, ser altivo e leal a lutar",
@@ -185,7 +179,7 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Altaneira Polícia Militar",
             "Cobre de louro o teu nome tradicional",
@@ -214,8 +208,8 @@
       "autoria": "Letra: Joaquim Osório Duque Estrada · Música: Francisco Manoel da Silva",
       "secoes": [
         {
-          "tipo": "estrofe",
-          "rotulo": null,
+          "tipo": "parte",
+          "rotulo": "Parte I",
           "versos": [
             "Ouviram do Ipiranga às margens plácidas",
             "De um povo heroico o brado retumbante,",
@@ -241,7 +235,13 @@
             "Ó Pátria amada!",
             "Dos filhos deste Solo és mãe gentil,",
             "Pátria amada,",
-            "Brasil",
+            "Brasil"
+          ]
+        },
+        {
+          "tipo": "parte",
+          "rotulo": "Parte II",
+          "versos": [
             "Deitado eternamente em berço esplêndido,",
             "Ao som do mar e à luz do céu profundo,",
             "Fulguras, ó Brasil, florão da América,",
@@ -281,7 +281,7 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Nós somos da Pátria a guarda",
             "Fieis soldados,",
@@ -294,12 +294,24 @@
             "Que um povo alcança",
             "No peito em que ela impera",
             "Rebrilha a glória,",
-            "Fulge a vitória.",
+            "Fulge a vitória."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "A paz queremos com fervor,",
             "A guerra só nos causa dor,",
             "Porem, se a Pátria amada",
             "For um dia ultrajada,",
-            "Lutaremos com fervor (bis)",
+            "Lutaremos com fervor (bis)"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
             "Come é sublime,",
             "Saber amar",
             "Com a alma adorar,",
@@ -319,7 +331,13 @@
             "De amor filial.",
             "E a ti, Pátria, salvaremos!",
             "Rebrilha a glória,",
-            "Fulge a vitória.",
+            "Fulge a vitória."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "A paz queremos com fervor,",
             "A guerra só nos causa dor,",
             "Porem, se a Pátria amada",
@@ -339,7 +357,7 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Se a Pátria querida",
             "For envolvida pelo perigo",
@@ -349,7 +367,13 @@
             "Se for preciso enfrento a morte",
             "Afronta se lavra",
             "Com fibra de herói",
-            "De gente brava",
+            "De gente brava"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Bandeira do Brasil",
             "Ninguém te manchará",
             "Teu povo varonil",
@@ -371,7 +395,7 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Avante com bravura a vencer",
             "O nosso lema “é servir e proteger”",
@@ -380,7 +404,13 @@
             "A comunidade, sempre assistida",
             "Mesmo com o risco da própria vida",
             "No combate do dia a dia",
-            "Vencendo com maestria",
+            "Vencendo com maestria"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Valorosa Polícia de Fontoura",
             "Nosso brado daremos com bravura",
             "20º Batalhão!",
@@ -399,9 +429,8 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
-            "Nascimento",
             "Vamos filhos altivos dos ares",
             "Nosso vôo ousado alçar,",
             "Sobre campos cidades e mares,",
@@ -413,7 +442,7 @@
           ]
         },
         {
-          "tipo": "coro",
+          "tipo": "estribilho",
           "rotulo": "Estribilho",
           "versos": [
             "Contato! Companheiros!",
@@ -423,7 +452,13 @@
             "Contato! Companheiros!",
             "Ao vento, sobranceiros,",
             "Lancemos o roncar",
-            "Da hélice a girar",
+            "Da hélice a girar"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
             "Mas se explode o corisco no espaço",
             "Com a metralha, na guerra, a rugir",
             "Cavaleiros do século do aço",
@@ -431,8 +466,21 @@
             "Não importa a tocaia da morte",
             "Pois que a Pátria, dos céus no altar",
             "Sempre erguemos de ânimo forte",
-            "O holocausto da vida, a voar",
-            "Estribilho (…)"
+            "O holocausto da vida, a voar"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Contato! Companheiros!",
+            "Ao vento, sobranceiros,",
+            "Lancemos o roncar",
+            "Da hélice a girar.",
+            "Contato! Companheiros!",
+            "Ao vento, sobranceiros,",
+            "Lancemos o roncar",
+            "Da hélice a girar"
           ]
         }
       ],
@@ -460,7 +508,7 @@
           ]
         },
         {
-          "tipo": "coro",
+          "tipo": "estribilho",
           "rotulo": "Estribilho",
           "versos": [
             "No combate feroz saberemos bem honrar",
@@ -494,26 +542,44 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Salve ó terra de ricas florestas,",
             "Fecundadas ao sol do Equador,",
             "Teu destino é viver entre festas,",
             "Do progresso, da paz e do amor,",
             "Salve ó terra de ricas florestas,",
-            "Fecundadas ao sol do Equador,",
+            "Fecundadas ao sol do Equador,"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "O Pará quanto orgulho ser filho,",
             "De um colosso tão belo e tão forte,",
             "Juncaremos de flores seu trilho,",
             "Do Brasil sentinela do Norte,",
             "E a deixar de manter esse brilho,",
-            "Preferimos mil vezes a morte.",
+            "Preferimos mil vezes a morte."
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
             "Salve ó terra de rios gigantes,",
             "D’Amazônia princesa louçã,",
             "Tudo em ti são encantos vibrantes,",
             "Desde a indústria à rudeza pagã,",
             "Salve ó terra de rios gigantes,",
-            "Da Amazônia princesa louçã.",
+            "Da Amazônia princesa louçã."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "O Pará quanto orgulho ser filho,",
             "De um colosso tão belo e tão forte,",
             "Juncaremos de flores seu trilho,",
@@ -534,30 +600,78 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Salve! Lindo Pendão da esperança",
             "Salve! Símbolo augusto da Paz",
             "Tua nobre presença à lembrança",
-            "A grandeza da Pátria, nos traz!",
+            "A grandeza da Pátria, nos traz!"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Recebe o afeto que se encerra",
             "Em nosso peito varonil",
             "Querido símbolo da terra,",
-            "Da amada terra do Brasil!",
+            "Da amada terra do Brasil!"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
             "Em teu seio formoso, retratas",
             "Este céu de puríssimo azul,",
             "A verdura sem par destas matas",
-            "E o esplendor do cruzeiro do sul",
-            "Recebe o .........",
+            "E o esplendor do cruzeiro do sul"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Recebe o afeto que se encerra",
+            "Em nosso peito varonil",
+            "Querido símbolo da terra,",
+            "Da amada terra do Brasil!"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "III",
+          "versos": [
             "Contemplando o teu vulto sagrado,",
             "Compreendemos o nosso dever!",
             "E o Brasil por seus filhos amados",
-            "Poderoso e feliz há de ser!",
-            "Recebe o ............",
+            "Poderoso e feliz há de ser!"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Recebe o afeto que se encerra",
+            "Em nosso peito varonil",
+            "Querido símbolo da terra,",
+            "Da amada terra do Brasil!"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "IV",
+          "versos": [
             "Sobre a imensa Nação Brasileira,",
             "Nos momentos de festa e de dor,",
             "Paira sempre, a sagrada Bandeira,",
-            "Pavilhão da Justiça e do amor.",
+            "Pavilhão da Justiça e do amor."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Recebe o afeto que se encerra",
             "Em nosso peito varonil,",
             "Querido símbolo da terra,",
@@ -576,7 +690,7 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Qual cisne branco que, em noite de lua,",
             "Vai deslizando num lago azul,",
@@ -585,7 +699,13 @@
             "Linda galera que, em noite apagada,",
             "Vai navegando num mar imenso,",
             "Nos traz saudades da terra amada",
-            "Da Pátria minha em que tanto penso.",
+            "Da Pátria minha em que tanto penso."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Qual linda garça",
             "Que aí vai cruzando os ares,",
             "Vai navegando",
@@ -593,7 +713,13 @@
             "Minha galera",
             "Também vai cruzando os mares;",
             "Os verdes mares,",
-            "Os mares verdes do Brasil!",
+            "Os mares verdes do Brasil!"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
             "Quanta alegria nos traz a volta",
             "À nossa Pátria do coração,",
             "Dada por finda nossa derrota,",
@@ -612,30 +738,72 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Arma ligeira que transpõe os montes,",
             "Caudais profundos, com ardor e glória,",
             "Estrela guia em negros horizontes,",
-            "Pelo caminho da luta e da vitória.",
+            "Pelo caminho da luta e da vitória."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Cavalaria, Cavalaria,",
-            "Tu és na guerra a nossa estrela guia.",
+            "Tu és na guerra a nossa estrela guia."
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
             "Arma de tradição que o peito embala,",
             "Cuja história é de luz e de fulgor,",
             "Pelo choque, na carga, ela avassala,",
-            "E, ao inimigo, impõe o seu valor.",
+            "E, ao inimigo, impõe o seu valor."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Cavalaria, Cavalaria,",
-            "Tu és na guerra a nossa estrela guia.",
+            "Tu és na guerra a nossa estrela guia."
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "III",
+          "versos": [
             "Montado sobre o dorso deste amigo:",
             "O cavalo que, altivo, nos conduz,",
             "Levamo-lo, também, para o perigo,",
-            "Para lutar conosco sob a cruz.",
+            "Para lutar conosco sob a cruz."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Cavalaria, Cavalaria,",
-            "Tu és na guerra a nossa estrela guia.",
+            "Tu és na guerra a nossa estrela guia."
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "IV",
+          "versos": [
             "De Andrade Neves o Osório, legendário,",
             "E outros heróis que honram a nossa história,",
             "Evocamos o valor extraordinário",
-            "Pelo Brasil a nossa maior glória!",
+            "Pelo Brasil a nossa maior glória!"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Cavalaria, Cavalaria,",
             "Tu és na guerra a nossa estrela guia."
           ]
@@ -652,7 +820,7 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Nós somos estes infantes",
             "Cujos peitos amantes",
@@ -665,7 +833,13 @@
             "Mostremos,",
             "Que em nossa Pátria temos,",
             "Valor imenso",
-            "No intenso da luta",
+            "No intenso da luta"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "És a nobre infantaria, Das armas da rainha,",
             "Por ti daria. A vida minha",
             "E a glória prometida,",
@@ -678,7 +852,13 @@
             "Marca a nossa alegria,",
             "Eu cantarei",
             "Eu gritarei!",
-            "És a nobre Infantaria!",
+            "És a nobre Infantaria!"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
             "Brasil, te darei com amor,",
             "Toda a seiva e vigor",
             "Que em meu peito se encerra,",
@@ -705,32 +885,80 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Dia e noite numa eterna vigilância, o BPCHOQUE estará",
             "Sob o manto da justiça com firmeza e prontidão",
-            "Dando a comunidade segurança e proteção",
+            "Dando a comunidade segurança e proteção"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Sou do Batalhão de Choque!",
             "Batalhão que nada teme",
             "Sou um povo usando farda no tumulto",
-            "Ou na guarda protegendo nosso chão!",
+            "Ou na guarda protegendo nosso chão!"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
             "Nossa farda é tão sagrada que aceitamos sem temer",
             "Até mesmo sacrifício de lutar até morrer",
-            "Pois acima de nós todos estará nosso dever!",
+            "Pois acima de nós todos estará nosso dever!"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Sou do Batalhão de Choque!",
             "Batalhão que nada teme",
             "Sou um povo usando farda no tumulto",
-            "Ou na guarda protegendo nosso chão!",
+            "Ou na guarda protegendo nosso chão!"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "III",
+          "versos": [
             "Na constância do ideal de cumprir qualquer missão",
             "Sempre pronto pra lutar,",
-            "Pois sou bravo choqueano da Polícia Militar!",
+            "Pois sou bravo choqueano da Polícia Militar!"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Sou do Batalhão de Choque!",
-            "(...)",
+            "Batalhão que nada teme",
+            "Sou um povo usando farda no tumulto",
+            "Ou na guarda protegendo nosso chão!"
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "IV",
+          "versos": [
             "E o Pará nas armas confiança",
             "Tua história brilhando seduz",
             "Que escrevestes com letras douradas",
             "Rumo certo com fé te conduz",
             "O futuro sacrossanto das jornadas"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Sou do Batalhão de Choque!",
+            "Batalhão que nada teme",
+            "Sou um povo usando farda no tumulto",
+            "Ou na guarda protegendo nosso chão!"
           ]
         }
       ],
@@ -745,7 +973,7 @@
       "secoes": [
         {
           "tipo": "estrofe",
-          "rotulo": null,
+          "rotulo": "I",
           "versos": [
             "Você sabe de onde eu venho?",
             "Venho do morro do engenho,",
@@ -758,8 +986,13 @@
             "Do pampa, do seringal,",
             "Das margens crespas dos rios",
             "Dos verdes mares bravios",
-            "Da minha terra natal.",
-            "(ESTRIBILHO)",
+            "Da minha terra natal."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
             "Por mais terra que eu percorra",
             "Não permita Deus que eu morra,",
             "Sem que volte para lá.",
@@ -771,7 +1004,13 @@
             "A ração do meu bornal,",
             "A água do meu cantil,",
             "As asas do meu ideal,",
-            "A glória do meu Brasil.",
+            "A glória do meu Brasil."
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "II",
+          "versos": [
             "Eu venho da minha terra,",
             "Da casa branca da serra",
             "E do luar do meu sertão;",
@@ -783,8 +1022,31 @@
             "Estendidos para mim.",
             "Ó minha terra querida",
             "Da Senhora Aparecida",
-            "E do Senhor do Bonfim!",
-            "(ESTRIBILHO)",
+            "E do Senhor do Bonfim!"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Por mais terra que eu percorra",
+            "Não permita Deus que eu morra,",
+            "Sem que volte para lá.",
+            "Sem que leve por divisa",
+            "Esse V que simboliza",
+            "A vitória que virá:",
+            "Nossa vitória final,",
+            "Que é a mira do meu fuzil,",
+            "A ração do meu bornal,",
+            "A água do meu cantil,",
+            "As asas do meu ideal,",
+            "A glória do meu Brasil."
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "III",
+          "versos": [
             "Você sabe de onde eu venho ?",
             "E de uma Pátria que eu tenho",
             "No bôjo do meu violão;",
@@ -796,8 +1058,31 @@
             "Meu pé de jacaranda,",
             "Minha casa pequenina",
             "Lá no alto da colina,",
-            "Onde canta o sabiá.",
-            "(ESTRIBILHO)",
+            "Onde canta o sabiá."
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Por mais terra que eu percorra",
+            "Não permita Deus que eu morra,",
+            "Sem que volte para lá.",
+            "Sem que leve por divisa",
+            "Esse V que simboliza",
+            "A vitória que virá:",
+            "Nossa vitória final,",
+            "Que é a mira do meu fuzil,",
+            "A ração do meu bornal,",
+            "A água do meu cantil,",
+            "As asas do meu ideal,",
+            "A glória do meu Brasil."
+          ]
+        },
+        {
+          "tipo": "estrofe",
+          "rotulo": "IV",
+          "versos": [
             "Venho do além desse monte",
             "Que ainda azula o horizonte,",
             "Onde o nosso amor nasceu;",
@@ -809,8 +1094,25 @@
             "Do azul mais cheio de luz,",
             "Cheio de estrelas prateadas",
             "Que se ajoelham deslumbradas,",
-            "Fazendo o sinal da Cruz!",
-            "(ESTRIBILHO)"
+            "Fazendo o sinal da Cruz!"
+          ]
+        },
+        {
+          "tipo": "estribilho",
+          "rotulo": "Estribilho",
+          "versos": [
+            "Por mais terra que eu percorra",
+            "Não permita Deus que eu morra,",
+            "Sem que volte para lá.",
+            "Sem que leve por divisa",
+            "Esse V que simboliza",
+            "A vitória que virá:",
+            "Nossa vitória final,",
+            "Que é a mira do meu fuzil,",
+            "A ração do meu bornal,",
+            "A água do meu cantil,",
+            "As asas do meu ideal,",
+            "A glória do meu Brasil."
           ]
         }
       ],

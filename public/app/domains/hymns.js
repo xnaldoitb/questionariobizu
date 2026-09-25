@@ -88,6 +88,8 @@ function totalVerses(hymn) {
 
 function sectionLabel(section, index) {
     if (section.tipo === 'coro') return section.rotulo || 'Coro';
+    if (section.tipo === 'estribilho') return section.rotulo || 'Estribilho';
+    if (section.tipo === 'parte') return section.rotulo || `Parte ${index + 1}`;
     if (section.rotulo) return `Estrofe ${section.rotulo}`;
     return `Parte ${index + 1}`;
 }
@@ -380,21 +382,30 @@ function startOrderMode(sectionIndex = 0) {
 
 function renderOrderMode(message = '') {
     const workspace = one('#hymnWorkspace');
+    const currentSection = currentHymn.secoes[orderSection];
     workspace.innerHTML = `
-        <section class="panel hymn-study-panel">
+        <section class="panel hymn-study-panel hymn-order-panel">
             <div class="hymn-exercise-head"><strong>Coloque os versos em ordem</strong><span>${orderPicked.length}/${currentHymn.secoes[orderSection].versos.length}</span></div>
-            <div class="hymn-section-tabs">
+            <div class="hymn-section-tabs" role="tablist" aria-label="Partes da canção">
                 ${currentHymn.secoes.map((section, index) => `<button type="button" data-order-section="${index}" class="${orderSection === index ? 'active' : ''}">${safeText(sectionLabel(section, index))}</button>`).join('')}
             </div>
-            <p class="hymn-level-help">Toque nos versos na ordem em que aparecem no hino.</p>
+            <p class="hymn-level-help">Organizando: <strong>${safeText(sectionLabel(currentSection, orderSection))}</strong>. Toque nos versos na ordem correta.</p>
             ${message ? `<p class="${message === 'Certo!' ? 'success-text' : 'error-text'}">${safeText(message)}</p>` : ''}
-            <div class="hymn-order-picked">
-                ${orderPicked.length ? orderPicked.map((item, index) => `<span>${index + 1}. ${safeText(item.verse)}</span>`).join('') : '<span>Nenhum verso escolhido ainda.</span>'}
+            <div class="hymn-order-workspace">
+                <section class="hymn-order-column hymn-order-answer" aria-label="Versos já ordenados">
+                    <div class="hymn-order-column-title"><strong>Ordem montada</strong><span>${orderPicked.length} de ${currentSection.versos.length}</span></div>
+                    <div class="hymn-order-picked">
+                        ${orderPicked.length ? orderPicked.map((item, index) => `<span><b>${index + 1}</b>${safeText(item.verse)}</span>`).join('') : '<span class="hymn-order-empty">Nenhum verso escolhido ainda.</span>'}
+                    </div>
+                </section>
+                <section class="hymn-order-column" aria-label="Versos disponíveis">
+                    <div class="hymn-order-column-title"><strong>Versos disponíveis</strong><span>${orderRemaining.length} restantes</span></div>
+                    <div class="hymn-order-list">
+                        ${orderRemaining.map((item) => `<button class="hymn-order-line" type="button" data-order-index="${item.index}"><span aria-hidden="true">↕</span><strong>${safeText(item.verse)}</strong></button>`).join('')}
+                    </div>
+                </section>
             </div>
-            <div class="hymn-order-list">
-                ${orderRemaining.map((item) => `<button class="hymn-order-line" type="button" data-order-index="${item.index}">${safeText(item.verse)}</button>`).join('')}
-            </div>
-            <button class="ui-button quiet-action mini" type="button" data-order-shuffle>Embaralhar novamente</button>
+            <button class="ui-button quiet-action mini hymn-order-shuffle" type="button" data-order-shuffle>Embaralhar novamente</button>
         </section>
     `;
 }

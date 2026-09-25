@@ -20,6 +20,7 @@ assert(module.includes("label: 'Nível 1'") && module.includes("label: 'Nível 5
 assert(module.includes('hymn-complete-revealed') && module.includes('}, 1500);'), 'O exercício deve revelar a frase completa antes de avançar.');
 assert(module.includes('function hiddenIndexes') && module.includes('memoryLevel < 1'), 'O nível Ler não pode ocultar palavras.');
 assert(module.includes('Math.max(minimum') && module.includes('memoryLevel === 1 ? 1 : 2'), 'Os níveis devem garantir uma e duas lacunas por verso.');
+assert(module.includes('hymn-order-workspace') && module.includes('Versos disponíveis'), 'O modo Ordem deve usar colunas responsivas e versos acessíveis.');
 assert(navigation.includes("'hymnsView'") && fragments.includes("'hymns.html'"));
 assert(!topbar.includes('id="navHymns"'), 'Hinos não deve aparecer no menu principal.');
 assert(dashboard.includes('id="hymnPicker"') && dashboard.includes('id="hymnModal"') && dashboard.includes('id="hymnOptions"'), 'A Sala de Canto deve ter seletor e janela abaixo das disciplinas.');
@@ -33,4 +34,5 @@ for (const hino of data.hinos.filter((item) => item.audio)) {
     assert(info.size > 100_000, `Áudio inválido: ${hino.audio}`);
 }
 
-console.log('Sala de canto v4.53.0: 17 hinos, treinos e áudios verificados.');
+console.log('Sala de canto v4.53.2: 17 hinos, treinos e áudios verificados.');
+await import('./test-hymns-official-v4532.mjs');

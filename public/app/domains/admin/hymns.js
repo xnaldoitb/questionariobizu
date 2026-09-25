@@ -16,8 +16,11 @@ function sectionsFromText(value) {
         const label = marker ? marker[1].trim() : String(index + 1);
         const verses = marker ? lines.slice(1) : lines;
         if (!verses.length) throw new Error(`A parte ${label} está sem versos.`);
+        const type = /^coro$/i.test(label) ? 'coro'
+            : /^estribilho$/i.test(label) ? 'estribilho'
+                : /^parte\b/i.test(label) ? 'parte' : 'estrofe';
         return {
-            tipo: /^coro$/i.test(label) ? 'coro' : 'estrofe',
+            tipo: type,
             rotulo: label,
             versos: verses,
         };
@@ -26,7 +29,8 @@ function sectionsFromText(value) {
 
 function sectionsToText(sections) {
     return (sections || []).map((section, index) => {
-        const label = section.tipo === 'coro' ? 'Coro' : section.rotulo || index + 1;
+        const label = section.rotulo
+            || (section.tipo === 'coro' ? 'Coro' : section.tipo === 'estribilho' ? 'Estribilho' : index + 1);
         return `[${label}]\n${(section.versos || []).join('\n')}`;
     }).join('\n\n');
 }
@@ -186,7 +190,7 @@ async function deleteSong(song) {
 }
 
 async function importDefaults() {
-    if (!confirm('Importar os 17 hinos atuais? Itens com o mesmo identificador serão atualizados.')) return;
+    if (!confirm('Sincronizar os 17 hinos oficiais? A letra e a organização de itens com o mesmo identificador serão atualizadas.')) return;
     try {
         const response = await fetch('/assets/hinos/hinos.json', { cache: 'no-store' });
         const payload = await response.json();
@@ -196,7 +200,7 @@ async function importDefaults() {
         });
         await refreshAdminHymns({ quiet: true });
         document.dispatchEvent(new Event('hymns:changed'));
-        notify(`${result.quantidade} hinos importados.`);
+        notify(`${result.quantidade} hinos oficiais sincronizados.`);
     } catch (error) {
         notify(error.message, 5000);
     }

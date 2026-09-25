@@ -471,20 +471,89 @@
 .hymn-order-picked {
     display: grid;
     gap: 8px;
-    margin-top: 14px;
 }
 
 .hymn-order-picked {
-    min-height: 48px;
+    min-height: 110px;
+    align-content: start;
     padding: 10px;
     background: var(--canvas-soft);
     border-radius: 8px;
 }
 
 .hymn-order-picked span {
+    display: grid;
+    grid-template-columns: 25px minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+    padding: 8px;
     color: var(--text-muted);
     font-size: 13px;
+    line-height: 1.45;
+    background: var(--panel-surface);
+    border: 1px solid var(--line);
+    border-radius: 7px;
 }
+
+.hymn-order-picked span b {
+    display: grid;
+    width: 23px;
+    height: 23px;
+    place-items: center;
+    color: var(--text-on-primary);
+    background: var(--navy-strong);
+    border-radius: 50%;
+    font-size: 10px;
+}
+
+.hymn-order-picked .hymn-order-empty { display: block; background: transparent; border: 0; }
+
+.hymn-order-panel { min-width: 0; overflow: hidden; }
+.hymn-order-panel .hymn-section-tabs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+    overflow: visible;
+}
+.hymn-order-panel .hymn-section-tabs button {
+    min-width: 0;
+    width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+.hymn-order-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    gap: 12px;
+    margin-top: 14px;
+}
+.hymn-order-column { min-width: 0; }
+.hymn-order-column-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+.hymn-order-column-title strong { font-size: 12px; }
+.hymn-order-column-title span { color: var(--text-muted); font: 600 9px var(--type-mono); }
+.hymn-order-list { min-width: 0; touch-action: pan-y; overscroll-behavior-y: contain; }
+.hymn-order-line {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    touch-action: manipulation;
+}
+.hymn-order-line > span { color: var(--text-muted); font-size: 16px; }
+.hymn-order-line > strong { min-width: 0; font: 600 13px/1.45 var(--type-body); }
+.hymn-order-shuffle { margin-top: 14px; }
 
 .hymn-finish {
     display: grid;
@@ -540,4 +609,13 @@
     .hymn-memory-levels small { font-size: 6.8px; letter-spacing: -.01em; }
     .hymn-section { padding: 14px; }
     .hymn-verse { font-size: 15px; line-height: 1.7; }
+    .hymn-order-panel .hymn-section-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hymn-order-workspace { grid-template-columns: 1fr; }
+    .hymn-order-answer { order: 2; }
+    .hymn-order-line { min-height: 52px; padding: 12px; }
+    .hymn-order-picked { min-height: 70px; }
+}
+
+@media (max-width: 380px) {
+    .hymn-order-panel .hymn-section-tabs { grid-template-columns: 1fr; }
 }

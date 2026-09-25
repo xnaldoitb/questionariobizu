@@ -14,13 +14,14 @@ function slugify(value) {
 
 function normalizedSections(value) {
     if (!Array.isArray(value) || !value.length) throw new Error('Informe ao menos uma parte da letra.');
+    const acceptedTypes = new Set(['estrofe', 'coro', 'estribilho', 'parte']);
     return value.map((section, index) => {
         const versos = Array.isArray(section?.versos)
             ? section.versos.map((verse) => String(verse || '').trim()).filter(Boolean)
             : [];
         if (!versos.length) throw new Error(`A parte ${index + 1} está sem versos.`);
         return {
-            tipo: section?.tipo === 'coro' ? 'coro' : 'estrofe',
+            tipo: acceptedTypes.has(section?.tipo) ? section.tipo : 'estrofe',
             rotulo: String(section?.rotulo || index + 1).trim().slice(0, 40),
             versos,
         };
