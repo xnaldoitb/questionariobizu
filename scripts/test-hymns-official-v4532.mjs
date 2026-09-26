@@ -21,5 +21,7 @@ assert.equal(bySlug['cancao-do-bpchoque-pmpa'].secoes.length, 8);
 assert(client.includes("section.tipo === 'estribilho'") && client.includes("section.tipo === 'parte'"));
 assert(admin.includes("/^estribilho$/i") && admin.includes("/^parte\\b/i"));
 assert(route.includes("'estrofe', 'coro', 'estribilho', 'parte'"));
+assert(client.includes('function isConnector') && client.includes('data-reveal-word="${key}"'));
+assert(client.includes('Os conectivos permanecem; toque nas iniciais destacadas'));
 
-console.log('Hinos v4.53.2: organização oficial, estribilhos e repetições verificados.');
+console.log('Hinos v4.53.3: organização oficial, estribilhos e repetições verificados.');

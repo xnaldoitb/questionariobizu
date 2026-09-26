@@ -390,8 +390,28 @@
 
 .hymn-word-initial {
     display: inline-block;
-    color: var(--text-main);
-    font-weight: 700;
+    min-width: 1.7em;
+    padding: 1px 6px;
+    color: var(--signal);
+    font: 800 .9em/1.6 var(--type-mono);
+    background: color-mix(in srgb, var(--signal) 12%, var(--canvas-soft));
+    border: 1px solid color-mix(in srgb, var(--signal) 38%, var(--line));
+    border-radius: 6px;
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--signal) 20%, transparent);
+    cursor: pointer;
+}
+
+.hymn-word-initial:hover,
+.hymn-word-initial:focus-visible {
+    background: color-mix(in srgb, var(--signal) 20%, var(--canvas-soft));
+    outline: 2px solid color-mix(in srgb, var(--signal) 45%, transparent);
+    outline-offset: 2px;
+}
+
+.hymn-word-revealed {
+    color: var(--signal);
+    font-weight: 750;
+    animation: hymn-word-reveal .22s ease-out;
 }
 
 .hymn-head-memory {
