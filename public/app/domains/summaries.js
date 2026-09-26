@@ -11,7 +11,12 @@ async function loadSummaries({ force = false } = {}) {
     if (summaries.length && !force) return summaries;
     const response = await fetch('/api/resumos', { credentials: 'include', cache: 'no-store' });
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.erro || 'Não foi possível carregar os resumos.');
+    if (!response.ok) {
+        const error = new Error(payload.erro || 'Não foi possível carregar os resumos.');
+        error.status = response.status;
+        error.code = payload.codigo || null;
+        throw error;
+    }
     summaries = Array.isArray(payload.resumos) ? payload.resumos : [];
     return summaries;
 }
@@ -36,6 +41,18 @@ function closeSelector() {
     one('#summaryPicker')?.focus({ preventScroll: true });
 }
 
+function showAccessNotice() {
+    one('#summaryAccessModal')?.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    one('#summaryAccessClose')?.focus({ preventScroll: true });
+}
+
+function closeAccessNotice() {
+    one('#summaryAccessModal')?.classList.add('hidden');
+    if (!one('.modal-overlay:not(.hidden)')) document.body.classList.remove('modal-open');
+    one('#summaryPicker')?.focus({ preventScroll: true });
+}
+
 async function openSelector() {
     try {
         await loadSummaries({ force: true });
@@ -48,7 +65,8 @@ async function openSelector() {
         document.body.classList.add('modal-open');
         one('#summaryModalClose')?.focus({ preventScroll: true });
     } catch (error) {
-        notify(error.message, 5000);
+        if (error.status === 403) showAccessNotice();
+        else notify(error.message, 5000);
     }
 }
 
@@ -61,6 +79,15 @@ export function bindSummaryEvents() {
     });
     one('#summaryModal')?.addEventListener('click', (event) => {
         if (event.target.id === 'summaryModal') closeSelector();
+    });
+    one('#summaryAccessClose')?.addEventListener('click', closeAccessNotice);
+    one('#summaryAccessDismiss')?.addEventListener('click', closeAccessNotice);
+    one('#summaryAccessPlans')?.addEventListener('click', () => {
+        closeAccessNotice();
+        one('#accountPlansBtn')?.click();
+    });
+    one('#summaryAccessModal')?.addEventListener('click', (event) => {
+        if (event.target.id === 'summaryAccessModal') closeAccessNotice();
     });
     document.addEventListener('summaries:changed', () => {
         summaries = [];

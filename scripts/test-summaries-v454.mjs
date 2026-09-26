@@ -15,7 +15,9 @@ const styles = await readFile('public/styles/17-summaries.css', 'utf8');
 
 assert(dashboard.indexOf('summaries-dashboard-section') < dashboard.indexOf('hymns-dashboard-section'));
 assert(dashboard.includes('id="summaryPicker"') && dashboard.includes('id="summaryModal"'));
+assert(dashboard.includes('id="summaryAccessModal"') && dashboard.includes('id="summaryAccessPlans"'));
 assert(client.includes("fetch('/api/resumos'") && client.includes('/api/resumo-arquivo?slug=') && client.includes('target="_blank"'));
+assert(client.includes('if (error.status === 403) showAccessNotice()') && client.includes("one('#accountPlansBtn')?.click()"));
 assert(adminView.includes('data-admin="summariesPanel"') && adminView.includes('id="adminSummaryForm"'));
 assert(adminView.includes('id="adminSummaryFile"') && adminView.includes('accept="application/pdf,.pdf"'));
 assert(!adminView.includes('adminSummaryFileUrl'), 'Não deve existir campo para endereço público permanente.');
@@ -30,5 +32,6 @@ assert(fileRoute.includes("db().storage.from(BUCKET).download(path)") && !fileRo
 assert(router.includes("['resumos'") && router.includes("['resumo-arquivo'") && router.includes("['admin-resumos'"));
 assert(migration.includes('create table if not exists public.resumos') && migration.includes("'resumos-pdf'") && migration.includes("false, 31457280"));
 assert(styles.includes('margin-top: 12px') && styles.includes('#dashboard > .study-panel { margin-top: 8px; }'));
+assert(styles.includes('.summary-access-modal') && styles.includes('width: min(92vw, 390px)'));
 
 console.log('Resumos v4.54: seletor, PDFs, administração e espaçamento compacto verificados.');

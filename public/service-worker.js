@@ -1,13 +1,13 @@
-const CACHE_NAME = 'questionario-bizu-v4.54.1';
+const CACHE_NAME = 'questionario-bizu-v4.54.2';
 const APP_SHELL = [
     '/',
     '/index.html',
-    '/manifest.webmanifest?v=4.54.1',
+    '/manifest.webmanifest?v=4.54.2',
     '/assets/icons/icon-192-v448.png',
     '/assets/icons/icon-512-v448.png',
     '/assets/icons/icon-maskable-512-v448.png',
-    '/assets/logo-questionario-bizu.svg?v=4.54.1',
-    '/assets/icons/questionario-bizu-icon.svg?v=4.54.1',
+    '/assets/logo-questionario-bizu.svg?v=4.54.2',
+    '/assets/icons/questionario-bizu-icon.svg?v=4.54.2',
     '/assets/icons/coroa-papirao.svg',
     '/assets/icons/colaborador-bizu.webp',
     '/app/main.js',

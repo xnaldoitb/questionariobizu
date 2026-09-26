@@ -24,4 +24,4 @@ assert(route.includes("'estrofe', 'coro', 'estribilho', 'parte'"));
 assert(client.includes('function isConnector') && client.includes('data-reveal-word="${key}"'));
 assert(client.includes('Os conectivos permanecem; toque nas iniciais destacadas'));
 
-console.log('Hinos v4.54.1: organização oficial, estribilhos e repetições verificados.');
+console.log('Hinos v4.54.2: organização oficial, estribilhos e repetições verificados.');
