@@ -34,5 +34,5 @@ for (const hino of data.hinos.filter((item) => item.audio)) {
     assert(info.size > 100_000, `Áudio inválido: ${hino.audio}`);
 }
 
-console.log('Sala de canto v4.53.3: 17 hinos, treinos e áudios verificados.');
+console.log('Sala de canto v4.54.1: 17 hinos, treinos e áudios verificados.');
 await import('./test-hymns-official-v4532.mjs');

@@ -14,12 +14,14 @@ import { bindMaintenanceManagement } from './admin/maintenance.js';
 import { refreshAdminOverview } from './admin/overview.js';
 import { bindPaymentManagement, refreshAdminPayments } from './admin/payments.js';
 import { bindHymnManagement, refreshAdminHymns } from './admin/hymns.js';
+import { bindSummaryManagement, refreshAdminSummaries } from './admin/summaries.js';
 
 const ADMIN_PANELS = [
     'overviewPanel',
     'usersPanel',
     'paymentsPanel',
     'contentPanel',
+    'summariesPanel',
     'hymnsPanel',
     'questionsPanel',
     'transferPanel',
@@ -57,6 +59,11 @@ async function loadPanel(panelId) {
 
     if (panelId === 'hymnsPanel') {
         await refreshAdminHymns();
+        return;
+    }
+
+    if (panelId === 'summariesPanel') {
+        await refreshAdminSummaries();
         return;
     }
 
@@ -129,7 +136,7 @@ export function applyManagementAccess() {
     const intro = one('#adminPermissionInfo');
     if (intro) {
         intro.textContent = supreme
-            ? 'Desenvolvedor: usuários, planos, pagamentos, conteúdo, hinos, questões, backup e manutenção.'
+            ? 'Desenvolvedor: usuários, planos, pagamentos, conteúdo, resumos, hinos, questões, backup e manutenção.'
             : 'ADM vendedor: você tem controle sobre usuários sob sua responsabilidade e usuários ainda sem responsável definido, incluindo contas em teste, vencidas e VIP. Pode aprovar, alterar validade, conceder ou remover VIP e excluir seus usuários. Ao realizar a primeira ação, o usuário passa a ficar sob sua responsabilidade.';
     }
 
@@ -146,6 +153,7 @@ export function bindManagementEvents() {
     bindPaymentManagement();
     bindContentManagement();
     bindHymnManagement();
+    bindSummaryManagement();
     bindQuestionManagement();
     bindTransferManagement();
     bindMaintenanceManagement();

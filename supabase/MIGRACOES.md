@@ -1,8 +1,12 @@
 # Migrações do Supabase
 
+## Atualização para v4.54
+
+Execute `migration-v4.54-resumos-pdf.sql` no SQL Editor do Supabase. Ela cria a tabela de resumos e o armazenamento privado de PDFs de até 30 MB. A visualização e o download passam pela sessão do aplicativo e exigem assinatura ativa. Depois, use **Administração → Resumos** para cadastrar os materiais; a marca d’água é aplicada automaticamente.
+
 ## Atualização para v4.53
 
-Execute `migration-v4.53-hinos-administraveis.sql` no SQL Editor do Supabase. Depois, abra **Administração → Hinos e canções** e use **Importar 17 hinos atuais** uma única vez.
+Execute `migration-v4.53-hinos-administraveis.sql` no SQL Editor do Supabase. Depois, abra **Administração → Hinos e canções** e use **Sincronizar 17 hinos oficiais** uma única vez.
 
 ### Atualização anterior: progressão v4.51
 

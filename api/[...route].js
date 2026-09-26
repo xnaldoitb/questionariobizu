@@ -13,6 +13,8 @@ const routes = new Map([
     ['acesso-atividade', () => import('../server/routes/acesso-atividade.mjs')],
     ['catalogo', () => import('../server/routes/catalogo.mjs')],
     ['hinos', () => import('../server/routes/hinos.mjs')],
+    ['resumos', () => import('../server/routes/resumos.mjs')],
+    ['resumo-arquivo', () => import('../server/routes/resumo-arquivo.mjs')],
     ['questoes', () => import('../server/routes/questoes.mjs')],
     ['responder', () => import('../server/routes/responder.mjs')],
     ['sessoes', () => import('../server/routes/sessoes.mjs')],
@@ -34,6 +36,7 @@ const routes = new Map([
     ['admin-users', () => import('../server/routes/admin-users.mjs')],
     ['admin-catalogo', () => import('../server/routes/admin-catalogo.mjs')],
     ['admin-hinos', () => import('../server/routes/admin-hinos.mjs')],
+    ['admin-resumos', () => import('../server/routes/admin-resumos.mjs')],
     ['admin-questions', () => import('../server/routes/admin-questions.mjs')],
     ['admin-import', () => import('../server/routes/admin-import.mjs')],
     ['admin-export', () => import('../server/routes/admin-export.mjs')],
@@ -85,14 +88,18 @@ export default async function apiRouter(req, res) {
     }
 
     try {
-        const { handler } = await routeLoader();
+        const routeModule = await routeLoader();
         const event = toNetlifyEvent(req);
         const sizeError = bodyLimitResponse(routeName, event.httpMethod, event.body, event.headers);
         if (sizeError) return res.status(413).json(sizeError);
         event.queryStringParameters = { ...event.queryStringParameters };
         delete event.queryStringParameters.route;
 
-        const result = await handler(event);
+        if (routeModule.streamHandler) {
+            return routeModule.streamHandler(req, res, event);
+        }
+
+        const result = await routeModule.handler(event);
         return sendNetlifyResult(res, result);
     } catch (error) {
         console.error(`Erro não tratado em /api/${routeName}:`, error);

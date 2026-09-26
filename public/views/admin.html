@@ -12,6 +12,7 @@
         <button class="ui-button quiet-action admin-tab" data-admin="usersPanel" type="button">Usuários</button>
         <button class="ui-button quiet-action admin-tab" data-admin="paymentsPanel" type="button">Planos e pagamentos</button>
         <button class="ui-button quiet-action admin-tab supreme-only" data-admin="contentPanel" type="button">Conteúdo</button>
+        <button class="ui-button quiet-action admin-tab supreme-only" data-admin="summariesPanel" type="button">Resumos</button>
         <button class="ui-button quiet-action admin-tab supreme-only" data-admin="hymnsPanel" type="button">Hinos e canções</button>
         <button class="ui-button quiet-action admin-tab supreme-only" data-admin="questionsPanel" type="button">Questões</button>
         <button class="ui-button quiet-action admin-tab supreme-only" data-admin="transferPanel" type="button">Importar / Exportar</button>
@@ -58,6 +59,7 @@
                 <button class="ui-button main-action" data-admin-jump="usersPanel" type="button">Gerenciar usuários</button>
                 <button class="ui-button quiet-action" data-admin-jump="paymentsPanel" type="button">Planos e pagamentos</button>
                 <button class="ui-button quiet-action supreme-only" data-admin-jump="questionsPanel" type="button">Banco de questões</button>
+                <button class="ui-button quiet-action supreme-only" data-admin-jump="summariesPanel" type="button">Resumos em PDF</button>
                 <button class="ui-button quiet-action supreme-only" data-admin-jump="hymnsPanel" type="button">Hinos e canções</button>
                 <button class="ui-button quiet-action supreme-only" data-admin-jump="transferPanel" type="button">Importar / Exportar</button>
             </div>
@@ -235,6 +237,50 @@
                 <button class="ui-button quiet-action" id="refreshCatalogAdmin" type="button">Atualizar</button>
             </div>
             <div id="catalogAdminList"></div>
+        </div>
+    </section>
+
+    <section class="admin-panel hidden" id="summariesPanel">
+        <div class="panel admin-hymn-editor">
+            <div class="panel-head">
+                <div>
+                    <h3 id="adminSummaryFormTitle">Adicionar novo resumo</h3>
+                    <p class="muted">Organize por disciplina e envie um arquivo PDF de até 30 MB.</p>
+                </div>
+                <button class="ui-button quiet-action" id="adminSummaryClear" type="button">Novo resumo</button>
+            </div>
+            <form id="adminSummaryForm">
+                <input id="adminSummaryOriginalSlug" type="hidden"/>
+                <input id="adminSummaryCurrentFile" type="hidden"/>
+                <div class="admin-form-grid">
+                    <label>Título<input id="adminSummaryTitle" maxlength="160" required/></label>
+                    <label>Disciplina<input id="adminSummaryDiscipline" maxlength="160" required placeholder="Ex.: Direito Penal Militar"/></label>
+                    <label>Identificador<input id="adminSummarySlug" maxlength="90" placeholder="gerado pelo título"/></label>
+                    <label>Ordem<input id="adminSummaryOrder" type="number" value="0"/></label>
+                    <label class="admin-vip-toggle"><input id="adminSummaryActive" type="checkbox" checked/><span><strong>Resumo ativo</strong><small>Disponível para os alunos.</small></span></label>
+                </div>
+                <label>Descrição curta<input id="adminSummaryDescription" maxlength="240" placeholder="Opcional"/></label>
+                <label>Arquivo PDF<input id="adminSummaryFile" type="file" accept="application/pdf,.pdf"/></label>
+                <small class="field-help">O PDF será armazenado de forma privada e receberá a marca d’água do Questionário Bizu.</small>
+                <div class="admin-hymn-audio-preview hidden" id="adminSummaryFilePreview">
+                    <a class="ui-button quiet-action mini" id="adminSummaryFileLink" target="_blank" rel="noopener noreferrer">Abrir PDF atual</a>
+                    <button class="ui-button quiet-action mini danger" id="adminSummaryRemoveFile" type="button">Remover PDF</button>
+                </div>
+                <div class="admin-form-submit">
+                    <button class="ui-button main-action" id="adminSummarySave" type="submit">Salvar resumo</button>
+                    <span class="muted" id="adminSummaryStatus" role="status"></span>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel wide admin-list-panel">
+            <div class="panel-head">
+                <div><h3>Acervo de resumos</h3><p class="muted">Edite, substitua o PDF, ative, desative ou exclua materiais.</p></div>
+                <button class="ui-button quiet-action" id="adminSummaryRefresh" type="button">Atualizar</button>
+            </div>
+            <label class="admin-filter-field admin-hymn-search">Pesquisar<input id="adminSummarySearch" type="search" placeholder="Título ou disciplina" autocomplete="off"/></label>
+            <div class="admin-list-meta" id="adminSummaryMeta">Carregando resumos…</div>
+            <div class="admin-hymn-list" id="adminSummaryList"></div>
         </div>
     </section>
 

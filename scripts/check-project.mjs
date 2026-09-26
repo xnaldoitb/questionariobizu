@@ -15,6 +15,7 @@ const requiredFiles = [
     'public/app/foundation/pwa.js',
     'public/app/domains/study.js',
     'public/app/domains/hymns.js',
+    'public/app/domains/summaries.js',
     'public/app/domains/management.js',
     'public/app/domains/community.js',
     'public/app/domains/access.js',
@@ -25,6 +26,7 @@ const requiredFiles = [
     'public/app/domains/admin/common.js',
     'public/app/domains/admin/users.js',
     'public/app/domains/admin/content.js',
+    'public/app/domains/admin/summaries.js',
     'public/app/domains/admin/questions.js',
     'public/app/domains/admin/transfer.js',
     'public/app/domains/admin/maintenance.js',
@@ -44,6 +46,7 @@ const requiredFiles = [
     'public/styles/14-ranking-patents.css',
     'public/styles/15-progression-notifications.css',
     'public/styles/16-hymns.css',
+    'public/styles/17-summaries.css',
     'public/assets/hinos/hinos.json',
     'public/assets/hinos/hino-a-fontoura.mp3',
     'public/assets/hinos/hino-do-soldado-do-fogo.mp3',
@@ -71,6 +74,9 @@ const requiredFiles = [
     'server/routes/notificacoes.mjs',
     'server/routes/admin-users.mjs',
     'server/routes/admin-catalogo.mjs',
+    'server/routes/resumos.mjs',
+    'server/routes/resumo-arquivo.mjs',
+    'server/routes/admin-resumos.mjs',
     'server/routes/admin-questions.mjs',
     'server/routes/admin-backup.mjs',
     'server/routes/admin-maintenance.mjs',
@@ -109,6 +115,7 @@ const requiredFiles = [
     'supabase/migration-v4.48.1-suporte-otimizado.sql',
     'supabase/migration-v4.49-topicos-completos.sql',
     'supabase/migration-v4.50-colaboradores.sql',
+    'supabase/migration-v4.54-resumos-pdf.sql',
     'supabase/migration-v4.51-xp-rapido.sql',
 ];
 
@@ -567,8 +574,8 @@ for (const marker of ['conceder_xp_questao_limitado', 'for update', 'p_limite_di
 for (const marker of ['listar_suporte_conversas_v4481', 'join lateral', 'suporte_mensagens_conversa_recente_idx', 'to service_role']) {
     if (!migration4481.includes(marker)) throw new Error(`Suporte otimizado v4.48.1 incompleto: ${marker}`);
 }
-if (!index.includes('manifest.webmanifest?v=4.53.3') || !serviceWorker.includes('questionario-bizu-v4.53.3')) {
-    throw new Error('Versão e cache PWA v4.53.3 não estão sincronizados.');
+if (!index.includes('manifest.webmanifest?v=4.54.1') || !serviceWorker.includes('questionario-bizu-v4.54.1')) {
+    throw new Error('Versão e cache PWA v4.54.1 não estão sincronizados.');
 }
 if (!fragments.includes('mountAdminInterface') || !mainModule.includes("import('./domains/management.js')")) {
     throw new Error('Carregamento sob demanda do painel administrativo v4.48 incompleto.');
@@ -585,4 +592,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.53.3: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.54.1: verificações estruturais concluídas.');

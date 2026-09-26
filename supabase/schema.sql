@@ -645,3 +645,22 @@ create index if not exists hinos_ativo_ordem_idx on public.hinos (ativo, ordem, 
 alter table public.hinos enable row level security;
 revoke all on public.hinos from public, anon, authenticated;
 grant select, insert, update, delete on public.hinos to service_role;
+
+-- Acervo administrável de resumos em PDF.
+create table if not exists public.resumos (
+  slug text primary key,
+  titulo text not null,
+  disciplina text not null,
+  descricao text,
+  arquivo text not null,
+  ordem integer not null default 0,
+  ativo boolean not null default true,
+  criado_em timestamptz not null default now(),
+  atualizado_em timestamptz not null default now(),
+  constraint resumos_slug_formato check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
+  constraint resumos_arquivo_armazenado check (arquivo ~ '^[a-z0-9-]+-[0-9]+[.]pdf$')
+);
+create index if not exists resumos_ativo_ordem_idx on public.resumos (ativo, ordem, disciplina, titulo);
+alter table public.resumos enable row level security;
+revoke all on public.resumos from public, anon, authenticated;
+grant select, insert, update, delete on public.resumos to service_role;

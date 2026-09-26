@@ -22,3 +22,4 @@ assert(router.includes("['hinos'") && router.includes("['admin-hinos'"));
 assert(migration.includes('create table if not exists public.hinos') && migration.includes("'hinos-audio'"));
 
 console.log('Hinos v4.53: CRUD administrativo, importação e áudio verificados.');
+await import('./test-summaries-v454.mjs');

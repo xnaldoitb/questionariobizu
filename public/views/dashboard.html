@@ -119,6 +119,47 @@
         </label>
     </div>
 
+    <section class="summaries-dashboard-section" aria-labelledby="summariesDashboardTitle">
+        <div class="study-intro compact-study-intro summaries-study-intro">
+            <div>
+                <p class="section-kicker"><span class="kicker-mark"></span> resumos em PDF</p>
+                <p id="summariesDashboardTitle">Escolha uma disciplina e abra o resumo para estudar.</p>
+            </div>
+        </div>
+        <div class="panel study-panel summaries-study-panel">
+            <div class="filters-grid summary-filters-grid">
+                <div class="discipline-filter summary-filter">
+                    <span id="summaryFilterLabel">Resumo</span>
+                    <button id="summaryPicker" class="study-filter-trigger" type="button"
+                        aria-labelledby="summaryFilterLabel summarySelectionSummary"
+                        aria-haspopup="dialog" aria-controls="summaryModal">
+                        <span class="study-filter-icon summary-picker-icon" aria-hidden="true">PDF</span>
+                        <span class="study-filter-copy">
+                            <strong id="summarySelectionSummary">Selecionar resumo</strong>
+                            <small id="summarySelectionMeta">Toque para escolher</small>
+                        </span>
+                        <span class="study-filter-arrow" aria-hidden="true">›</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="modal-overlay study-filter-overlay hidden" id="summaryModal" role="dialog" aria-modal="true" aria-labelledby="summaryModalTitle">
+        <section class="report-modal study-filter-modal summary-selector-modal">
+            <header class="study-filter-modal-header">
+                <span class="study-modal-heading-icon summary-modal-icon" aria-hidden="true">PDF</span>
+                <div><small>Material de estudo</small><h2 id="summaryModalTitle">Escolha o resumo</h2></div>
+                <button class="study-modal-close" id="summaryModalClose" type="button" aria-label="Fechar seleção de resumo">×</button>
+            </header>
+            <div class="study-filter-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+                <input id="summarySearch" type="search" placeholder="Pesquisar resumo ou disciplina" aria-label="Pesquisar resumo" autocomplete="off">
+            </div>
+            <div class="discipline-option-list summary-option-list" id="summaryOptions" aria-label="Resumos disponíveis"></div>
+        </section>
+    </div>
+
     <section class="hymns-dashboard-section" aria-labelledby="hymnsDashboardTitle">
         <div class="study-intro compact-study-intro hymns-study-intro">
             <div>

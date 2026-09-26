@@ -20,6 +20,7 @@ import { bindPatentEvents, checkPatentNotification } from './domains/patents.js'
 import { ADMIN_PATENT, DEVELOPER_PATENT, patentButtonMarkup, patentForHits } from './foundation/patents.js';
 import { bindPwaInstall } from './foundation/pwa.js';
 import { bindHymnEvents } from './domains/hymns.js';
+import { bindSummaryEvents } from './domains/summaries.js';
 
 const PROFILE_REFRESH_MS = 15_000;
 let lastProfileRefresh = 0;
@@ -197,6 +198,7 @@ async function bootstrap() {
     bindPatentEvents();
     bindPwaInstall();
     bindHymnEvents();
+    bindSummaryEvents();
 
     try {
         await recoverIdentity();

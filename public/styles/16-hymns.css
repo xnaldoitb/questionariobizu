@@ -16,7 +16,7 @@
 .hymns-dashboard-section {
     display: grid;
     gap: 0;
-    margin-top: 24px;
+    margin-top: 12px;
 }
 
 .hymns-study-intro { margin-top: 0; }
