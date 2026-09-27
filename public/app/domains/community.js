@@ -71,13 +71,13 @@ function closeModal(id) {
 
 function updatePresence(payload = {}) {
     const count = Number(payload.online || 0);
-    if (one('#chatHeaderOnline')) one('#chatHeaderOnline').textContent = `${count} online`;
-    const badge = one('#chatOnlineCount');
-    if (badge) {
-        badge.textContent = count > 99 ? '99+' : String(Math.max(0, count));
-        badge.classList.toggle('hidden', count <= 0);
-        badge.setAttribute('aria-label', `${count} ${count === 1 ? 'usuário online' : 'usuários online'}`);
-    }
+    const visibleCount = count > 99 ? '99+' : String(Math.max(0, count));
+    if (one('#chatHeaderOnline')) one('#chatHeaderOnline').textContent = `${visibleCount} online`;
+    if (one('#onlineCount')) one('#onlineCount').textContent = `${visibleCount} online`;
+    const users = Array.isArray(payload.usuarios) ? payload.usuarios.slice(0, 3) : [];
+    if (one('#onlineSpotlight')) one('#onlineSpotlight').innerHTML = users.length
+        ? users.map((user) => `${safeText(user.proprio ? 'Você' : user.nome)} ${accountBadges(user)}`).join(', ')
+        : 'Nenhum aluno ativo agora';
 }
 
 async function sendPresence({ activity = false } = {}) {

@@ -3,18 +3,14 @@ import { json, parseBody } from '../platform/http.mjs';
 import { consumeRateLimit } from '../platform/rate-limit.mjs';
 import {
     cleanupCommunity,
-    listActiveUsers,
+    presenceTotals,
     removePresence,
     touchPresence,
 } from '../platform/community.mjs';
 
 async function snapshot(userId) {
     await cleanupCommunity();
-    const active = await listActiveUsers(30, userId);
-    return {
-        online: active.count,
-        usuarios: active.users,
-    };
+    return presenceTotals(userId, 30);
 }
 
 export const handler = async (event) => {
@@ -38,8 +34,7 @@ export const handler = async (event) => {
             await cleanupCommunity();
             const { atividade = false } = parseBody(event);
             await touchPresence(user.id, { activity: Boolean(atividade) });
-            const active = await listActiveUsers(30, user.id);
-            return json(200, { online: active.count, usuarios: active.users });
+            return json(200, await presenceTotals(user.id, 30));
         }
 
         if (event.httpMethod === 'DELETE') {

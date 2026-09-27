@@ -33,6 +33,7 @@ const exportsByFile = {
     'payments.js': { bindPaymentManagement:()=>{}, refreshAdminPayments:async()=>{ loads++; } },
     'hymns.js': { bindHymnManagement:()=>{}, refreshAdminHymns:async()=>{ loads++; } },
     'summaries.js': { bindSummaryManagement:()=>{}, refreshAdminSummaries:async()=>{ loads++; } },
+    'online.js': { bindOnlineManagement:()=>{}, refreshAdminOnline:async()=>{ loads++; } },
 };
 await route.link((spec) => {
     const exports = exportsByFile[spec.split('/').at(-1)];

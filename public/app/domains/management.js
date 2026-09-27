@@ -15,11 +15,13 @@ import { refreshAdminOverview } from './admin/overview.js';
 import { bindPaymentManagement, refreshAdminPayments } from './admin/payments.js';
 import { bindHymnManagement, refreshAdminHymns } from './admin/hymns.js';
 import { bindSummaryManagement, refreshAdminSummaries } from './admin/summaries.js';
+import { bindOnlineManagement, refreshAdminOnline } from './admin/online.js';
 
 const ADMIN_PANELS = [
     'overviewPanel',
     'usersPanel',
     'paymentsPanel',
+    'onlinePanel',
     'contentPanel',
     'summariesPanel',
     'hymnsPanel',
@@ -49,6 +51,11 @@ async function loadPanel(panelId) {
 
     if (panelId === 'paymentsPanel') {
         await refreshAdminPayments();
+        return;
+    }
+
+    if (panelId === 'onlinePanel') {
+        await refreshAdminOnline();
         return;
     }
 
@@ -151,6 +158,7 @@ export function bindManagementEvents() {
     bindAdminModalClosers();
     bindUserManagement();
     bindPaymentManagement();
+    bindOnlineManagement();
     bindContentManagement();
     bindHymnManagement();
     bindSummaryManagement();

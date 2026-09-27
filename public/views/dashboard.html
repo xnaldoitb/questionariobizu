@@ -37,13 +37,19 @@
         </div>
     </aside>
 
-    <div class="community-strip community-actions-only" aria-label="Comunidade e perfil">
+    <div class="community-strip" aria-label="Comunidade e perfil">
+        <div class="community-presence" aria-live="polite">
+            <span class="presence-dot" aria-hidden="true"></span>
+            <strong id="onlineCount">0 online</strong>
+            <span class="presence-divider" aria-hidden="true">·</span>
+            <span id="onlineSpotlight">Atualizando presença…</span>
+        </div>
         <div class="community-actions">
             <button class="community-chat-button profile-action" id="openProfileBtn" type="button">
                 <span class="community-action-icon" aria-hidden="true">♙</span><span>Perfil</span>
             </button>
             <button class="community-chat-button" id="openChatBtn" type="button">
-                <span class="community-action-icon" aria-hidden="true">◌</span><span>Chat</span><b class="community-online-count hidden" id="chatOnlineCount" aria-label="Usuários online">0</b><b class="community-unread-count hidden" id="chatUnreadCount" aria-label="Mensagens não lidas">0</b>
+                <span class="community-action-icon" aria-hidden="true">◌</span><span>Chat</span><b class="community-unread-count hidden" id="chatUnreadCount" aria-label="Mensagens não lidas">0</b>
             </button>
             <button class="community-chat-button support-action" id="openSupportBtn" type="button">
                 <span class="community-action-icon" aria-hidden="true">?</span><span>Falar com suporte</span><b class="community-unread-count hidden" id="supportUnreadCount" aria-label="Mensagens de suporte não lidas">0</b>

@@ -9,15 +9,13 @@ const [view, styles, progression, community, notifications] = await Promise.all(
     readFile(new URL('../server/routes/notificacoes.mjs', import.meta.url), 'utf8'),
 ]);
 
-for (const id of ['chatOnlineCount', 'chatUnreadCount', 'supportUnreadCount']) assert(view.includes(`id="${id}"`));
+for (const id of ['chatUnreadCount', 'supportUnreadCount']) assert(view.includes(`id="${id}"`));
 assert(styles.includes('.community-unread-count.hidden'));
-assert(styles.includes('.community-online-count::before'));
 assert(progression.includes("updateCount('chatUnreadCount', counters.chat)"));
 assert(progression.includes("updateCount('supportUnreadCount', counters.suporte)"));
 assert(progression.includes("acao: 'marcar_contexto'"));
 assert(community.includes("acknowledgeCommunityContent('chat', currentRoomId)"));
 assert(community.includes("acknowledgeCommunityContent('suporte', supportConversationId)"));
-assert(community.includes("one('#chatOnlineCount')"));
 assert(notifications.includes("['chat_privado', 'chat_mencao']"));
 assert(notifications.includes("body.acao === 'marcar_contexto'"));
 

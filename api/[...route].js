@@ -44,6 +44,7 @@ const routes = new Map([
     ['admin-backup', () => import('../server/routes/admin-backup.mjs')],
     ['admin-maintenance', () => import('../server/routes/admin-maintenance.mjs')],
     ['admin-payments', () => import('../server/routes/admin-payments.mjs')],
+    ['admin-online', () => import('../server/routes/admin-online.mjs')],
 ]);
 
 export function crossOriginMutation(req, routeName) {

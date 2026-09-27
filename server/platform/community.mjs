@@ -117,3 +117,23 @@ export async function listActiveUsers(limit = 30, currentUserId = null) {
             })),
     };
 }
+
+export async function fakeOnlineCount() {
+    const { data, error } = await db().from('configuracoes_online')
+        .select('fake_online').eq('id', true).maybeSingle();
+    if (error) throw error;
+    return Math.max(0, Number(data?.fake_online || 0));
+}
+
+export async function presenceTotals(currentUserId = null, limit = 30) {
+    const [active, fake] = await Promise.all([
+        listActiveUsers(limit, currentUserId),
+        fakeOnlineCount(),
+    ]);
+    return {
+        online: active.count + fake,
+        online_real: active.count,
+        online_fake: fake,
+        usuarios: active.users,
+    };
+}

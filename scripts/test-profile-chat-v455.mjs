@@ -11,8 +11,8 @@ const migration = await readFile('supabase/migration-v4.55-perfil-chat.sql', 'ut
 const router = await readFile('api/[...route].js', 'utf8');
 
 assert(view.indexOf('id="openProfileBtn"') < view.indexOf('id="openChatBtn"'), 'Perfil deve ficar à esquerda do Chat.');
-assert(!view.includes('id="onlineCount"') && !view.includes('id="onlineSpotlight"'));
-assert(view.includes('id="chatHeaderOnline"') && view.includes('id="chatOnlineCount"'), 'A presença deve aparecer somente no chat e no botão de acesso ao chat.');
+assert(view.includes('id="onlineCount"') && view.includes('id="onlineSpotlight"'));
+assert(view.includes('id="chatHeaderOnline"') && !view.includes('id="chatOnlineCount"'), 'A presença deve aparecer na faixa original e dentro do chat, sem marcador no botão.');
 assert(view.includes('id="profileModal"') && view.includes('id="profileCurrentPassword"') && view.includes('id="profileNewPassword"'));
 assert(profile.includes("requestJson('perfil'") && profile.includes('As novas senhas não coincidem.'));
 assert(profileRoute.includes('bcrypt.compare') && profileRoute.includes('bcrypt.hash') && profileRoute.includes("requireUser(event)"));

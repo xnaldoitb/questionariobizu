@@ -6,9 +6,6 @@
 .community-chat-button { position:relative; min-height:38px; padding:7px 11px; gap:7px; border-radius:9px; }
 .community-unread-count { display:grid; min-width:18px; height:18px; padding:0 5px; place-items:center; color:#fff; background:#c8323e; border:2px solid var(--panel-surface); border-radius:10px; box-shadow:0 2px 7px rgb(84 11 20 / 28%); font:800 8px/1 var(--type-ui); }
 .community-unread-count.hidden { display:none; }
-.community-online-count { display:flex; min-width:18px; height:18px; padding:0 5px; align-items:center; justify-content:center; gap:4px; color:#fff; background:#238354; border:2px solid var(--panel-surface); border-radius:10px; box-shadow:0 2px 7px rgb(12 77 44 / 24%); font:800 8px/1 var(--type-ui); }
-.community-online-count::before { width:5px; height:5px; content:''; background:#9cf0bf; border-radius:50%; }
-.community-online-count.hidden { display:none; }
 .community-action-icon,.community-modal-symbol { display:grid; place-items:center; width:22px; height:22px; color:#fff; background:#356fc1; border-radius:7px; font:800 12px var(--type-ui); }
 .support-action .community-action-icon,.support-symbol { background:#d17b24; }
 .topics-action .community-action-icon,.topics-symbol { background:#358b67; }
