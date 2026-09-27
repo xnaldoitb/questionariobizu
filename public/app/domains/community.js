@@ -20,6 +20,7 @@ let initialized = false;
 let lastActivityPing = 0;
 let heartbeatTimer;
 let presenceTimer;
+let presenceSpotlightTimer;
 let communityTimer;
 let activeModal = null;
 let rooms = [];
@@ -33,6 +34,8 @@ let activeTopicId = null;
 let activeTopic = null;
 let topicItems = [];
 let editingTopicId = null;
+let presenceUsers = [];
+let presenceUserIndex = 0;
 
 function acknowledgeCommunityContent(contexto, referenciaId) {
     if (!referenciaId) return;
@@ -69,15 +72,25 @@ function closeModal(id) {
     if (!document.querySelector('.modal-overlay:not(.hidden)')) document.body.classList.remove('modal-open');
 }
 
+function renderPresenceSpotlight() {
+    const target = one('#onlineSpotlight');
+    if (!target) return;
+    if (!presenceUsers.length) {
+        target.textContent = 'Nenhum aluno ativo agora';
+        return;
+    }
+    const user = presenceUsers[presenceUserIndex % presenceUsers.length];
+    target.innerHTML = `${safeText(user.proprio ? 'Você' : user.nome)} ${accountBadges(user)}`;
+}
+
 function updatePresence(payload = {}) {
     const count = Number(payload.online || 0);
     const visibleCount = count > 99 ? '99+' : String(Math.max(0, count));
     if (one('#chatHeaderOnline')) one('#chatHeaderOnline').textContent = `${visibleCount} online`;
     if (one('#onlineCount')) one('#onlineCount').textContent = `${visibleCount} online`;
-    const users = Array.isArray(payload.usuarios) ? payload.usuarios.slice(0, 3) : [];
-    if (one('#onlineSpotlight')) one('#onlineSpotlight').innerHTML = users.length
-        ? users.map((user) => `${safeText(user.proprio ? 'Você' : user.nome)} ${accountBadges(user)}`).join(', ')
-        : 'Nenhum aluno ativo agora';
+    presenceUsers = Array.isArray(payload.usuarios) ? payload.usuarios : [];
+    if (presenceUserIndex >= presenceUsers.length) presenceUserIndex = 0;
+    renderPresenceSpotlight();
 }
 
 async function sendPresence({ activity = false } = {}) {
@@ -671,4 +684,9 @@ export function startCommunity() {
     refreshPresence();
     heartbeatTimer = setInterval(() => document.visibilityState === 'visible' && sendPresence(), HEARTBEAT_MS);
     presenceTimer = setInterval(refreshPresence, PRESENCE_REFRESH_MS);
+    presenceSpotlightTimer = setInterval(() => {
+        if (document.visibilityState !== 'visible' || presenceUsers.length < 2) return;
+        presenceUserIndex = (presenceUserIndex + 1) % presenceUsers.length;
+        renderPresenceSpotlight();
+    }, 3500);
 }

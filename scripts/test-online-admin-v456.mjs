@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const [dashboard, admin, community, presence, route, management, onlineUi, migration, router] = await Promise.all([
+const [dashboard, admin, community, communityStyles, presence, route, management, onlineUi, migration, router] = await Promise.all([
     readFile('public/views/dashboard.html', 'utf8'),
     readFile('public/views/admin.html', 'utf8'),
     readFile('public/app/domains/community.js', 'utf8'),
+    readFile('public/styles/12-community-hub.css', 'utf8'),
     readFile('server/routes/presenca.mjs', 'utf8'),
     readFile('server/routes/admin-online.mjs', 'utf8'),
     readFile('public/app/domains/management.js', 'utf8'),
@@ -16,6 +17,9 @@ const [dashboard, admin, community, presence, route, management, onlineUi, migra
 assert(dashboard.includes('id="onlineCount"') && dashboard.includes('id="onlineSpotlight"'));
 assert(!dashboard.includes('id="chatOnlineCount"'));
 assert(community.includes("count > 99 ? '99+'"));
+assert(community.includes('renderPresenceSpotlight') && community.includes('presenceUserIndex + 1'));
+assert(communityStyles.includes('flex:1 1 25%') && communityStyles.includes('.mobile-action-label'));
+assert(!communityStyles.includes('overflow-x:auto'));
 assert(presence.includes('presenceTotals'));
 assert(admin.includes('data-admin="onlinePanel"') && admin.includes('id="adminOnlineFakeInput"'));
 assert(management.includes("'onlinePanel'") && management.includes('bindOnlineManagement'));

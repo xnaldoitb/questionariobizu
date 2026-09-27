@@ -6,6 +6,7 @@
 .community-chat-button { position:relative; min-height:38px; padding:7px 11px; gap:7px; border-radius:9px; }
 .community-unread-count { display:grid; min-width:18px; height:18px; padding:0 5px; place-items:center; color:#fff; background:#c8323e; border:2px solid var(--panel-surface); border-radius:10px; box-shadow:0 2px 7px rgb(84 11 20 / 28%); font:800 8px/1 var(--type-ui); }
 .community-unread-count.hidden { display:none; }
+.mobile-action-label { display:none; }
 .community-action-icon,.community-modal-symbol { display:grid; place-items:center; width:22px; height:22px; color:#fff; background:#356fc1; border-radius:7px; font:800 12px var(--type-ui); }
 .support-action .community-action-icon,.support-symbol { background:#d17b24; }
 .topics-action .community-action-icon,.topics-symbol { background:#358b67; }
@@ -72,8 +73,9 @@
 .chat-mention-list button:hover { background:var(--choice-hover); }
 .chat-mention-list strong { font-size:10px; }.chat-mention-list small { color:var(--text-muted); font-size:9px; }
 
-.profile-modal-card { width:min(94vw,520px); overflow:hidden; }
-.profile-form { display:grid; gap:12px; padding:18px; }
+.profile-modal-card { display:flex; width:min(94vw,520px); max-height:min(88dvh,720px); overflow:hidden; flex-direction:column; }
+.profile-modal-card > .community-modal-header { flex:0 0 auto; }
+.profile-form { display:grid; min-height:0; gap:12px; padding:18px; overflow-y:auto; overscroll-behavior:contain; }
 .profile-form > label,.profile-password-fields label { display:grid; gap:5px; color:var(--text-muted); font:700 9px var(--type-ui); text-transform:uppercase; }
 .profile-form input { width:100%; padding:10px 11px; color:var(--text-main); background:var(--canvas-soft); border:1px solid var(--line); border-radius:8px; font:500 12px var(--type-ui); }
 .profile-form input[readonly] { opacity:.72; cursor:not-allowed; }
@@ -81,7 +83,7 @@
 .profile-password-fields legend { padding:0 6px; color:var(--text-main); font:700 10px var(--type-ui); }
 .profile-password-fields label:first-of-type,.profile-password-fields > small { grid-column:1/-1; }
 .profile-password-fields > small { color:var(--text-muted); font-size:9px; }
-.profile-form-actions { display:flex; align-items:center; justify-content:flex-end; gap:12px; }
+.profile-form-actions { position:sticky; bottom:-18px; z-index:2; display:flex; align-items:center; justify-content:flex-end; gap:12px; margin:0 -18px -18px; padding:12px 18px; background:var(--panel-surface); border-top:1px solid var(--line); box-shadow:0 -8px 18px rgb(5 15 36 / 6%); }
 .profile-form-actions span { flex:1; color:var(--danger); font-size:10px; }
 .chat-messages,.community-messages { flex:1; min-height:0; padding:12px; overflow-y:auto; overscroll-behavior:contain; }
 .chat-compose { padding:9px 11px 10px; border-top:1px solid var(--line); }
@@ -146,9 +148,11 @@
 .collaborator-wall-position { color:#8a620e; font:800 10px var(--type-ui); text-align:center; }
 
 @media (max-width:680px) {
-    .community-strip { align-items:flex-start; }
-    .community-actions { width:100%; justify-content:stretch; }
-    .community-chat-button { flex:1; justify-content:center; padding-inline:7px; font-size:8px; }
+    .community-strip { align-items:stretch; flex-direction:column; }
+    .community-actions { width:100%; flex-wrap:nowrap; justify-content:stretch; overflow:visible; gap:5px; }
+    .community-chat-button { flex:1 1 25%; min-width:0; justify-content:center; padding-inline:4px; font-size:8px; white-space:nowrap; }
+    .desktop-action-label { display:none; }
+    .mobile-action-label { display:inline; }
     .profile-password-fields { grid-template-columns:1fr; }
     .profile-password-fields label,.profile-password-fields label:first-of-type,.profile-password-fields > small { grid-column:1; }
     .community-modal,.chat-modal { width:min(92vw,430px); height:min(78svh,650px); max-height:78svh; }
@@ -162,4 +166,13 @@
     .topic-create h3 { grid-column:auto; }
     .topic-card { grid-template-columns:auto minmax(0,1fr); }.topic-card small { grid-column:1/-1; }.topic-card-stats { grid-column:1/-1; justify-content:flex-start; }
     .topic-reactions { flex-wrap:wrap; }.topic-reactions > small { width:100%; margin-left:0; }
+}
+
+@media (max-width:420px) {
+    .community-actions .community-action-icon { display:none; }
+    .community-chat-button { min-height:34px; padding-inline:3px; gap:3px; }
+    .profile-modal-card { width:calc(100vw - 16px); max-height:calc(100dvh - 16px); border-radius:14px; }
+    .profile-form { padding:14px; }
+    .profile-form-actions { bottom:-14px; margin:0 -14px -14px; padding:10px 14px; }
+    .profile-form-actions .main-action { flex:0 0 auto; }
 }

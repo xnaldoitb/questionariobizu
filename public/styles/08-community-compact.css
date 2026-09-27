@@ -432,13 +432,14 @@
 
     .community-strip {
         align-items: stretch;
+        flex-direction: column;
         gap: 7px;
         padding-left: 9px;
     }
     .community-presence { flex: 1 1 auto; gap: 5px; }
     .presence-divider { display: none; }
-    #onlineSpotlight { display: none; }
-    .community-chat-button { min-width: 74px; justify-content: center; }
+    #onlineSpotlight { display: inline; }
+    .community-chat-button { min-width: max-content; justify-content: center; }
 
     .chat-modal {
         width: calc(100vw - 16px);

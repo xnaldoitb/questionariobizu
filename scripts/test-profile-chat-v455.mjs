@@ -9,11 +9,14 @@ const rooms = await readFile('server/routes/chat-salas.mjs', 'utf8');
 const chat = await readFile('server/routes/chat.mjs', 'utf8');
 const migration = await readFile('supabase/migration-v4.55-perfil-chat.sql', 'utf8');
 const router = await readFile('api/[...route].js', 'utf8');
+const styles = await readFile('public/styles/12-community-hub.css', 'utf8');
 
 assert(view.indexOf('id="openProfileBtn"') < view.indexOf('id="openChatBtn"'), 'Perfil deve ficar à esquerda do Chat.');
 assert(view.includes('id="onlineCount"') && view.includes('id="onlineSpotlight"'));
 assert(view.includes('id="chatHeaderOnline"') && !view.includes('id="chatOnlineCount"'), 'A presença deve aparecer na faixa original e dentro do chat, sem marcador no botão.');
 assert(view.includes('id="profileModal"') && view.includes('id="profileCurrentPassword"') && view.includes('id="profileNewPassword"'));
+assert(view.includes('id="profileSave"') && styles.includes('.profile-form {') && styles.includes('overflow-y:auto'));
+assert(styles.includes('.profile-form-actions { position:sticky'));
 assert(profile.includes("requestJson('perfil'") && profile.includes('As novas senhas não coincidem.'));
 assert(profileRoute.includes('bcrypt.compare') && profileRoute.includes('bcrypt.hash') && profileRoute.includes("requireUser(event)"));
 assert(router.includes("['perfil'"));
