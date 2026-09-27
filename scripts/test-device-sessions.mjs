@@ -2,10 +2,12 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
-const [migration, login, auth, logout, maintenance, view, users] = await Promise.all([
+const [migration, recoveryMigration, login, auth, activity, logout, maintenance, view, users] = await Promise.all([
     read('supabase/migration-v4.25-dois-dispositivos-filtro-adm.sql'),
+    read('supabase/migration-v4.56.2-recuperacao-sessoes.sql'),
     read('server/routes/login.mjs'),
     read('server/platform/auth.mjs'),
+    read('server/routes/acesso-atividade.mjs'),
     read('server/routes/logout.mjs'),
     read('server/routes/admin-maintenance.mjs'),
     read('public/views/admin.html'),
@@ -24,6 +26,9 @@ for (const marker of [
 assert.ok(login.includes("'iniciar_sessao_dispositivo_aluno'"));
 assert.ok(login.includes('p_limite: 2'));
 assert.ok(login.includes("codigo: 'LIMITE_DISPOSITIVOS'"));
+assert.ok(recoveryMigration.includes("ultimo_acesso_em <= now() - interval '30 minutes'"));
+assert.ok(recoveryMigration.includes('order by ultimo_acesso_em asc'));
+assert.ok(activity.includes("from('sessoes_dispositivo')") && activity.includes('ultimo_acesso_em'));
 assert.ok(auth.includes("from('sessoes_dispositivo')"));
 assert.ok(auth.includes(".eq('usuario_id', registro.id)"));
 assert.ok(logout.includes("from('sessoes_dispositivo').delete()"));

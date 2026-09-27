@@ -70,8 +70,7 @@ export function bindIdentityEvents(onAuthenticated) {
         event.target.value = [ddd && `(${ddd})`, first, last && `-${last}`].filter(Boolean).join(' ');
     });
 
-    one('#loginForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
+    async function authenticate() {
         one('#loginError').textContent = '';
 
         try {
@@ -80,7 +79,7 @@ export function bindIdentityEvents(onAuthenticated) {
                 headers: { 'x-client-device': clientDeviceToken() },
                 body: JSON.stringify({
                     usuario: one('#loginUser').value,
-                    senha: one('#loginPass').value
+                    senha: one('#loginPass').value,
                 })
             });
 
@@ -89,6 +88,11 @@ export function bindIdentityEvents(onAuthenticated) {
         } catch (error) {
             one('#loginError').textContent = error.message;
         }
+    }
+
+    one('#loginForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await authenticate();
     });
 
     one('#signupForm').addEventListener('submit', async (event) => {

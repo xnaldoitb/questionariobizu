@@ -447,7 +447,9 @@ begin
   end if;
   perform 1 from public.usuarios where id = p_usuario_id and perfil = 'aluno' for update;
   if not found then return query select false, null::uuid, 0, false; return; end if;
-  delete from public.sessoes_dispositivo where usuario_id = p_usuario_id and expira_em <= now();
+  delete from public.sessoes_dispositivo
+  where usuario_id = p_usuario_id
+    and (expira_em <= now() or ultimo_acesso_em <= now() - interval '30 minutes');
   select id into v_existente from public.sessoes_dispositivo
     where usuario_id = p_usuario_id and device_hash = p_device_hash and expira_em > now() limit 1;
   if v_existente is not null then
@@ -456,7 +458,16 @@ begin
     return query select true, v_existente, v_quantidade, true; return;
   end if;
   select count(*) into v_quantidade from public.sessoes_dispositivo where usuario_id = p_usuario_id and expira_em > now();
-  if v_quantidade >= p_limite then return query select false, null::uuid, v_quantidade, false; return; end if;
+  if v_quantidade >= p_limite then
+    delete from public.sessoes_dispositivo
+    where id = (
+      select id from public.sessoes_dispositivo
+      where usuario_id = p_usuario_id and expira_em > now()
+      order by ultimo_acesso_em asc, criada_em asc
+      limit 1
+    );
+    v_quantidade := greatest(v_quantidade - 1, 0);
+  end if;
   insert into public.sessoes_dispositivo(id, usuario_id, device_hash, expira_em)
     values (p_sessao_id, p_usuario_id, p_device_hash, p_expira_em);
   return query select true, p_sessao_id, v_quantidade + 1, false;

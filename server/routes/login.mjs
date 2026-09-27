@@ -106,7 +106,7 @@ export const handler = async (event) => {
 
             if (!reservation?.permitido || !reservation?.sessao_id) {
                 return json(409, {
-                    erro: 'Esta conta já está conectada em dois dispositivos. Faça logout em um deles ou peça ao suporte para encerrar as sessões.',
+                    erro: 'Não foi possível liberar uma vaga de acesso. Tente novamente ou procure o suporte.',
                     codigo: 'LIMITE_DISPOSITIVOS',
                 });
             }
