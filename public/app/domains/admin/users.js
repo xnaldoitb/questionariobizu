@@ -268,7 +268,10 @@ function openUserEdit(id) {
     if (responsibleSelect) responsibleSelect.value = user.responsavel_admin_id || '';
 
     const vipToggle = one('#editUserVip');
-    if (vipToggle) vipToggle.checked = Boolean(user.vip);
+    if (vipToggle) {
+        vipToggle.checked = Boolean(user.vip);
+        vipToggle.dataset.initialVip = user.vip ? 'true' : 'false';
+    }
 
     one('#userEditTitle').textContent = `Editar ${user.nome}`;
     openAdminModal('userEditModal');
@@ -450,7 +453,10 @@ async function saveUserEdit(event) {
         whatsapp: one('#editUserWhatsapp').value,
     };
 
-    payload.vip = Boolean(one('#editUserVip')?.checked);
+    const vipToggle = one('#editUserVip');
+    const currentVip = Boolean(vipToggle?.checked);
+    const initialVip = vipToggle?.dataset.initialVip === 'true';
+    if (currentVip !== initialVip) payload.vip = currentVip;
     if (isSupreme()) {
         if (one('#editUserPassword').value) {
             payload.senha = one('#editUserPassword').value;
@@ -461,7 +467,7 @@ async function saveUserEdit(event) {
     try {
         await sendUserAction(id, 'update_user', payload);
         closeAdminModal('userEditModal');
-        notify(payload.vip ? 'Usuário atualizado como VIP com acesso vitalício.' : 'Dados do usuário atualizados.');
+        notify(payload.vip === true ? 'Usuário atualizado como VIP com acesso vitalício.' : 'Dados do usuário atualizados.');
         await refreshManagedUsers();
     } catch (error) {
         notify(error.message, 4200);

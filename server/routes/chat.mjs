@@ -71,6 +71,27 @@ export const handler = async (event) => {
                 .select('id,mensagem,criado_em').single();
             if (error) throw error;
 
+            const mentions = [...new Set([...message.matchAll(/@([a-z0-9._-]{2,40})/gi)].map((match) => match[1].toLowerCase()))];
+            if (mentions.length) {
+                const { data: mentioned } = await db().from('usuarios').select('id,usuario')
+                    .in('usuario', mentions).eq('ativo', true).neq('id', user.id);
+                let recipients = mentioned || [];
+                if (room.tipo === 'privada' && recipients.length) {
+                    const { data: memberships } = await db().from('chat_sala_membros').select('usuario_id').eq('sala_id', room.id);
+                    const memberIds = new Set((memberships || []).map((member) => member.usuario_id));
+                    recipients = recipients.filter((person) => memberIds.has(person.id));
+                }
+                await createNotifications(recipients.map((person) => ({
+                    usuario_id: person.id,
+                    tipo: 'chat_mencao',
+                    titulo: `${user.nome} mencionou você`,
+                    mensagem: message,
+                    acao: 'chat',
+                    referencia_id: room.id,
+                    chave: `chat-mencao:${data.id}:${person.id}`,
+                }))).catch((notificationError) => console.error('Falha ao notificar menção:', notificationError.message));
+            }
+
             if (room.tipo === 'privada') {
                 const { data: members, error: memberError } = await db().from('chat_sala_membros')
                     .select('usuario_id').eq('sala_id', room.id).neq('usuario_id', user.id);

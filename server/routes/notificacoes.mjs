@@ -24,6 +24,10 @@ export const handler = async (event) => {
             return json(200, {
                 notificacoes: notifications,
                 nao_lidas: notifications.filter((item) => !item.lida_em).length,
+                contadores: {
+                    chat: notifications.filter((item) => !item.lida_em && ['chat_privado', 'chat_mencao'].includes(item.tipo)).length,
+                    suporte: notifications.filter((item) => !item.lida_em && item.tipo === 'suporte').length,
+                },
             });
         }
 
@@ -37,6 +41,18 @@ export const handler = async (event) => {
         if (body.acao === 'marcar_lida' && Number.isSafeInteger(Number(body.id))) {
             const { error } = await db().from('notificacoes').update({ lida_em: new Date().toISOString() })
                 .eq('id', Number(body.id)).eq('usuario_id', user.id);
+            if (error) throw error;
+            return json(200, { ok: true });
+        }
+        if (body.acao === 'marcar_contexto' && ['chat', 'suporte'].includes(body.contexto)) {
+            const referenceId = String(body.referencia_id || '').trim();
+            if (!referenceId) return json(400, { erro: 'Referência da notificação inválida.' });
+            let query = db().from('notificacoes').update({ lida_em: new Date().toISOString() })
+                .eq('usuario_id', user.id).eq('referencia_id', referenceId).is('lida_em', null);
+            query = body.contexto === 'chat'
+                ? query.in('tipo', ['chat_privado', 'chat_mencao'])
+                : query.eq('tipo', 'suporte');
+            const { error } = await query;
             if (error) throw error;
             return json(200, { ok: true });
         }

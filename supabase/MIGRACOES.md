@@ -1,5 +1,9 @@
 # Migrações do Supabase
 
+## Atualização para v4.55
+
+Execute `migration-v4.55-perfil-chat.sql` para permitir conversas privadas diretas reutilizáveis. A edição do próprio perfil e as menções com `@` não exigem tabelas adicionais.
+
 ## Atualização para v4.54
 
 Execute `migration-v4.54-resumos-pdf.sql` no SQL Editor do Supabase. Ela cria a tabela de resumos e o armazenamento privado de PDFs de até 30 MB. A visualização e o download passam pela sessão do aplicativo e exigem assinatura ativa. Depois, use **Administração → Resumos** para cadastrar os materiais; a marca d’água é aplicada automaticamente.

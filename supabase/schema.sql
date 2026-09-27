@@ -457,8 +457,10 @@ create table if not exists public.chat_salas (
   tipo text not null default 'publica' check (tipo in ('publica','privada')),
   criador_id uuid references public.usuarios(id) on delete set null,
   sistema boolean not null default false, ativa boolean not null default true,
+  chave_direta text,
   criado_em timestamptz not null default now()
 );
+create unique index if not exists chat_salas_chave_direta_uidx on public.chat_salas(chave_direta) where chave_direta is not null;
 create table if not exists public.chat_sala_membros (
   sala_id uuid not null references public.chat_salas(id) on delete cascade,
   usuario_id uuid not null references public.usuarios(id) on delete cascade,

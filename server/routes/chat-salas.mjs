@@ -59,6 +59,44 @@ async function resolvePrivateMembers(logins) {
     return found;
 }
 
+async function listChatUsers(currentUserId) {
+    const { data, error } = await db().from('usuarios').select('id,usuario,nome')
+        .eq('ativo', true).eq('status_aprovacao', 'aprovado').neq('id', currentUserId)
+        .order('nome').limit(150);
+    if (error) throw error;
+    return data || [];
+}
+
+async function openDirectRoom(user, targetLogin) {
+    const login = String(targetLogin || '').trim().toLowerCase();
+    if (!login || login === String(user.usuario).toLowerCase()) throw new Error('USUARIO_DIRETO_INVALIDO');
+    const { data: target, error: targetError } = await db().from('usuarios').select('id,usuario,nome')
+        .eq('usuario', login).eq('ativo', true).eq('status_aprovacao', 'aprovado').maybeSingle();
+    if (targetError || !target) throw new Error('USUARIO_DIRETO_INVALIDO');
+    const key = [user.id, target.id].sort().join(':');
+    const client = db();
+    let { data: room, error } = await client.from('chat_salas')
+        .select('id,nome,tipo,criador_id,sistema,ativa,criado_em,chave_direta').eq('chave_direta', key).maybeSingle();
+    if (error) throw error;
+    if (!room) {
+        const created = await client.from('chat_salas').insert({ nome: `${user.nome} e ${target.nome}`.slice(0, 50), tipo: 'privada', criador_id: user.id, chave_direta: key })
+            .select('id,nome,tipo,criador_id,sistema,ativa,criado_em,chave_direta').single();
+        if (created.error) throw created.error;
+        room = created.data;
+    } else if (!room.ativa) {
+        const restored = await client.from('chat_salas').update({ ativa: true }).eq('id', room.id)
+            .select('id,nome,tipo,criador_id,sistema,ativa,criado_em,chave_direta').single();
+        if (restored.error) throw restored.error;
+        room = restored.data;
+    }
+    const membership = await client.from('chat_sala_membros').upsert([
+        { sala_id: room.id, usuario_id: user.id, papel: room.criador_id === user.id ? 'criador' : 'membro' },
+        { sala_id: room.id, usuario_id: target.id, papel: room.criador_id === target.id ? 'criador' : 'membro' },
+    ], { onConflict: 'sala_id,usuario_id' });
+    if (membership.error) throw membership.error;
+    return { room, target };
+}
+
 export const handler = async (event) => {
     if (!['GET', 'POST'].includes(event.httpMethod)) return json(405, { erro: 'Método não permitido.' });
     const user = await requireUser(event);
@@ -72,14 +110,26 @@ export const handler = async (event) => {
             if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
                 erro: 'Muitas atualizações das salas. Aguarde um minuto.',
             }, { 'retry-after': '60' });
+            if (event.queryStringParameters?.usuarios === '1') return json(200, { usuarios: await listChatUsers(user.id) });
             return json(200, { salas: await listRooms(user) });
         }
 
         if (event.httpMethod === 'POST') {
+            const body = parseBody(event);
+            if (body.acao === 'conversa-direta') {
+                const directRate = await consumeRateLimit(event, 'chat-conversa-direta', { limit: 30, windowSeconds: 3600 }, user.id);
+                if (!directRate.allowed) return json(429, { erro: 'Muitas conversas privadas abertas. Tente novamente mais tarde.' });
+                try {
+                    const { room, target } = await openDirectRoom(user, body.usuario);
+                    await createNotifications([{ usuario_id: target.id, tipo: 'chat_privado', titulo: 'Nova conversa privada', mensagem: `${user.nome} iniciou uma conversa privada com você.`, acao: 'chat', referencia_id: room.id, chave: `pv:${room.id}:${target.id}` }]).catch(() => {});
+                    return json(200, { sala: publicRoom(room, user.id, true) });
+                } catch (error) {
+                    if (error.message === 'USUARIO_DIRETO_INVALIDO') return json(400, { erro: 'Usuário indisponível para conversa privada.' });
+                    throw error;
+                }
+            }
             const rate = await consumeRateLimit(event, 'chat-criar-sala', { limit: 5, windowSeconds: 3600 }, user.id);
             if (!rate.allowed) return json(429, { erro: 'Limite de criação de salas atingido. Tente novamente mais tarde.' });
-
-            const body = parseBody(event);
             const nome = cleanText(body.nome, 50);
             const tipo = body.tipo === 'privada' ? 'privada' : 'publica';
             if (nome.length < 3 || nome.length > 50) return json(400, { erro: 'O nome da sala deve ter entre 3 e 50 caracteres.' });

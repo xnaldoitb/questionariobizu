@@ -43,7 +43,7 @@ assert(pwa.includes("type: 'SKIP_WAITING'"));
 assert(worker.includes("event.data?.type === 'SKIP_WAITING'"));
 assert(!worker.match(/install[\s\S]{0,180}self\.skipWaiting\(\)/));
 assert(manifest.includes('icon-512-v448.png'));
-assert(worker.includes('questionario-bizu-v4.54.2'));
+assert(worker.includes('questionario-bizu-v4.55.2'));
 assert(!worker.includes('OPENMOJI_CODES'));
 assert(!authView.includes('admin-contact-links'));
 assert(fragments.includes('id="installAppClose"'));
@@ -68,3 +68,4 @@ assert(support.includes('propria: message.autor_id === currentUserId'));
 assert(community.includes('const own = Boolean(item.propria)'));
 
 console.log('v4.35.4: comunidade, minimização de dados, suporte, tópicos e PWA validados.');
+await import('./test-profile-chat-v455.mjs');

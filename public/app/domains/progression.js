@@ -41,8 +41,13 @@ function relativeTime(value) {
 }
 
 const notificationSymbols = {
-    suporte: '?', chat_privado: '◌', vencimento: '!', missao: '✓', patente: '★', plano: '◆', sistema: 'i',
+    suporte: '?', chat_privado: '◌', chat_mencao: '@', vencimento: '!', missao: '✓', patente: '★', plano: '◆', sistema: 'i',
 };
+
+function updateCommunityCounts(counters = {}) {
+    updateCount('chatUnreadCount', counters.chat);
+    updateCount('supportUnreadCount', counters.suporte);
+}
 
 function renderNotifications() {
     const list = one('#notificationsList');
@@ -63,6 +68,7 @@ async function loadNotifications({ quiet = false } = {}) {
         const payload = await requestJson('notificacoes');
         notifications = payload.notificacoes || [];
         updateCount('notificationCount', payload.nao_lidas);
+        updateCommunityCounts(payload.contadores);
         one('#notificationsStatus').textContent = payload.nao_lidas
             ? `${payload.nao_lidas} ${payload.nao_lidas === 1 ? 'aviso não lido' : 'avisos não lidos'}`
             : 'Nenhum aviso pendente';
@@ -101,8 +107,20 @@ async function markAll() {
     await requestJson('notificacoes', { method: 'POST', body: JSON.stringify({ acao: 'marcar_todas' }) });
     notifications = notifications.map((item) => ({ ...item, lida_em: item.lida_em || new Date().toISOString() }));
     updateCount('notificationCount', 0);
+    updateCommunityCounts({ chat: 0, suporte: 0 });
     one('#notificationsStatus').textContent = 'Nenhum aviso pendente';
     renderNotifications();
+}
+
+async function markCommunityContext(event) {
+    const contexto = event.detail?.contexto;
+    const referenciaId = String(event.detail?.referencia_id || '').trim();
+    if (!['chat', 'suporte'].includes(contexto) || !referenciaId) return;
+    await requestJson('notificacoes', {
+        method: 'POST',
+        body: JSON.stringify({ acao: 'marcar_contexto', contexto, referencia_id: referenciaId }),
+    });
+    await loadNotifications({ quiet: true });
 }
 
 function renderMissions(payload) {
@@ -199,6 +217,7 @@ function bindUi() {
     });
     document.addEventListener('quiz:progress-changed', scheduleMissionRefresh);
     document.addEventListener('quiz:xp-changed', scheduleMissionRefresh);
+    document.addEventListener('community:content-opened', (event) => markCommunityContext(event).catch(() => {}));
 }
 
 export function startProgression() {

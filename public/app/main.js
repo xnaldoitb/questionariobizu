@@ -21,6 +21,7 @@ import { ADMIN_PATENT, DEVELOPER_PATENT, patentButtonMarkup, patentForHits } fro
 import { bindPwaInstall } from './foundation/pwa.js';
 import { bindHymnEvents } from './domains/hymns.js';
 import { bindSummaryEvents } from './domains/summaries.js';
+import { bindProfileEvents } from './domains/profile.js';
 
 const PROFILE_REFRESH_MS = 15_000;
 let lastProfileRefresh = 0;
@@ -199,6 +200,7 @@ async function bootstrap() {
     bindPwaInstall();
     bindHymnEvents();
     bindSummaryEvents();
+    bindProfileEvents();
 
     try {
         await recoverIdentity();

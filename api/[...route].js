@@ -10,6 +10,7 @@ const routes = new Map([
     ['logout', () => import('../server/routes/logout.mjs')],
     ['cadastro', () => import('../server/routes/cadastro.mjs')],
     ['me', () => import('../server/routes/me.mjs')],
+    ['perfil', () => import('../server/routes/perfil.mjs')],
     ['acesso-atividade', () => import('../server/routes/acesso-atividade.mjs')],
     ['catalogo', () => import('../server/routes/catalogo.mjs')],
     ['hinos', () => import('../server/routes/hinos.mjs')],

@@ -537,29 +537,33 @@ export const handler = async (event) => {
                 if (target.perfil === 'admin' && !nextVip) {
                     return json(400, { erro: 'Administradores possuem acesso vitalício automático.' });
                 }
-                payload.vip = nextVip;
-                if (nextVip) {
-                    payload.vip_desde = target.vip_desde || new Date().toISOString();
-                    payload.premium = false;
-                    payload.validade_ate = null;
-                    payload.desativado_por_validade = false;
-                    payload.status_aprovacao = 'aprovado';
-                    payload.ativo = true;
-                    payload.acesso_teste = false;
-                    payload.plano_atual = 'vitalicio';
-                    if (target.acesso_teste) {
-                        payload.aprovado_por_admin_id = actor.id;
-                        payload.responsavel_admin_id = target.responsavel_admin_id || actor.id;
+                // Reenviar o mesmo estado VIP durante uma edição comum não pode
+                // alterar validade, plano ou acesso. Só uma transição real modifica-os.
+                if (nextVip !== Boolean(target.vip)) {
+                    payload.vip = nextVip;
+                    if (nextVip) {
+                        payload.vip_desde = target.vip_desde || new Date().toISOString();
+                        payload.premium = false;
+                        payload.validade_ate = null;
+                        payload.desativado_por_validade = false;
+                        payload.status_aprovacao = 'aprovado';
+                        payload.ativo = true;
+                        payload.acesso_teste = false;
+                        payload.plano_atual = 'vitalicio';
+                        if (target.acesso_teste) {
+                            payload.aprovado_por_admin_id = actor.id;
+                            payload.responsavel_admin_id = target.responsavel_admin_id || actor.id;
+                        }
+                    } else {
+                        payload.vip_desde = null;
+                        payload.premium = false;
+                        payload.validade_ate = null;
+                        payload.acesso_teste = true;
+                        payload.teste_ativo_ate = null;
+                        payload.teste_ciclo_em = new Date().toISOString();
+                        payload.teste_saldo_segundos = 0;
+                        payload.plano_atual = null;
                     }
-                } else {
-                    payload.vip_desde = null;
-                    payload.premium = false;
-                    payload.validade_ate = null;
-                    payload.acesso_teste = true;
-                    payload.teste_ativo_ate = null;
-                    payload.teste_ciclo_em = new Date().toISOString();
-                    payload.teste_saldo_segundos = 0;
-                    payload.plano_atual = null;
                 }
             }
 

@@ -37,24 +37,43 @@
         </div>
     </aside>
 
-    <div class="community-strip" aria-label="Comunidade online">
-        <div class="community-presence">
-            <span class="presence-dot" aria-hidden="true"></span>
-            <strong id="onlineCount">0 online agora</strong>
-            <span class="presence-divider" aria-hidden="true">·</span>
-            <span id="onlineSpotlight">Conectando à comunidade…</span>
-        </div>
+    <div class="community-strip community-actions-only" aria-label="Comunidade e perfil">
         <div class="community-actions">
+            <button class="community-chat-button profile-action" id="openProfileBtn" type="button">
+                <span class="community-action-icon" aria-hidden="true">♙</span><span>Perfil</span>
+            </button>
             <button class="community-chat-button" id="openChatBtn" type="button">
-                <span class="community-action-icon" aria-hidden="true">◌</span><span>Chat</span><b id="chatOnlineCount">0</b>
+                <span class="community-action-icon" aria-hidden="true">◌</span><span>Chat</span><b class="community-online-count hidden" id="chatOnlineCount" aria-label="Usuários online">0</b><b class="community-unread-count hidden" id="chatUnreadCount" aria-label="Mensagens não lidas">0</b>
             </button>
             <button class="community-chat-button support-action" id="openSupportBtn" type="button">
-                <span class="community-action-icon" aria-hidden="true">?</span><span>Falar com suporte</span>
+                <span class="community-action-icon" aria-hidden="true">?</span><span>Falar com suporte</span><b class="community-unread-count hidden" id="supportUnreadCount" aria-label="Mensagens de suporte não lidas">0</b>
             </button>
             <button class="community-chat-button topics-action" id="openTopicsBtn" type="button">
                 <span class="community-action-icon" aria-hidden="true">#</span><span>Tópicos</span>
             </button>
         </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+        <section class="report-modal profile-modal-card">
+            <header class="community-modal-header">
+                <div class="community-modal-title"><span class="community-modal-symbol" aria-hidden="true">♙</span><div><h2 id="profileModalTitle">Meu perfil</h2><small>Atualize suas informações pessoais</small></div></div>
+                <button class="modal-close" id="profileModalClose" type="button" aria-label="Fechar perfil">×</button>
+            </header>
+            <form class="profile-form" id="profileForm">
+                <label>Nome de Guerra<input id="profileNameInput" maxlength="120" required/></label>
+                <label>AL SD PM Nº<input id="profileLoginInput" readonly aria-readonly="true"/></label>
+                <label>WhatsApp<input id="profileWhatsappInput" inputmode="tel" placeholder="5591999999999"/></label>
+                <fieldset class="profile-password-fields">
+                    <legend>Alterar senha</legend>
+                    <label>Senha atual<input id="profileCurrentPassword" type="password" maxlength="72" autocomplete="current-password"/></label>
+                    <label>Nova senha<input id="profileNewPassword" type="password" minlength="6" maxlength="72" autocomplete="new-password"/></label>
+                    <label>Confirmar nova senha<input id="profileConfirmPassword" type="password" minlength="6" maxlength="72" autocomplete="new-password"/></label>
+                    <small>Preencha os três campos somente se quiser trocar a senha.</small>
+                </fieldset>
+                <div class="profile-form-actions"><span id="profileFormStatus" role="status"></span><button class="ui-button main-action" id="profileSave" type="submit">Salvar alterações</button></div>
+            </form>
+        </section>
     </div>
 
     <div class="study-intro compact-study-intro">
@@ -256,6 +275,7 @@
                     <div><h2 id="chatTitle">Chat</h2><small><strong id="chatRoomName">Sala geral</strong> · <span id="chatHeaderOnline">0 online</span></small></div>
                 </div>
                 <div class="community-header-actions">
+                    <button class="community-icon-button" id="chatDirectToggle" type="button" aria-label="Nova conversa privada">Nova PV</button>
                     <button class="community-icon-button" id="chatRoomsToggle" type="button" aria-label="Escolher sala">Salas</button>
                     <button class="community-icon-button" id="chatCreateRoomToggle" type="button" aria-label="Criar sala">＋</button>
                 </div>
@@ -263,6 +283,10 @@
             </header>
 
             <div class="chat-body">
+                <div class="chat-user-panel hidden" id="chatUserPanel">
+                    <label><span>Nova conversa privada</span><input id="chatUserSearch" type="search" placeholder="Pesquisar nome ou AL" autocomplete="off"></label>
+                    <div class="chat-user-list" id="chatUserList"></div>
+                </div>
                 <div class="chat-room-panel hidden" id="chatRoomPanel">
                     <div class="chat-room-list" id="chatRoomList"></div>
                 </div>
@@ -281,6 +305,7 @@
                 <form class="chat-compose" id="chatForm">
                     <label class="sr-only" for="chatInput">Mensagem</label>
                     <textarea id="chatInput" rows="2" maxlength="1600" placeholder="Digite uma mensagem…" autocomplete="off"></textarea>
+                    <div class="chat-mention-list hidden" id="chatMentionList" role="listbox" aria-label="Selecionar usuário para mencionar"></div>
                     <div class="openmoji-picker hidden" id="emojiPicker" aria-label="Seletor de emojis OpenMoji">
                         <div class="openmoji-header">
                             <input id="emojiSearch" type="search" placeholder="Buscar emoji…" aria-label="Buscar emoji">

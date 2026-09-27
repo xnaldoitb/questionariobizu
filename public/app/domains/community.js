@@ -17,14 +17,13 @@ const XP_RULES_TOPIC_ID = 'regras-xp';
 const COLLABORATOR_TOPIC_ID = 'mural-colaboradores';
 
 let initialized = false;
-let onlineUsers = [];
 let lastActivityPing = 0;
 let heartbeatTimer;
 let presenceTimer;
-let spotlightTimer;
 let communityTimer;
 let activeModal = null;
 let rooms = [];
+let chatUsers = [];
 let currentRoomId = GENERAL_ROOM_ID;
 let supportConversationId = null;
 let supportDirectory = [];
@@ -34,6 +33,13 @@ let activeTopicId = null;
 let activeTopic = null;
 let topicItems = [];
 let editingTopicId = null;
+
+function acknowledgeCommunityContent(contexto, referenciaId) {
+    if (!referenciaId) return;
+    document.dispatchEvent(new CustomEvent('community:content-opened', {
+        detail: { contexto, referencia_id: String(referenciaId) },
+    }));
+}
 
 function formatTime(value, includeDate = false) {
     const date = new Date(value);
@@ -65,25 +71,13 @@ function closeModal(id) {
 
 function updatePresence(payload = {}) {
     const count = Number(payload.online || 0);
-    onlineUsers = Array.isArray(payload.usuarios) ? payload.usuarios : onlineUsers;
-    if (one('#onlineCount')) one('#onlineCount').textContent = `${count} online agora`;
-    if (one('#chatOnlineCount')) one('#chatOnlineCount').textContent = String(count);
     if (one('#chatHeaderOnline')) one('#chatHeaderOnline').textContent = `${count} online`;
-    rotateSpotlight();
-}
-
-function rotateSpotlight() {
-    const target = one('#onlineSpotlight');
-    if (!target) return;
-    if (!onlineUsers.length) {
-        target.textContent = 'Comunidade disponível';
-        return;
+    const badge = one('#chatOnlineCount');
+    if (badge) {
+        badge.textContent = count > 99 ? '99+' : String(Math.max(0, count));
+        badge.classList.toggle('hidden', count <= 0);
+        badge.setAttribute('aria-label', `${count} ${count === 1 ? 'usuário online' : 'usuários online'}`);
     }
-    const pool = onlineUsers.filter((user) => !user.proprio);
-    const candidates = pool.length ? pool : onlineUsers;
-    const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-    const own = Boolean(chosen?.proprio);
-    target.innerHTML = chosen ? `${own ? 'Você' : safeText(chosen.nome)} está online ${accountBadges(chosen)}` : 'Comunidade disponível';
 }
 
 async function sendPresence({ activity = false } = {}) {
@@ -94,7 +88,11 @@ async function sendPresence({ activity = false } = {}) {
 
 async function refreshPresence() {
     try { updatePresence(await requestJson('presenca')); }
-    catch { if (one('#onlineSpotlight')) one('#onlineSpotlight').textContent = 'Comunidade disponível'; }
+    catch { /* Presença será atualizada novamente dentro do chat. */ }
+}
+
+function messageMarkup(value) {
+    return safeText(value).replace(/@([a-z0-9._-]{2,40})/gi, '<mark class="chat-mention">@$1</mark>').replace(/\n/g, '<br>');
 }
 
 function sendActivityPing() {
@@ -116,7 +114,7 @@ function renderMessages(target, messages, { support = false } = {}) {
         const own = Boolean(item.propria);
         return `<article class="chat-message ${own ? 'is-own' : ''}">
             <div class="chat-message-head"><strong>${safeText(own ? 'Você' : (author.nome || 'Usuário'))}</strong>${accountBadges(author)}<time>${safeText(formatTime(item.criado_em))}</time></div>
-            <p>${safeText(item.mensagem).replace(/\n/g, '<br>')}</p>
+            <p>${messageMarkup(item.mensagem)}</p>
         </article>`;
     }).join('');
     if (nearBottom || !list.dataset.loaded) list.scrollTop = list.scrollHeight;
@@ -138,6 +136,61 @@ async function loadRooms() {
     renderRooms();
 }
 
+function matchingChatUsers(query = '') {
+    const term = String(query).trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return chatUsers.filter((user) => !term || `${user.nome} ${user.usuario}`.toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(term));
+}
+
+function renderChatUsers(query = '') {
+    const list = one('#chatUserList');
+    if (!list) return;
+    const visible = matchingChatUsers(query).slice(0, 60);
+    list.innerHTML = visible.map((user) => `<button type="button" data-direct-user="${safeText(user.usuario)}"><span class="chat-user-avatar">${safeText((user.nome || 'U').charAt(0).toUpperCase())}</span><span><strong>${safeText(user.nome)}</strong><small>AL SD PM Nº ${safeText(user.usuario)}</small></span><i>Conversar</i></button>`).join('') || '<div class="chat-empty">Nenhum usuário encontrado.</div>';
+}
+
+async function loadChatUsers() {
+    if (chatUsers.length) return chatUsers;
+    const payload = await requestJson('chat-salas?usuarios=1');
+    chatUsers = payload.usuarios || [];
+    renderChatUsers();
+    return chatUsers;
+}
+
+async function openDirectChat(login) {
+    const payload = await requestJson('chat-salas', { method: 'POST', body: JSON.stringify({ acao: 'conversa-direta', usuario: login }) });
+    currentRoomId = payload.sala.id;
+    one('#chatUserPanel')?.classList.add('hidden');
+    await loadRooms();
+    await refreshChat({ quiet: false });
+    acknowledgeCommunityContent('chat', currentRoomId);
+    one('#chatInput')?.focus();
+}
+
+function renderMentionSuggestions(input) {
+    const list = one('#chatMentionList');
+    if (!list) return;
+    const match = input.value.slice(0, input.selectionStart ?? input.value.length).match(/(?:^|\s)@([a-z0-9._-]*)$/i);
+    if (!match) {
+        list.classList.add('hidden');
+        list.innerHTML = '';
+        return;
+    }
+    const visible = matchingChatUsers(match[1]).slice(0, 6);
+    list.innerHTML = visible.map((user) => `<button type="button" role="option" data-mention-user="${safeText(user.usuario)}"><strong>${safeText(user.nome)}</strong><small>@${safeText(user.usuario)}</small></button>`).join('');
+    list.classList.toggle('hidden', !visible.length);
+}
+
+function insertMention(button) {
+    const input = one('#chatInput');
+    const cursor = input.selectionStart ?? input.value.length;
+    const before = input.value.slice(0, cursor).replace(/@([a-z0-9._-]*)$/i, `@${button.dataset.mentionUser} `);
+    input.value = before + input.value.slice(cursor);
+    input.selectionStart = input.selectionEnd = before.length;
+    one('#chatMentionList').classList.add('hidden');
+    one('#chatCounter').textContent = `${countGraphemes(input.value)}/400`;
+    input.focus();
+}
+
 async function refreshChat({ quiet = true } = {}) {
     if (activeModal !== 'chatModal') return;
     try {
@@ -153,8 +206,9 @@ async function refreshChat({ quiet = true } = {}) {
 export async function openCommunityChat(roomId = null) {
     if (roomId) currentRoomId = String(roomId);
     openModal('chatModal');
-    try { await loadRooms(); await refreshChat({ quiet: false }); }
+    try { await Promise.all([loadRooms(), loadChatUsers()]); await refreshChat({ quiet: false }); }
     catch (error) { notify(error.message); }
+    acknowledgeCommunityContent('chat', currentRoomId);
     one('#chatInput')?.focus();
     clearInterval(communityTimer);
     communityTimer = setInterval(() => refreshChat({ quiet: true }), CHAT_REFRESH_MS);
@@ -171,6 +225,7 @@ async function submitChat(event) {
         await requestJson('chat', { method: 'POST', body: JSON.stringify({ sala_id: currentRoomId, mensagem: message }) });
         input.value = '';
         one('#chatCounter').textContent = '0/400';
+        one('#chatMentionList')?.classList.add('hidden');
         await refreshChat();
     } catch (error) { notify(error.message); }
     finally { one('#chatSend').disabled = false; }
@@ -238,6 +293,7 @@ export async function openCommunitySupport(conversationId = null) {
     if (conversationId) supportConversationId = String(conversationId);
     openModal('supportModal');
     await loadSupport({ refreshDirectory: appState.user?.perfil === 'supremo' });
+    acknowledgeCommunityContent('suporte', supportConversationId);
     one('#supportInput')?.focus();
     clearInterval(communityTimer);
     communityTimer = setInterval(() => activeModal === 'supportModal' && loadSupport({ quiet: true }), SUPPORT_REFRESH_MS);
@@ -561,12 +617,17 @@ function bindCommunityUi() {
     ['chatModal', 'supportModal', 'topicsModal'].forEach((id) => one(`#${id}`)?.addEventListener('click', (event) => { if (event.target === event.currentTarget) closeModal(id); }));
     one('#chatForm')?.addEventListener('submit', submitChat);
     one('#chatInput')?.addEventListener('input', (event) => { one('#chatCounter').textContent = `${countGraphemes(event.currentTarget.value)}/400`; });
+    one('#chatInput')?.addEventListener('input', (event) => renderMentionSuggestions(event.currentTarget));
     one('#chatInput')?.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); one('#chatForm').requestSubmit(); } });
     one('#chatRoomsToggle')?.addEventListener('click', () => one('#chatRoomPanel').classList.toggle('hidden'));
+    one('#chatDirectToggle')?.addEventListener('click', async () => { await loadChatUsers().catch((error) => notify(error.message)); one('#chatUserPanel').classList.toggle('hidden'); one('#chatUserSearch')?.focus(); });
+    one('#chatUserSearch')?.addEventListener('input', (event) => renderChatUsers(event.target.value));
+    one('#chatUserList')?.addEventListener('click', (event) => { const button = event.target.closest('[data-direct-user]'); if (button) openDirectChat(button.dataset.directUser).catch((error) => notify(error.message)); });
+    one('#chatMentionList')?.addEventListener('click', (event) => { const button = event.target.closest('[data-mention-user]'); if (button) insertMention(button); });
     one('#chatCreateRoomToggle')?.addEventListener('click', () => one('#chatRoomForm').classList.toggle('hidden'));
     one('#chatRoomType')?.addEventListener('change', (event) => one('#chatRoomParticipants').classList.toggle('hidden', event.target.value !== 'privada'));
     one('#chatRoomForm')?.addEventListener('submit', createRoom);
-    one('#chatRoomList')?.addEventListener('click', async (event) => { const button = event.target.closest('[data-room-id]'); if (!button) return; currentRoomId = button.dataset.roomId; renderRooms(); one('#chatRoomPanel').classList.add('hidden'); await refreshChat({ quiet: false }); });
+    one('#chatRoomList')?.addEventListener('click', async (event) => { const button = event.target.closest('[data-room-id]'); if (!button) return; currentRoomId = button.dataset.roomId; renderRooms(); one('#chatRoomPanel').classList.add('hidden'); await refreshChat({ quiet: false }); acknowledgeCommunityContent('chat', currentRoomId); });
     one('#supportForm')?.addEventListener('submit', submitSupport);
     one('#supportConversations')?.addEventListener('click', async (event) => {
         const button = event.target.closest('[data-support-id]');
@@ -575,6 +636,7 @@ function bindCommunityUi() {
         renderSupportConversations(supportDirectory);
         one('#supportMessages').innerHTML = '<div class="chat-empty">Carregando conversa…</div>';
         await loadSupport({ refreshDirectory: false });
+        acknowledgeCommunityContent('suporte', supportConversationId);
     });
     one('#topicForm')?.addEventListener('submit', submitTopic);
     one('#topicReplyForm')?.addEventListener('submit', submitTopicReply);
@@ -609,5 +671,4 @@ export function startCommunity() {
     refreshPresence();
     heartbeatTimer = setInterval(() => document.visibilityState === 'visible' && sendPresence(), HEARTBEAT_MS);
     presenceTimer = setInterval(refreshPresence, PRESENCE_REFRESH_MS);
-    spotlightTimer = setInterval(rotateSpotlight, 8_000);
 }

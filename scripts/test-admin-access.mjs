@@ -39,6 +39,11 @@ assert.equal((await call('POST',{usuario:'9999',nome:'Teste',senha:'12345',valid
 assert.equal((await call('POST',{usuario:'9999',nome:'Teste',senha:'123456',validade_ate:date})).statusCode,201);
 assert.equal(saved.premium,true);
 assert.equal(saved.vip,false);
+saved=null;
+assert.equal((await call('PUT',{id:target.id,action:'update_user',nome:'Nome corrigido',vip:false})).statusCode,200);
+assert.equal(saved.nome,'Nome corrigido');
+assert.equal(Object.hasOwn(saved,'vip'),false);
+assert.equal(Object.hasOwn(saved,'validade_ate'),false);
 assert.equal((await call('PUT',{id:target.id,action:'set_validity',validade_ate:date})).statusCode,200);
 assert.equal(saved.premium,true);
 assert.equal(saved.sessao_ativa_id,undefined); // no forced logout on grant
@@ -72,4 +77,7 @@ assert.equal(saved.vip,true);
 assert.equal(saved.plano_atual,'vitalicio');
 assert.equal(saved.validade_ate,null);
 assert.equal(saved.acesso_teste,false);
+const usersClient=await readFile(new URL('../public/app/domains/admin/users.js',import.meta.url),'utf8');
+assert(usersClient.includes("vipToggle.dataset.initialVip = user.vip ? 'true' : 'false'"));
+assert(usersClient.includes('if (currentVip !== initialVip) payload.vip = currentVip'));
 console.log('ADM: gestão de alunos e promoção com acesso vitalício automático passaram (banco simulado).');
