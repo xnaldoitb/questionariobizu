@@ -434,6 +434,21 @@ async function awardChapterMastery(userId, chapterId) {
     return result;
 }
 
+export async function awardRecentChapterMastery(userId) {
+    const { data, error } = await db().from('respostas')
+        .select('capitulo_id_snapshot')
+        .eq('usuario_id', userId)
+        .eq('pulada', false)
+        .not('capitulo_id_snapshot', 'is', null)
+        .order('respondida_em', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+    if (error) throw error;
+    return data?.capitulo_id_snapshot
+        ? awardChapterMastery(userId, data.capitulo_id_snapshot)
+        : null;
+}
+
 export async function awardAnswerXp({ userId, sessionId, questionId, chapterId, correct, previous = [] }) {
     const awarded = [];
     awarded.push(await awardLimitedQuestionXp(

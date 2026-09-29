@@ -46,6 +46,17 @@ function reviewQuery(enabled) {
 }
 
 async function fetchCompleteQuestionSet(disciplineId, chapterId, reviewOnly) {
+    try {
+        const grouped = await requestJson(
+            `questoes?disciplina=${encodeURIComponent(disciplineId)}` +
+            `&capitulos=${encodeURIComponent(chapterId)}` +
+            `&limite=all&agrupado=1${reviewQuery(reviewOnly)}`
+        );
+        if (Array.isArray(grouped.questoes)) return grouped.questoes.sort(() => Math.random() - 0.5);
+    } catch (error) {
+        // Compatibilidade enquanto a migration v4.56.6 ainda não foi aplicada.
+        if (!['RPC_INDISPONIVEL', 'API_GATEWAY', 'API_TIMEOUT'].includes(error.code)) throw error;
+    }
     const questions = [];
     let page = 1;
 
@@ -53,7 +64,7 @@ async function fetchCompleteQuestionSet(disciplineId, chapterId, reviewOnly) {
         const data = await requestJson(
             `questoes?disciplina=${encodeURIComponent(disciplineId)}` +
             `&capitulos=${encodeURIComponent(chapterId)}` +
-            `&limite=all&pagina=${page}&por_pagina=250` +
+            `&limite=all&pagina=${page}&por_pagina=500` +
             reviewQuery(reviewOnly)
         );
 
@@ -265,7 +276,7 @@ async function submitAnswer(answerIndex) {
     confirmButton.textContent = 'Confirmando…';
 
     try {
-        await syncSessionActivity({ interaction: true });
+        void syncSessionActivity({ interaction: true }).catch(() => {});
         const question = appState.quiz.questions[appState.quiz.current];
         const data = await requestJson('responder', {
             method: 'POST',
@@ -351,7 +362,7 @@ async function skipCurrentQuestion() {
     appState.quiz.locked = true;
 
     try {
-        await syncSessionActivity({ interaction: true });
+        void syncSessionActivity({ interaction: true }).catch(() => {});
         const question = appState.quiz.questions[appState.quiz.current];
 
         await requestJson('responder', {

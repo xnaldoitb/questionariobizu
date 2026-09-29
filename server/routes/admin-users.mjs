@@ -19,6 +19,8 @@ import {
 } from '../platform/admin-permissions.mjs';
 
 const MANAGEMENT_ROLES = ['admin', 'supremo'];
+const EXPIRY_SWEEP_INTERVAL_MS = 5 * 60 * 1000;
+let lastExpirySweep = 0;
 const COMMON_ADMIN_ACTIONS = new Set([
     'approve',
     'deny',
@@ -167,7 +169,10 @@ export const handler = async (event) => {
                 if (error) throw error;
                 return json(200, { historico: data || [] });
             }
-            await expireOverdueAccounts();
+            if (Date.now() - lastExpirySweep > EXPIRY_SWEEP_INTERVAL_MS) {
+                await expireOverdueAccounts();
+                lastExpirySweep = Date.now();
+            }
 
             let usersQuery = db()
                     .from('usuarios')

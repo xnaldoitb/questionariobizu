@@ -175,7 +175,9 @@ async function loadMissions({ quiet = false } = {}) {
 
 function scheduleMissionRefresh() {
     clearTimeout(missionRefreshTimer);
-    missionRefreshTimer = setTimeout(() => loadMissions({ quiet: true }), 900);
+    // Consolida várias respostas seguidas em uma única atualização de
+    // missões, fora do caminho crítico da confirmação.
+    missionRefreshTimer = setTimeout(() => loadMissions({ quiet: true }), 10_000);
 }
 
 async function openMissions() {

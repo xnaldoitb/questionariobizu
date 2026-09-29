@@ -57,6 +57,8 @@ export function startSessionActivity(callback) {
     });
     window.addEventListener('pagehide', pauseOnExit);
     window.addEventListener('pageshow', resume);
-    timer = window.setInterval(resume, 20000);
+    // Um minuto preserva a contagem do teste sem bombardear a API quando
+    // centenas de alunos estudam ao mesmo tempo.
+    timer = window.setInterval(resume, 60000);
     resume();
 }

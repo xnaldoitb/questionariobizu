@@ -1,5 +1,11 @@
 # Migrações do Supabase
 
+## Atualização para v4.56.6
+
+Execute `migration-v4.56.6-alta-concorrencia.sql` no SQL Editor antes de publicar o código. Ela consolida carregamento de simulados, confirmação de respostas, XP básico e catálogo administrativo em poucas chamadas ao banco. Não remove nem recalcula usuários, respostas, histórico, pagamentos ou XP existente.
+
+Se ainda não foi aplicada, execute antes `migration-v4.56.4-simulados-performance.sql`.
+
 ## Atualização para v4.55
 
 Execute `migration-v4.55-perfil-chat.sql` para permitir conversas privadas diretas reutilizáveis. A edição do próprio perfil e as menções com `@` não exigem tabelas adicionais.

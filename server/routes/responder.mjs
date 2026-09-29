@@ -29,6 +29,29 @@ export const handler = async (event) => {
   if (!sessao_id || !Number.isSafeInteger(Number(questao_id)) || Number(questao_id) <= 0) {
     return json(400, { erro: 'Sessão ou questão inválida.' });
   }
+  const client = db();
+  const fastResult = typeof client.rpc === 'function'
+    ? await client.rpc('registrar_resposta_v4566', {
+        p_usuario_id: user.id,
+        p_sessao_id: sessao_id,
+        p_questao_id: Number(questao_id),
+        p_resposta: pulada ? null : Number(resposta_marcada),
+        p_pulada: Boolean(pulada),
+      })
+    : { data: null, error: { code: 'PGRST202' } };
+  if (!fastResult.error) {
+    const payload = fastResult.data || {};
+    if (payload.erro) return json(Number(payload.status || 400), {
+      erro: payload.erro,
+      codigo: payload.codigo || null,
+    });
+    return json(200, payload);
+  }
+  if (!['42883', 'PGRST202'].includes(fastResult.error.code)) {
+    console.error('Falha ao registrar resposta otimizada:', fastResult.error.message);
+    return json(500, { erro: 'Não foi possível registrar a resposta.' });
+  }
+  // Compatibilidade temporária durante a publicação da migration v4.56.6.
   const { data: sessao, error: sessaoError } = await db()
     .from('sessoes')
     .select('id,questoes_ids,finalizada_em')

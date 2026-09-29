@@ -33,6 +33,11 @@ async function fetchAll(table, columns, orderColumn = 'id') {
 }
 
 async function listAdminCatalog() {
+    const optimized = await db().rpc('catalogo_admin_v4566');
+    if (!optimized.error && optimized.data) return optimized.data;
+    if (optimized.error && !['42883', 'PGRST202'].includes(optimized.error.code)) throw optimized.error;
+
+    // Compatibilidade enquanto a migration v4.56.6 ainda não foi aplicada.
     const [disciplinas, capitulos, questionRefs] = await Promise.all([
         fetchAll('disciplinas', 'id,nome,descricao,ordem,ativo', 'ordem'),
         fetchAll('capitulos', 'id,disciplina_id,indice,nome,ativo', 'id'),

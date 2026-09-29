@@ -1,7 +1,7 @@
 import { requireUser } from '../platform/auth.mjs';
 import { json } from '../platform/http.mjs';
 import { consumeRateLimit } from '../platform/rate-limit.mjs';
-import { missionStatus } from '../platform/xp.mjs';
+import { awardRecentChapterMastery, missionStatus } from '../platform/xp.mjs';
 
 export const handler = async (event) => {
     if (event.httpMethod !== 'GET') return json(405, { erro: 'Método não permitido.' });
@@ -13,8 +13,11 @@ export const handler = async (event) => {
     }, user.id);
     if (!rate.allowed) return json(rate.unavailable ? 503 : 429, { erro: 'Aguarde um instante antes de atualizar as missões.' });
     try {
+        if (!institutional) await awardRecentChapterMastery(user.id);
         return json(200, await missionStatus(user.id, {
-            award: false,
+            // A progressão é consolidada aqui, depois que a resposta já foi
+            // exibida ao aluno, em vez de bloquear cada confirmação.
+            award: true,
             institutional,
         }));
     } catch (error) {

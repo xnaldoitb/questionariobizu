@@ -31,6 +31,8 @@ const ADMIN_PANELS = [
 ];
 
 let currentPanel = 'overviewPanel';
+const panelLoadedAt = new Map();
+const PANEL_CACHE_MS = 30_000;
 
 function panelAllowed(panelId) {
     if (!isManager()) return false;
@@ -93,7 +95,7 @@ async function loadPanel(panelId) {
     }
 }
 
-export async function activateAdminPanel(panelId, { load = true } = {}) {
+export async function activateAdminPanel(panelId, { load = true, force = false } = {}) {
     if (!panelAllowed(panelId)) {
         notify('Esta área é permitida somente ao Desenvolvedor.');
         return;
@@ -109,9 +111,10 @@ export async function activateAdminPanel(panelId, { load = true } = {}) {
         one(`#${id}`)?.classList.toggle('hidden', id !== panelId);
     });
 
-    if (load) {
+    if (load && (force || Date.now() - Number(panelLoadedAt.get(panelId) || 0) > PANEL_CACHE_MS)) {
         try {
             await loadPanel(panelId);
+            panelLoadedAt.set(panelId, Date.now());
         } catch {
             // Cada módulo já exibe a mensagem apropriada ao usuário.
         }
@@ -174,7 +177,7 @@ export function bindManagementEvents() {
         button.addEventListener('click', () => activateAdminPanel(button.dataset.adminJump));
     });
 
-    one('#adminRefreshCurrent')?.addEventListener('click', () => activateAdminPanel(currentPanel));
+    one('#adminRefreshCurrent')?.addEventListener('click', () => activateAdminPanel(currentPanel, { force: true }));
 }
 
 export async function openManagementWorkspace() {

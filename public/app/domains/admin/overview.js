@@ -10,11 +10,10 @@ function setText(selector, value) {
 
 export async function refreshAdminOverview({ quiet = false } = {}) {
     try {
-        await refreshManagedUsers({ quiet: true });
-
-        if (isSupreme()) {
-            await refreshAdminCatalog({ quiet: true });
-        }
+        await Promise.all([
+            refreshManagedUsers({ quiet: true }),
+            isSupreme() ? refreshAdminCatalog({ quiet: true }) : Promise.resolve(),
+        ]);
 
         const users = adminState.users;
         const activeUsers = users.filter((user) => user.ativo && user.status_aprovacao === 'aprovado' && !user.acesso_expirado).length;

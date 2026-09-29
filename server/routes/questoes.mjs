@@ -119,6 +119,26 @@ export const handler = async (event) => {
         return json(400, { erro: error.message });
     }
 
+    if (params.limite === 'all' && params.agrupado === '1') {
+        const { data, error } = await db().rpc('listar_questoes_simulado_v4566', {
+            p_usuario_id: user.id,
+            p_disciplina_id: String(params.disciplina),
+            p_capitulos: params.chapterIds,
+            p_revisao: params.revisao === 'pendentes_erros',
+        });
+        if (error) {
+            if (['42883', 'PGRST202'].includes(error.code)) {
+                return json(503, {
+                    erro: 'Atualização de desempenho ainda não aplicada.',
+                    codigo: 'RPC_INDISPONIVEL',
+                });
+            }
+            console.error('Falha ao carregar lote do simulado:', error.message);
+            return json(500, { erro: 'Não foi possível carregar as questões.' });
+        }
+        return json(200, { questoes: Array.isArray(data) ? data : [], total: Array.isArray(data) ? data.length : 0 });
+    }
+
     try {
         const reviewOnly = params.revisao === 'pendentes_erros';
 

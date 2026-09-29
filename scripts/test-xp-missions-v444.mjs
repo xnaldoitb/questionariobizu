@@ -70,7 +70,7 @@ for (const marker of ["action === 'gift_xp'", "awardXp(id, `presente:", "tipo: '
 for (const marker of ['data-user-command="gift_xp"', "openAdminModal('xpGiftModal')", "sendUserAction(id, 'gift_xp'"]) assert(adminUsersUi.includes(marker));
 assert(notifications.includes(".eq('usuario_id', user.id)") && notifications.includes('marcar_todas'));
 assert(missions.includes('missionStatus(user.id, {'));
-assert(missions.includes("['admin', 'supremo'].includes(user.perfil)") && missions.includes('award: false'));
+assert(missions.includes("['admin', 'supremo'].includes(user.perfil)") && missions.includes('award: true'));
 assert(router.includes("['missoes',") && router.includes("['notificacoes',"));
 for (const id of ['notificationsBtn', 'missionsBtn']) assert(topbar.includes(`id="${id}"`));
 assert(topbar.includes('<div class="action-brand action-brand-static"') && !topbar.includes('<button class="action-brand"'));
@@ -89,7 +89,7 @@ assert(community.includes('20, 40, 60… questões válidas') && community.inclu
 for (const marker of ['conceder_xp_questao_limitado', 'for update', "America/Belem", 'p_limite_diario integer default 5000', 'on conflict (usuario_id, chave) do nothing']) assert(rapidXpMigration.includes(marker));
 assert(ranking.includes('xp_total') && patent.includes('xp_total'));
 assert(xp.includes("rpc('metricas_missoes_v448'") && xp.includes("rpc('metricas_dominio_capitulo_v448'"));
-assert(index.includes('15-progression-notifications.css') && index.includes('4.56.5'));
-assert(worker.includes('questionario-bizu-v4.56.5') && worker.includes('15-progression-notifications.css'));
+assert(index.includes('15-progression-notifications.css') && index.includes('4.56.6'));
+assert(worker.includes('questionario-bizu-v4.56.6') && worker.includes('15-progression-notifications.css'));
 
 console.log('XP, missões progressivas, métricas agregadas e notificações v4.48 validados.');

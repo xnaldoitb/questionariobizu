@@ -80,7 +80,7 @@ assert([...timers.values()].some(t=>t.ms===30000));
 assert(!calls.some(c=>c.endpoint==='pagamento-criar'));
 // Idle pauses; interacting resumes. Neither process starts another purchase.
 now+=125000;
-[...timers.values()].find(t=>t.ms===20000).fn(); await flush();
+[...timers.values()].find(t=>t.ms===60000).fn(); await flush();
 assert(calls.some(c=>c.endpoint==='acesso-atividade'&&c.body.ativo===false));
 windowEvents.get('pointerdown')(); await flush();
 assert.equal(calls.at(-1).body.ativo,true);
