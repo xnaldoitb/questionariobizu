@@ -14,8 +14,11 @@ export function sessionIsActive() {
 export async function syncSessionActivity({ interaction = false } = {}) {
     if (interaction) lastActivity = Date.now();
     if (inFlight) {
+        const requestWasActive = wasActive;
         await inFlight;
-        if (!interaction) return;
+        // Reaproveita a chamada corrente. Só envia outra quando ela registrou
+        // inatividade e esta interação precisa reativar a sessão.
+        if (!interaction || requestWasActive) return;
     }
     if (!appState.user) return;
     const active = sessionIsActive();

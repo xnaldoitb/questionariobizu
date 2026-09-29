@@ -18,8 +18,11 @@ export const handler = async (event) => {
     const formStartedAt = Number(body.form_started_at || 0);
     const elapsed = Date.now() - formStartedAt;
 
-    if (String(body.website || '').trim() || !Number.isFinite(elapsed) || elapsed < 1500 || elapsed > 2 * 60 * 60 * 1000) {
-        return json(400, { erro: 'Não foi possível validar o cadastro. Atualize a página e tente novamente.' });
+    // O campo invisível pode ser preenchido por gerenciadores de senha. A
+    // proteção efetiva permanece nos limites por IP/dispositivo, duplicidade e
+    // tempo mínimo, sem bloquear uma pessoa real por autofill ou página antiga.
+    if (formStartedAt > 0 && (!Number.isFinite(elapsed) || elapsed < 800)) {
+        return json(400, { erro: 'Aguarde um instante, confira os dados e tente enviar novamente.' });
     }
 
     if (!/^[a-zA-Z0-9-]{20,100}$/.test(deviceToken)) {

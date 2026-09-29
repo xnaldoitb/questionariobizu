@@ -19,6 +19,9 @@ export async function requestJson(endpoint, options = {}) {
     if (!contentType.includes('application/json')) {
         const raw = await response.text().catch(() => '');
         if (!response.ok) {
+            if ([502, 503, 504].includes(response.status)) {
+                throw new Error('O servidor demorou para responder. Tente novamente.');
+            }
             throw new Error(`Erro de comunicação com a API (${response.status}).`);
         }
         throw new Error(

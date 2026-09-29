@@ -130,13 +130,15 @@ async function enterWorkspace() {
     one('#appView').classList.remove('hidden');
 
     preloadPaymentPlans().catch(() => {});
-    await refreshProfileSummary();
     startAccessIndicator();
     startCommunity();
     startProgression();
     one('#navAdmin')?.classList.toggle('hidden', !canManage());
-    await refreshCatalog();
     openScreen('dashboard');
+    refreshProfileSummary().catch(() => {});
+    refreshCatalog().catch(() => {
+        notify('Não foi possível carregar as disciplinas. Tente atualizar a página.');
+    });
     checkRewardNotification().then((shown) => {
         if (!shown) checkPatentNotification();
     });
@@ -204,10 +206,11 @@ async function bootstrap() {
 
     try {
         await recoverIdentity();
-        await enterWorkspace();
     } catch {
         one('#loginView').classList.remove('hidden');
+        return;
     }
+    await enterWorkspace();
 }
 
 bootstrap();

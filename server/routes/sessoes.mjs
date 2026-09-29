@@ -7,7 +7,7 @@ import { awardSessionXp } from '../platform/xp.mjs';
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 50;
 const MAX_SESSION_QUESTIONS = 5000;
-const QUESTION_BATCH_SIZE = 150;
+const QUESTION_BATCH_SIZE = 500;
 
 function normalizedQuestionIds(value) {
     if (!Array.isArray(value) || !value.length || value.length > MAX_SESSION_QUESTIONS) {
@@ -23,16 +23,37 @@ function normalizedQuestionIds(value) {
 }
 
 async function validateSessionQuestions(disciplineId, chapterId, ids) {
-    const found = [];
+    const rpcArguments = {
+        p_disciplina_id: disciplineId,
+        p_capitulo_id: chapterId ? Number(chapterId) : null,
+        p_ids: ids,
+    };
+    const { data: valid, error: rpcError } = await db().rpc('validar_questoes_sessao', rpcArguments);
+
+    if (!rpcError) {
+        if (valid !== true) {
+            throw new Error('Uma ou mais questões não pertencem à disciplina selecionada.');
+        }
+        return;
+    }
+
+    // Compatibilidade durante a publicação: se a migration ainda não foi
+    // aplicada, valida em lotes paralelos em vez de dezenas de chamadas em série.
+    if (!['42883', 'PGRST202'].includes(rpcError.code)) throw rpcError;
+
+    const batches = [];
     for (let index = 0; index < ids.length; index += QUESTION_BATCH_SIZE) {
-        const batch = ids.slice(index, index + QUESTION_BATCH_SIZE);
+        batches.push(ids.slice(index, index + QUESTION_BATCH_SIZE));
+    }
+    const results = await Promise.all(batches.map(async (batch) => {
         let query = db().from('questoes')
             .select('id').eq('ativo', true).eq('disciplina_id', disciplineId).in('id', batch);
         if (chapterId) query = query.eq('capitulo_id', Number(chapterId));
         const { data, error } = await query;
         if (error) throw error;
-        found.push(...(data || []).map((item) => Number(item.id)));
-    }
+        return (data || []).map((item) => Number(item.id));
+    }));
+    const found = results.flat();
     if (new Set(found).size !== ids.length) {
         throw new Error('Uma ou mais questões não pertencem à disciplina selecionada.');
     }

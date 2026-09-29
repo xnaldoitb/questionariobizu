@@ -113,7 +113,9 @@ export function bindIdentityEvents(onAuthenticated) {
                     usuario: one('#signupUser').value,
                     whatsapp: `55${one('#signupWhatsapp').value.replace(/\D/g, '').replace(/^55/, '')}`,
                     senha: one('#signupPass').value,
-                    website: one('#signupWebsite').value,
+                    // Não envia valores que o preenchimento automático possa ter
+                    // inserido no campo invisível de proteção.
+                    website: '',
                     form_started_at: signupStartedAt
                 })
             });

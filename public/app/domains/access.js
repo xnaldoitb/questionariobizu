@@ -380,7 +380,9 @@ export function startAccessIndicator() {
 }
 
 export async function refreshAccessState() {
-    await syncSessionActivity({ interaction: true });
+    // A presença/atividade é auxiliar. Uma indisponibilidade momentânea nessa
+    // rota não pode impedir o aluno de iniciar ou continuar um simulado.
+    await syncSessionActivity({ interaction: true }).catch(() => {});
     const data = await requestJson('me');
     acceptUser(data.usuario);
     return appState.user;
