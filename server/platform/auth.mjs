@@ -4,6 +4,9 @@ import { db } from './db.mjs';
 import { resolveQuestionAccess } from './question-access.mjs';
 
 const encoder = new TextEncoder();
+const AUTH_CACHE_MS = 15_000;
+const AUTH_CACHE_MAX = 2_000;
+const authCache = new Map();
 const USER_SESSION_COLUMNS = [
     'id', 'usuario', 'nome', 'whatsapp', 'perfil', 'vip', 'premium', 'plano_atual', 'colaborador', 'colaborador_desde',
     'xp_total', 'xp_bonus_plano', 'ativo', 'desativado_por_validade', 'status_aprovacao',
@@ -66,12 +69,17 @@ function extractToken(event) {
         ?.slice(13) || null;
 }
 
-export async function getUser(event) {
+export async function getUser(event, { bypassCache = false } = {}) {
     const token = extractToken(event);
     if (!token) return null;
 
     try {
         const { payload } = await jwtVerify(token, secret());
+        const cached = authCache.get(token);
+        if (!bypassCache && cached && cached.expiresAt > Date.now() && cached.subject === payload.sub) {
+            return { ...cached.user };
+        }
+        if (cached) authCache.delete(token);
         const { data: registro, error } = await db()
             .from('usuarios')
             .select(USER_SESSION_COLUMNS)
@@ -117,7 +125,10 @@ export async function getUser(event) {
         };
 
         // Desenvolvedor e administradores comuns nao possuem bloqueio por dispositivo.
-        if (registro.perfil !== 'aluno') return user;
+        if (registro.perfil !== 'aluno') {
+            cacheAuthenticatedUser(token, payload.sub, user);
+            return user;
+        }
 
         // Tokens antigos, emitidos antes da protecao, deixam de autenticar alunos.
         if (!payload.sessao_id) return null;
@@ -133,10 +144,23 @@ export async function getUser(event) {
 
         if (!expiraEm || expiraEm <= Date.now()) return null;
 
+        cacheAuthenticatedUser(token, payload.sub, user);
         return user;
     } catch {
         return null;
     }
+}
+
+function cacheAuthenticatedUser(token, subject, user) {
+    if (authCache.size >= AUTH_CACHE_MAX) {
+        const oldest = authCache.keys().next().value;
+        if (oldest) authCache.delete(oldest);
+    }
+    authCache.set(token, {
+        subject,
+        user: { ...user },
+        expiresAt: Date.now() + AUTH_CACHE_MS,
+    });
 }
 
 export async function requireUser(event, role) {

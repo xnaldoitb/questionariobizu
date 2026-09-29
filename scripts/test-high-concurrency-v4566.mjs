@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const [study, activity, community, presence, questions, answer, missions, management, overview, catalog, users, migration] = await Promise.all([
+const [study, activity, community, presence, questions, answer, missions, management, overview, catalog, users, migration, auth, accessActivity] = await Promise.all([
     readFile('public/app/domains/study.js', 'utf8'),
     readFile('public/app/domains/session-activity.js', 'utf8'),
     readFile('public/app/domains/community.js', 'utf8'),
@@ -14,6 +14,8 @@ const [study, activity, community, presence, questions, answer, missions, manage
     readFile('server/routes/admin-catalogo.mjs', 'utf8'),
     readFile('server/routes/admin-users.mjs', 'utf8'),
     readFile('supabase/migration-v4.56.6-alta-concorrencia.sql', 'utf8'),
+    readFile('server/platform/auth.mjs', 'utf8'),
+    readFile('server/routes/acesso-atividade.mjs', 'utf8'),
 ]);
 
 assert(study.includes('void syncSessionActivity({ interaction: true }).catch(() => {})'));
@@ -28,7 +30,10 @@ assert(management.includes('PANEL_CACHE_MS = 30_000'));
 assert(overview.includes('await Promise.all(['));
 assert(catalog.includes("rpc('catalogo_admin_v4566')"));
 assert(users.includes('EXPIRY_SWEEP_INTERVAL_MS = 5 * 60 * 1000'));
-for (const marker of ['listar_questoes_simulado_v4566', 'registrar_resposta_v4566', 'catalogo_admin_v4566']) {
+assert(auth.includes('AUTH_CACHE_MS = 15_000'));
+assert(auth.includes('cacheAuthenticatedUser'));
+assert(accessActivity.includes('bypassCache: true'));
+for (const marker of ['consume_login_limits_v4566', 'listar_questoes_simulado_v4566', 'registrar_resposta_v4566', 'catalogo_admin_v4566']) {
     assert(migration.includes(marker));
 }
 

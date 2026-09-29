@@ -14,7 +14,7 @@ function clientIp(event) {
         || 'unknown';
 }
 
-function rateLimitKey(subject = '', includeIp = true, event = {}) {
+export function rateLimitKey(subject = '', includeIp = true, event = {}) {
     const rawKey = `${includeIp ? clientIp(event) : 'global'}:${String(subject).trim().toLowerCase()}`;
     return createHash('sha256').update(rawKey).digest('hex');
 }

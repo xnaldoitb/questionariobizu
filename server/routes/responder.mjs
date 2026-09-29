@@ -18,13 +18,6 @@ export const handler = async (event) => {
     }));
   }
   if (event.httpMethod !== 'POST') return json(405, { erro: 'Método não permitido.' });
-  const rate = await consumeRateLimit(event, 'responder', {
-    limit: 60, windowSeconds: 60, includeIp: false, failClosed: true,
-  }, user.id);
-  if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
-    erro: 'Muitas respostas em pouco tempo. Aguarde um minuto.',
-  }, { 'retry-after': '60' });
-
   const { sessao_id, questao_id, resposta_marcada, pulada = false } = parseBody(event);
   if (!sessao_id || !Number.isSafeInteger(Number(questao_id)) || Number(questao_id) <= 0) {
     return json(400, { erro: 'Sessão ou questão inválida.' });
@@ -52,6 +45,12 @@ export const handler = async (event) => {
     return json(500, { erro: 'Não foi possível registrar a resposta.' });
   }
   // Compatibilidade temporária durante a publicação da migration v4.56.6.
+  const rate = await consumeRateLimit(event, 'responder', {
+    limit: 60, windowSeconds: 60, includeIp: false, failClosed: true,
+  }, user.id);
+  if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
+    erro: 'Muitas respostas em pouco tempo. Aguarde um minuto.',
+  }, { 'retry-after': '60' });
   const { data: sessao, error: sessaoError } = await db()
     .from('sessoes')
     .select('id,questoes_ids,finalizada_em')

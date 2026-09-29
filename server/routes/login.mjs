@@ -3,12 +3,12 @@ import { createHash, randomUUID } from 'node:crypto';
 import { db } from '../platform/db.mjs';
 import { createToken, sessionCookie } from '../platform/auth.mjs';
 import { json, parseBody } from '../platform/http.mjs';
-import { consumeRateLimit } from '../platform/rate-limit.mjs';
+import { consumeRateLimit, rateLimitKey } from '../platform/rate-limit.mjs';
 import { resolveQuestionAccess } from '../platform/question-access.mjs';
 
 const SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
-const RATE_LIMIT_TIMEOUT_MS = 7000;
-const DATABASE_TIMEOUT_MS = 9000;
+const RATE_LIMIT_TIMEOUT_MS = 12000;
+const DATABASE_TIMEOUT_MS = 12000;
 const LOGIN_COLUMNS = [
     'id', 'usuario', 'nome', 'senha_hash', 'perfil', 'status_aprovacao', 'ativo',
     'desativado_por_validade', 'vip', 'premium', 'plano_atual', 'validade_ate', 'colaborador', 'colaborador_desde',
@@ -28,6 +28,32 @@ function within(promise, milliseconds, publicMessage) {
     return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
+async function consumeLoginLimits(event, login) {
+    const client = db();
+    const optimized = typeof client.rpc === 'function'
+        ? await client.rpc('consume_login_limits_v4566', {
+            p_ip_key: rateLimitKey('', true, event),
+            p_account_key: rateLimitKey(login, false, event),
+        })
+        : { data: null, error: { code: 'PGRST202' } };
+    if (!optimized.error) {
+        const value = optimized.data || {};
+        return [
+            { allowed: value.ip_allowed !== false, unavailable: false },
+            { allowed: value.account_allowed !== false, unavailable: false },
+        ];
+    }
+    if (!['42883', 'PGRST202'].includes(optimized.error.code)) {
+        return [{ allowed: false, unavailable: true }];
+    }
+    return Promise.all([
+        consumeRateLimit(event, 'login-ip', { limit: 30, windowSeconds: 15 * 60, failClosed: true }),
+        consumeRateLimit(event, 'login-conta', {
+            limit: 50, windowSeconds: 15 * 60, failClosed: true, includeIp: false,
+        }, login),
+    ]);
+}
+
 export const handler = async (event) => {
     if (event.httpMethod !== 'POST') {
         return json(405, { erro: 'Método não permitido.' });
@@ -44,25 +70,6 @@ export const handler = async (event) => {
             ? createHash('sha256').update(deviceToken).digest('hex')
             : null;
 
-        const rates = await within(Promise.all([
-            consumeRateLimit(event, 'login-ip', { limit: 30, windowSeconds: 15 * 60, failClosed: true }),
-            consumeRateLimit(event, 'login-conta', {
-                // O limite por IP já bloqueia força bruta concentrada. Um limite
-                // global maior evita que poucas tentativas externas travem a conta
-                // legítima de outro usuário.
-                limit: 50,
-                windowSeconds: 15 * 60,
-                failClosed: true,
-                includeIp: false,
-            }, login),
-        ]), RATE_LIMIT_TIMEOUT_MS, 'A proteção de acesso demorou para responder. Tente novamente.');
-        if (rates.some((rate) => !rate.allowed)) {
-            if (rates.some((rate) => rate.unavailable)) {
-                return json(503, { erro: 'A proteção de acesso está temporariamente indisponível. Tente novamente em alguns minutos.' });
-            }
-            return json(429, { erro: 'Muitas tentativas de acesso. Aguarde alguns minutos e tente novamente.' }, { 'retry-after': '900' });
-        }
-
         if (!login || !senha) {
             return json(400, { erro: 'Informe o AL SD PM Nº e a senha.' });
         }
@@ -71,11 +78,24 @@ export const handler = async (event) => {
             return json(400, { erro: 'Não foi possível identificar este dispositivo. Atualize a página e tente novamente.' });
         }
 
-        const { data: user, error } = await within(db()
+        const userLookup = within(db()
             .from('usuarios')
             .select(LOGIN_COLUMNS)
             .eq('usuario', login)
             .maybeSingle(), DATABASE_TIMEOUT_MS, 'O servidor demorou para localizar seu cadastro. Tente novamente.');
+        const ratesLookup = within(
+            consumeLoginLimits(event, login),
+            RATE_LIMIT_TIMEOUT_MS,
+            'A proteção de acesso demorou para responder. Tente novamente.',
+        );
+        const [rates, { data: user, error }] = await Promise.all([ratesLookup, userLookup]);
+
+        if (rates.some((rate) => !rate.allowed)) {
+            if (rates.some((rate) => rate.unavailable)) {
+                return json(503, { erro: 'A proteção de acesso está temporariamente indisponível. Tente novamente em alguns minutos.' });
+            }
+            return json(429, { erro: 'Muitas tentativas de acesso. Aguarde alguns minutos e tente novamente.' }, { 'retry-after': '900' });
+        }
 
         if (error || !user || !(await bcrypt.compare(String(senha), user.senha_hash))) {
             return json(401, { erro: 'AL SD PM Nº ou senha inválidos.' });

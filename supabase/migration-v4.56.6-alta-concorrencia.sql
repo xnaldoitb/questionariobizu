@@ -4,6 +4,31 @@
 
 begin;
 
+create or replace function public.consume_login_limits_v4566(
+  p_ip_key text,
+  p_account_key text
+) returns jsonb
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  v_ip record;
+  v_account record;
+begin
+  select * into v_ip
+  from public.consume_rate_limit('login-ip', p_ip_key, 30, 900);
+  select * into v_account
+  from public.consume_rate_limit('login-conta', p_account_key, 50, 900);
+  return jsonb_build_object(
+    'ip_allowed', coalesce(v_ip.allowed, false),
+    'ip_remaining', coalesce(v_ip.remaining, 0),
+    'account_allowed', coalesce(v_account.allowed, false),
+    'account_remaining', coalesce(v_account.remaining, 0)
+  );
+end;
+$$;
+
 create or replace function public.listar_questoes_simulado_v4566(
   p_usuario_id uuid,
   p_disciplina_id text,
@@ -66,6 +91,15 @@ declare
   v_total bigint := 0;
   v_item record;
 begin
+  select * into v_item
+  from public.consume_rate_limit('responder', p_usuario_id::text, 60, 60);
+  if coalesce(v_item.allowed, false) is false then
+    return jsonb_build_object(
+      'erro', 'Muitas respostas em pouco tempo. Aguarde um minuto.',
+      'codigo', 'LIMITE_RESPOSTAS', 'status', 429
+    );
+  end if;
+
   select * into v_sessao
   from public.sessoes s
   where s.id = p_sessao_id and s.usuario_id = p_usuario_id
@@ -246,11 +280,15 @@ revoke all on function public.registrar_resposta_v4566(uuid,uuid,bigint,smallint
   from public, anon, authenticated;
 revoke all on function public.catalogo_admin_v4566()
   from public, anon, authenticated;
+revoke all on function public.consume_login_limits_v4566(text,text)
+  from public, anon, authenticated;
 grant execute on function public.listar_questoes_simulado_v4566(uuid,text,bigint[],boolean)
   to service_role;
 grant execute on function public.registrar_resposta_v4566(uuid,uuid,bigint,smallint,boolean)
   to service_role;
 grant execute on function public.catalogo_admin_v4566()
+  to service_role;
+grant execute on function public.consume_login_limits_v4566(text,text)
   to service_role;
 
 commit;

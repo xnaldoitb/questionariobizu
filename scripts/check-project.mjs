@@ -585,14 +585,14 @@ for (const marker of ['conceder_xp_questao_limitado', 'for update', 'p_limite_di
 for (const marker of ['validar_questoes_sessao', 'cardinality(p_ids)', 'q.id = any(p_ids)', 'to service_role']) {
     if (!migration4564.includes(marker)) throw new Error(`Estabilidade de simulados v4.56.4 incompleta: ${marker}`);
 }
-for (const marker of ['listar_questoes_simulado_v4566', 'registrar_resposta_v4566', 'catalogo_admin_v4566', 'conceder_xp_questao_limitado', 'to service_role']) {
+for (const marker of ['consume_login_limits_v4566', 'listar_questoes_simulado_v4566', 'registrar_resposta_v4566', 'catalogo_admin_v4566', 'conceder_xp_questao_limitado', 'to service_role']) {
     if (!migration4566.includes(marker)) throw new Error(`Alta concorrência v4.56.6 incompleta: ${marker}`);
 }
 for (const marker of ['listar_suporte_conversas_v4481', 'join lateral', 'suporte_mensagens_conversa_recente_idx', 'to service_role']) {
     if (!migration4481.includes(marker)) throw new Error(`Suporte otimizado v4.48.1 incompleto: ${marker}`);
 }
-if (!index.includes('manifest.webmanifest?v=4.56.6') || !serviceWorker.includes('questionario-bizu-v4.56.6')) {
-    throw new Error('Versão e cache PWA v4.56.6 não estão sincronizados.');
+if (!index.includes('manifest.webmanifest?v=4.56.7') || !serviceWorker.includes('questionario-bizu-v4.56.7')) {
+    throw new Error('Versão e cache PWA v4.56.7 não estão sincronizados.');
 }
 if (!fragments.includes('mountAdminInterface') || !mainModule.includes("import('./domains/management.js')")) {
     throw new Error('Carregamento sob demanda do painel administrativo v4.48 incompleto.');
@@ -609,4 +609,4 @@ if (!login.includes('p_device_hash: deviceHash') || !identityModule.includes("he
     throw new Error('Renovação de login no mesmo dispositivo v4.18 incompleta.');
 }
 
-console.log('Questionário Bizu v4.56.6: verificações estruturais concluídas.');
+console.log('Questionário Bizu v4.56.7: verificações estruturais concluídas.');

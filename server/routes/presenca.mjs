@@ -1,6 +1,5 @@
 import { requireUser } from '../platform/auth.mjs';
 import { json, parseBody } from '../platform/http.mjs';
-import { consumeRateLimit } from '../platform/rate-limit.mjs';
 import {
     presenceTotals,
     removePresence,
@@ -19,13 +18,6 @@ export const handler = async (event) => {
         if (event.httpMethod === 'GET') {
             return json(200, await snapshot(user.id));
         }
-
-        const rate = await consumeRateLimit(event, 'presenca', {
-            limit: 20, windowSeconds: 60, includeIp: false, failClosed: true,
-        }, user.id);
-        if (!rate.allowed) return json(rate.unavailable ? 503 : 429, {
-            erro: 'Muitas atualizações de presença. Aguarde um minuto.',
-        }, { 'retry-after': '60' });
 
         if (event.httpMethod === 'POST') {
             const { atividade = false } = parseBody(event);

@@ -16,5 +16,5 @@ export const handler = async event => {
     if (!user.acesso_teste) return json(200, { usuario: user });
     const { error } = await db().rpc('atualizar_teste_ativo', { p_usuario_id: user.id, p_ativo: ativo === true });
     if (error) throw error;
-    return json(200, { usuario: await getUser(event) });
+    return json(200, { usuario: await getUser(event, { bypassCache: true }) });
 };

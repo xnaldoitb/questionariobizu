@@ -7,8 +7,10 @@ const [login, identity, request] = await Promise.all([
     readFile('public/app/foundation/request.js', 'utf8'),
 ]);
 
-assert(login.includes('RATE_LIMIT_TIMEOUT_MS = 7000'));
-assert(login.includes('DATABASE_TIMEOUT_MS = 9000'));
+assert(login.includes('RATE_LIMIT_TIMEOUT_MS = 12000'));
+assert(login.includes('DATABASE_TIMEOUT_MS = 12000'));
+assert(login.includes("rpc('consume_login_limits_v4566'"));
+assert(login.includes('Promise.all([ratesLookup, userLookup])'));
 assert(login.includes('const lastAccessUpdate = within('));
 assert(login.indexOf('const lastAccessUpdate') < login.indexOf("iniciar_sessao_dispositivo_aluno"));
 assert(login.includes('error.publicMessage'));
