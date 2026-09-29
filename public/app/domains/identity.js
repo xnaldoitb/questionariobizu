@@ -4,6 +4,7 @@ import { appState } from '../foundation/model.js';
 
 let signupStartedAt = Date.now();
 let volatileDeviceToken = null;
+let loginInFlight = false;
 const SUPPORT_WHATSAPP = '5593992048088';
 
 function whatsappHelpUrl(kind) {
@@ -71,22 +72,37 @@ export function bindIdentityEvents(onAuthenticated) {
     });
 
     async function authenticate() {
+        if (loginInFlight) return;
+        loginInFlight = true;
         one('#loginError').textContent = '';
+        const submitButton = one('#loginForm button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
 
         try {
-            const data = await requestJson('login', {
-                method: 'POST',
+            const requestOptions = {
+                method: 'POST', timeoutMs: 23000,
                 headers: { 'x-client-device': clientDeviceToken() },
-                body: JSON.stringify({
-                    usuario: one('#loginUser').value,
-                    senha: one('#loginPass').value,
-                })
-            });
+                body: JSON.stringify({ usuario: one('#loginUser').value, senha: one('#loginPass').value })
+            };
+            let data;
+            for (let attempt = 0; attempt < 2; attempt += 1) {
+                try {
+                    data = await requestJson('login', requestOptions);
+                    break;
+                } catch (error) {
+                    if (attempt > 0 || !['API_TIMEOUT', 'API_NETWORK', 'API_GATEWAY'].includes(error.code)) throw error;
+                    one('#loginError').textContent = 'A conexão oscilou. Repetindo o acesso...';
+                    await new Promise((resolve) => window.setTimeout(resolve, 500));
+                }
+            }
 
             appState.user = data.usuario;
             await onAuthenticated();
         } catch (error) {
             one('#loginError').textContent = error.message;
+        } finally {
+            loginInFlight = false;
+            if (submitButton) submitButton.disabled = false;
         }
     }
 
